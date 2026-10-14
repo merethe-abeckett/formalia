@@ -102,6 +102,7 @@ def check_base(base, field, current):
         raise EditError(f"编辑冲突：“{field}”在你打开页面之后已被别人修改。请刷新页面，在最新内容上重新编辑。")
 
 PENDING = {}   # 路径 -> 内容；全部检查通过后才一次性写盘
+PROOF_SPEC = {}  # 声明证明时：交给验证任务的证明说明
 
 def write_json(p, obj):
     PENDING[p] = json.dumps(obj, ensure_ascii=False, indent=2) + "\n"
@@ -115,24 +116,67 @@ def flush():
         p.write_text(text, encoding="utf-8")
 
 # ---------- 四种编辑 ----------
-def apply_claim(sub, editor):
+REPO_RE = re.compile(r"^https://github\.com/([A-Za-z0-9_.-]{1,100})/([A-Za-z0-9_.-]{1,100}?)(?:\.git)?/?$")
+SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+LEAN_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_']*(\.[A-Za-z_][A-Za-z0-9_']*)*$")
+ROOT_RE = re.compile(r"^[A-Z][A-Za-z0-9_]{0,40}$")
+RESERVED_ROOTS = {"Conjectures", "RegistryTools", "Mathlib", "Batteries", "Lean", "Std", "Init", "Lake", "Aesop", "Qq",
+                  "Plausible", "ProofWidgets", "LeanSearchClient", "ImportGraph", "Cli", "Main", "Submitted", "Archive", "Essays", "Proofs"}
+PROOF_MAX = 40000   # 粘贴的证明：议题正文上限 65536 字符，JSON 转义后要放得下
+
+def clean_proof(d, sid, issue):
+    """证明的来源：GitHub 仓库的固定提交，或者直接粘贴的单个文件。返回写进登记的字段和交给验证任务的说明。"""
+    theorem = clean(d.get("theorem"), 200, "定理名", required=True)
+    if not LEAN_NAME_RE.match(theorem): raise EditError("定理名格式不对，应为 Lean 名字，例如 MyProof.goldbach")
+    if d.get("proof"):
+        text = clean(d.get("proof"), PROOF_MAX, "证明代码", multiline=True, required=True)
+        path = f"Proofs/S{sid.replace('-', '_')}_i{issue}.lean"
+        return ({"source": "pasted", "file": path, "theorem": theorem},
+                {"kind": "pasted", "text": text, "root": "Proof", "module": "Proof", "theorem": theorem, "store": path})
+    m = REPO_RE.match(clean(d.get("repo"), 300, "仓库链接", required=True))
+    if not m: raise EditError("仓库链接应为 https://github.com/用户名/仓库名")
+    commit = clean(d.get("commit"), 40, "提交号", required=True).lower()
+    if not SHA_RE.match(commit): raise EditError("提交号必须是完整的 40 位十六进制 commit，不能是分支名")
+    module = clean(d.get("module"), 200, "证明所在模块", required=True)
+    if not LEAN_NAME_RE.match(module): raise EditError("模块名格式不对，例如 MyProof.Main")
+    root = module.split(".")[0]
+    if not ROOT_RE.match(root) or root in RESERVED_ROOTS:
+        raise EditError(f"模块的顶层名 {root} 不可用：需以大写字母开头，且不能是 " + "、".join(sorted(RESERVED_ROOTS)))
+    repo = f"https://github.com/{m.group(1)}/{m.group(2)}"
+    return ({"source": "github", "repo": repo, "commit": commit, "module": module, "theorem": theorem},
+            {"kind": "github", "repo": repo, "commit": commit, "root": root, "module": module, "theorem": theorem})
+
+def apply_claim(sub, editor, issue=0, verified=None):
     p = find_statement(sub.get("target"))
     d = sub.get("data") or {}
+    meta = json.loads(p.read_text(encoding="utf-8"))
+    proof, spec = clean_proof(d, meta["id"], issue)
     claim = {
         "claimant": clean(d.get("claimant"), 120, "声称方", required=True),
         "date": clean_date(d.get("date"), "声称日期"),
-        "url": clean_url(d.get("url"), "证明链接", required=True),
+        "url": (f"{proof['repo']}/tree/{proof['commit']}" if proof["source"] == "github"
+                else f"https://github.com/merethe-abeckett/formalia/blob/main/{proof['file']}"),
+        "proof": proof,
         "note": clean(d.get("note"), 2000, "备注", multiline=True),
         "recorded_by": editor,
     }
-    meta = json.loads(p.read_text(encoding="utf-8"))
+    if d.get("url"): claim["announcement"] = clean_url(d.get("url"), "公告链接")
+    if verified: claim["verification"] = verified
     claims = meta.setdefault("claimed_proofs", [])
-    if any(c.get("url") == claim["url"] for c in claims):
-        raise EditError(f"这个证明链接已经登记在 #{meta['id']} 下了")
+    same = lambda c: (c.get("proof") or {}).get("repo") == proof.get("repo") and (c.get("proof") or {}).get("commit") == proof.get("commit") \
+        and (c.get("proof") or {}).get("theorem") == proof["theorem"]
+    if proof["source"] == "github" and any(same(c) for c in claims):
+        raise EditError(f"这个提交里的这个定理已经登记在 #{meta['id']} 下了")
     if len(claims) >= 200: raise EditError("该表述的声明条数已达上限")
     claims.append(claim)
     write_json(p, meta)
-    return meta["id"], [p], False
+    changed = [p]
+    if spec["kind"] == "pasted":
+        sp = ROOT / spec["store"]
+        write_text(sp, spec["text"] + "\n"); changed.append(sp)
+    spec.update(statement=meta["declaration"], statement_module=meta["module"])
+    PROOF_SPEC.update(spec)
+    return meta["id"], changed, False
 
 META_FIELDS = {
     "source_note":    (lambda m: (m.get("source") or {}).get("note")),
@@ -363,8 +407,9 @@ def parse_claim_form(body, author):
     return {"v": 1, "type": "claim", "target": f.get("表述编号", "").lstrip("#").strip(),
             "summary": "经 GitHub 表单声明证明",
             "editor": {"label": f"GitHub 用户 {author}", "anon": "", "name": author},
-            "data": {"claimant": f.get("声称方"), "date": f.get("声称日期"), "url": f.get("证明链接"),
-                     "note": f.get("备注（可选，只写事实）")}}
+            "data": {"claimant": f.get("声称方"), "date": f.get("声称日期"), "repo": f.get("证明仓库"),
+                     "commit": f.get("提交号"), "module": f.get("证明所在模块"), "theorem": f.get("定理名"),
+                     "url": f.get("公告链接（可选）"), "note": f.get("备注（可选，只写事实）")}}
 
 def main():
     ap = argparse.ArgumentParser()
@@ -373,9 +418,10 @@ def main():
     ap.add_argument("--result", required=True)
     ap.add_argument("--claim-form", action="store_true")
     ap.add_argument("--author", default="")
+    ap.add_argument("--verified", default="", help="证明验证通过后由写入任务传入：验证记录 JSON")
     a = ap.parse_args()
     body = sys.stdin.read()
-    res = {"ok": False, "message": "", "kind": None, "target": None, "changed": [], "needs_lean": False, "commit_message": ""}
+    res = {"ok": False, "message": "", "kind": None, "target": None, "changed": [], "needs_lean": False, "needs_proof": False, "proof": None, "commit_message": ""}
     try:
         sub = parse_claim_form(body, a.author) if a.claim_form else parse_web(body)
         kind = sub.get("type")
@@ -383,14 +429,14 @@ def main():
         ed = sub.get("editor") or {}
         editor = clean(ed.get("label"), 80, "编辑者", required=True)
         summary = clean(sub.get("summary"), 200, "编辑摘要") or TYPE_ZH[kind]
-        if kind == "claim": target, changed, lean = apply_claim(sub, editor)
+        if kind == "claim": target, changed, lean = apply_claim(sub, editor, a.issue, json.loads(a.verified) if a.verified else None)
         elif kind == "meta": target, changed, lean = apply_meta(sub, editor)
         elif kind == "conjecture": target, changed, lean = apply_conjecture(sub, editor)
         elif kind == "essay": target, changed, lean = apply_essay(sub, editor, a.created_at)
         else: target, changed, lean = apply_statement(sub, editor, a.created_at)
         flush()
         label = f"#{target}" if ID_RE.match(target) else target
-        res.update(ok=True, kind=kind, target=target, needs_lean=lean,
+        res.update(ok=True, kind=kind, target=target, needs_lean=lean, needs_proof=bool(PROOF_SPEC), proof=PROOF_SPEC or None,
                    changed=[str(p.relative_to(ROOT)) for p in changed],
                    message=f"{TYPE_ZH[kind]} {label} 已通过格式检查。",
                    commit_message=f"网页编辑：{TYPE_ZH[kind]} {label}：{summary}\n\n编辑者：{editor}\n议题：#{a.issue}\n")

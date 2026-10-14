@@ -66,3 +66,20 @@ jobs:
         with:
           name: check-reports
           path: build/check/
+
+  # 证明验证流程：一份正确的证明必须通过，几种作弊的证明必须被拒
+  proof-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install elan
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./elan-init -y --no-modify-path --default-toolchain "$(cat lean-toolchain)"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Get Mathlib cache
+        run: lake exe cache get
+      - name: Proof pipeline tests
+        run: bash tests/test_proof_pipeline.sh

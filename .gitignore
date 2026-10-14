@@ -3,3 +3,6 @@ build/
 _site/
 __pycache__/
 *.pyc
+Submitted/
+proof-out/
+edit-out/

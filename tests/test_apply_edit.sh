@@ -12,11 +12,18 @@ expect() {  # $1 期望退出码  $2 说明  $3 提交 JSON  $4 期望出现在�
   if [ "$code" = "$1" ] && [[ "$out" == *"$4"* ]]; then pass=$((pass+1)); else fail=$((fail+1)); echo "FAIL: $2 (exit $code): $out"; fi
 }
 ED='"editor":{"label":"匿名者 00000000"}'
-expect 0 "claim"            '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","url":"https://e.org/p"}}' "已通过"
-expect 1 "duplicate claim"  '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","url":"https://e.org/p"}}' "已经登记"
-expect 1 "js url"           '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","url":"javascript:alert(1)"}}' "http"
-expect 1 "future date"      '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2999-01-01","url":"https://e.org/q"}}' "将来"
-expect 1 "missing target"   '{"v":1,"type":"claim","target":"20991231-01",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","url":"https://e.org/q"}}' "找不到"
+G='"repo":"https://github.com/a/b","commit":"0123456789abcdef0123456789abcdef01234567","module":"MyProof.Main","theorem":"MyProof.t"'
+expect 0 "claim"            '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10",'"$G"'}}' "已通过"
+expect 1 "duplicate claim"  '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10",'"$G"'}}' "已经登记"
+expect 1 "js announcement"  '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10",'"$G"',"url":"javascript:alert(1)"}}' "http"
+expect 1 "future date"      '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2999-01-01",'"$G"'}}' "将来"
+expect 1 "missing target"   '{"v":1,"type":"claim","target":"20991231-01",'"$ED"',"data":{"claimant":"x","date":"2026-10-10",'"$G"'}}' "找不到"
+expect 1 "claim no proof"   '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","theorem":"T.t"}}' "仓库链接"
+expect 1 "claim branch"     '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","repo":"https://github.com/a/b","commit":"main","module":"M.A","theorem":"M.t"}}' "40 位"
+expect 1 "claim not github" '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","repo":"https://evil.org/a/b","commit":"0123456789abcdef0123456789abcdef01234567","module":"M.A","theorem":"M.t"}}' "github.com"
+expect 1 "claim reserved"   '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","repo":"https://github.com/a/b","commit":"0123456789abcdef0123456789abcdef01234567","module":"Mathlib.Evil","theorem":"M.t"}}' "不可用"
+expect 0 "claim pasted"     '{"v":1,"type":"claim","target":"20261014-01",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","theorem":"Proof.ok","proof":"theorem Proof.ok : True := trivial"}}' "已通过"
+[ -f Proofs/S20261014_01_i1.lean ] && grep -q '"needs_proof": true' r.json && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: pasted proof not stored / needs_proof"; }
 expect 1 "meta conflict"    '{"v":1,"type":"meta","target":"20261014-01",'"$ED"',"data":{"restatement":"新"},"base":{"restatement":"旧"}}' "编辑冲突"
 expect 1 "meta forbidden"   '{"v":1,"type":"meta","target":"20261014-01",'"$ED"',"data":{"submitted_by":"me"}}' "不能编辑"
 expect 1 "meta no change"   '{"v":1,"type":"meta","target":"20261014-01",'"$ED"',"data":{"external_links":[]}}' "完全相同"

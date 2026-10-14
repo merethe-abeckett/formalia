@@ -201,6 +201,7 @@ async function submit(request, env, reply) {
     MARKER, "```json", fencedJson(sub), "```", "",
   ].join("\n");
 
+  if (body.length > 65000) return reply(413, { ok: false, error: "内容太长（GitHub 议题上限约 6.5 万字符）。长的证明请放进 GitHub 仓库，填仓库和提交号提交。" });
   const r = await gh(env, "POST", `/repos/${env.REPO}/issues`, { title, body });
   if (!r.ok) return reply(502, { ok: false, error: "暂时无法提交，请稍后再试" });
   const issue = r.data.number;

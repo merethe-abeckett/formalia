@@ -26,3 +26,8 @@ name = "RegistryTools"
 [[lean_exe]]
 name = "check"
 root = "RegistryTools.Check"
+
+# 证明验证器：检查提交的证明是否正好证明了某条表述（见 RegistryTools/Verify.lean）
+[[lean_exe]]
+name = "verify"
+root = "RegistryTools.Verify"
