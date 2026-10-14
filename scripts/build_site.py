@@ -16,6 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
+ARCH = ROOT / "Archive"
 CHECK = ROOT / "build" / "check"
 OUT = ROOT / "_site"
 
@@ -102,7 +103,11 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     ]
     table = "<table>" + "".join(f"<tr><th>{k}</th><td>{v}</td></tr>" for k,v in rows) + "</table>"
 
-    body = f"<h1>Statement #{esc(sid)} — {esc(conj['name'])}</h1>{table}"
+    body = f"<h1>Statement #{esc(sid)} — {esc(conj['name'])}</h1>"
+    if meta.get("archived"):
+        a = meta["archived"]
+        body += f'<p class="note"><span class="bad">Archived {esc(a.get("at",""))}.</span> {esc(a.get("reason",""))} Discussion: <a href="{esc(a.get("issue",""))}">{esc(a.get("issue",""))}</a>. Kept for reference; not built or checked any more.</p>'
+    body += table
     body += "<h2>Lean code</h2><pre><code>" + esc(lean_src) + "</code></pre>"
 
     body += "<h2>Checker report</h2>"
@@ -151,7 +156,7 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     body += "<ul class='plain'>" + "".join(f'<li><a href="{esc(l["url"])}">{esc(l.get("label", l["url"]))}</a></li>' for l in els) + "</ul>" if els else '<p class="muted">none recorded</p>'
     return page(f"#{sid} — {conj['name']}", [(conj["name"], "../index.html"), (f"#{sid}", None)], body, 2)
 
-def render_conjecture(conj, entries):
+def render_conjecture(conj, entries, archived=()):
     body = f"<h1>{esc(conj['name'])}</h1>"
     if conj.get("name_zh"): body += f'<p class="muted">{esc(conj["name_zh"])}</p>'
     body += f"<p><em>Informal statement:</em> {esc(conj.get('informal',''))}</p>"
@@ -160,6 +165,13 @@ def render_conjecture(conj, entries):
     for meta, decl in entries:
         body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(meta.get("submitted_at",""))} · {esc(meta.get("submitted_by",""))}</td><td>{esc(meta.get("source",{}).get("kind",""))}</td><td>{status_cell(decl)}</td><td>{len(meta.get("claimed_proofs") or [])}</td></tr>'
     body += "</table>"
+    if archived:
+        body += "<h2>Archived statements</h2><p class='note'>Removed from the live catalogue after a deletion proposal (see docs/DELETION.md). Ids are never reused; the text each id referred to is kept here.</p>"
+        body += "<table><tr><th>Id</th><th>Declaration</th><th>Archived</th><th>Reason</th><th>Discussion</th></tr>"
+        for meta in archived:
+            a = meta.get("archived", {})
+            body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(a.get("at",""))}</td><td>{esc(a.get("reason",""))}</td><td><a href="{esc(a.get("issue",""))}">issue</a></td></tr>'
+        body += "</table>"
     refs = conj.get("references") or []
     if refs:
         body += "<h2>References</h2><ul class='plain'>" + "".join(f'<li><a href="{esc(r["url"])}">{esc(r.get("label", r["url"]))}</a></li>' for r in refs) + "</ul>"
@@ -196,8 +208,17 @@ def main():
             d = OUT / conj["slug"] / meta["id"]; d.mkdir(parents=True, exist_ok=True)
             (d / "index.html").write_text(render_statement(conj, meta, lean_src, check, tc, deps), encoding="utf-8")
             entries.append((meta, decl))
+        archived = []
+        adir = ARCH / cdir.name
+        if adir.is_dir():
+            for mj in sorted(adir.glob("S*.json")):
+                meta = read_json(mj); meta["_stem"] = mj.stem
+                lean_src = (adir / (mj.stem + ".lean")).read_text(encoding="utf-8")
+                d = OUT / conj["slug"] / meta["id"]; d.mkdir(parents=True, exist_ok=True)
+                (d / "index.html").write_text(render_statement(conj, meta, lean_src, None, tc, deps), encoding="utf-8")
+                archived.append(meta)
         (OUT / conj["slug"]).mkdir(parents=True, exist_ok=True)
-        (OUT / conj["slug"] / "index.html").write_text(render_conjecture(conj, entries), encoding="utf-8")
+        (OUT / conj["slug"] / "index.html").write_text(render_conjecture(conj, entries, archived), encoding="utf-8")
         index_rows.append((conj, len(entries)))
     (OUT / "index.html").write_text(render_index(index_rows, tc, deps, all_ok), encoding="utf-8")
     (OUT / ".nojekyll").write_text("")

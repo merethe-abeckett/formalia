@@ -29,8 +29,13 @@ scripts/run_checks.sh        build + run the checker, write build/check/*.json
 scripts/lean4checker.sh      independent kernel re-check of every statement module
 scripts/validate_meta.py     metadata and naming rules
 scripts/build_site.py        render the wiki-style static site into _site/
+scripts/archive_entry.py     move an entry to Archive/ after a deletion proposal
+patrol/patrol.py             two-model patrol for Lean-level problems (opens issues)
+Archive/                     archived entries (ids kept, not built)
+docs/DELETION.md             deletion proposals, patrol rule, notice period, archiving
 .github/workflows/ci.yml     lock-down checks on every push / PR
 .github/workflows/pages.yml  build and publish the site with GitHub Pages
+.github/workflows/patrol.yml weekly patrol run
 ```
 
 ### Ids
@@ -75,6 +80,10 @@ A red check blocks the merge. There is no human "approval" step for mathematical
 4. Open a pull request.
 
 To record a claimed proof of an existing statement, add an entry to its `claimed_proofs` with a link to the proof. The registry does not host proofs; it points at them.
+
+## Deletion proposals, patrol, archiving
+
+See `docs/DELETION.md`. In short: only Lean-level problems can be proposed for deletion; equivalence to the informal conjecture never is. A weekly patrol (`patrol/patrol.py`, two independent models, Qwen and Gemini to start) opens issues per a fixed rule; a proposal has a 14-day public notice period; entries are then **archived** to `Archive/`, with their id kept forever, not deleted. The patrol needs the repository secrets `QWEN_API_KEY` and `GEMINI_API_KEY`.
 
 ## Site
 
