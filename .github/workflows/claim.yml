@@ -1,0 +1,63 @@
+# 把带 claim 标签的表单议题转成 PR：往对应表述的 claimed_proofs 里加一条。
+# 需要仓库 Settings → Actions → Workflow permissions 为 Read and write，
+# 且勾选 Allow GitHub Actions to create and approve pull requests。
+name: Claim
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  claim:
+    if: contains(github.event.issue.labels.*.name, 'claim')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 写入元数据
+        id: apply
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          set +e
+          out=$(printf '%s' "$BODY" | python3 scripts/claim_from_issue.py "${{ github.event.issue.number }}" "${{ github.event.issue.html_url }}")
+          code=$?
+          echo "out<<EOF" >> "$GITHUB_OUTPUT"; echo "$out" >> "$GITHUB_OUTPUT"; echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: 失败时回复议题
+        if: steps.apply.outputs.code != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --body "自动处理失败：${{ steps.apply.outputs.out }}
+
+          请编辑议题正文修正后保存，机器人会重新处理。"
+
+      - name: 校验
+        if: steps.apply.outputs.code == '0'
+        run: python3 scripts/validate_meta.py
+
+      - name: 开 PR
+        if: steps.apply.outputs.code == '0'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: claim/issue-${{ github.event.issue.number }}
+          title: "声明证明：议题 #${{ github.event.issue.number }}"
+          commit-message: "记录证明声明（议题 #${{ github.event.issue.number }}）"
+          body: |
+            由议题 #${{ github.event.issue.number }} 自动生成，修改 `${{ steps.apply.outputs.out }}`。
+            登记库只记录声明，不认证。CI 通过后由维护者合并。
+
+            Closes #${{ github.event.issue.number }}
+          labels: claim
+
+      - name: 成功时回复议题
+        if: steps.apply.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh issue comment "${{ github.event.issue.number }}" --body "已生成 PR，CI 通过并合并后网站上会显示这条声明。"

@@ -71,6 +71,7 @@ th{background:var(--box);font-weight:600;width:200px}pre{background:var(--box);b
 code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.93em}.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}.warn{color:var(--warn);font-weight:600}
 .note{background:var(--box);border-left:3px solid var(--line);padding:8px 12px;font-family:system-ui,sans-serif;font-size:14px;color:var(--muted)}
 .muted{color:var(--muted)}footer{max-width:960px;margin:40px auto;padding:16px;border-top:1px solid var(--line);font-family:system-ui,sans-serif;font-size:13px;color:var(--muted)}
+.btn{display:inline-block;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--box);text-decoration:none;font-family:system-ui,sans-serif;font-size:14px}
 ul.plain{list-style:none;padding:0}ul.plain li{padding:4px 0;border-bottom:1px dotted var(--line)}
 """
 
@@ -174,12 +175,17 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     else:
         body += '<p class="muted">未提供</p>'
 
-    body += "<h2>声称的证明</h2>"
+    repo = git("config", "--get", "remote.origin.url").replace(".git", "")
+    repo = re.sub(r"^git@github\.com:", "https://github.com/", repo)
+    claim_url = f"{repo}/issues/new?template=claim.yml&title=%5Bclaim%5D+%E8%A1%A8%E8%BF%B0+%23{esc(sid)}&statement={esc(sid)}"
+    body += f"<h2>声称的证明</h2><p><a class=\"btn\" href=\"{claim_url}\">＋ 声明证明了这条表述</a> <span class=\"muted\">（跳转到 GitHub 表单，需要 GitHub 账号；登记库只记录声明，不认证）</span></p>"
     cps = meta.get("claimed_proofs") or []
     if cps:
         body += "<table><tr><th>声称方</th><th>日期</th><th>链接</th><th>备注</th></tr>"
         for c in cps:
-            body += f"<tr><td>{esc(c.get('claimant',''))}</td><td>{esc(c.get('date',''))}</td><td><a href=\"{esc(c.get('url',''))}\">{esc(c.get('url',''))}</a></td><td>{esc(c.get('note',''))}</td></tr>"
+            note = esc(c.get('note',''))
+            if c.get('issue'): note += f' <a href="{esc(c["issue"])}">议题</a>'
+            body += f"<tr><td>{esc(c.get('claimant',''))}</td><td>{esc(c.get('date',''))}</td><td><a href=\"{esc(c.get('url',''))}\">{esc(c.get('url',''))}</a></td><td>{note}</td></tr>"
         body += "</table>"
     else:
         body += '<p class="muted">暂无记录</p>'
