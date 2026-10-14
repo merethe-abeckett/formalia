@@ -7,7 +7,7 @@
 - 其他 HTTP 错误原样抛出 GeminiError，调用方不得把它当成“无问题”。
 代码许可：Apache-2.0。
 """
-import json, os, sys, time, urllib.request, urllib.error
+import http.client, json, os, sys, time, urllib.request, urllib.error
 
 BASE = "https://generativelanguage.googleapis.com/v1beta"
 DEFAULT_MODEL = "gemini-3.8-flash"
@@ -15,23 +15,15 @@ DEFAULT_MODEL = "gemini-3.8-flash"
 class GeminiError(Exception):
     pass
 
-def _clean(v, name):
-    """容忍把整行“NAME = value”或带引号、空白的值填进仓库变量/密钥的情况。"""
-    if not v: return v
-    v = v.strip()
-    if "=" in v and v.split("=", 1)[0].strip().upper() == name:
-        v = v.split("=", 1)[1].strip()
-    return v.strip("\"'").strip()
-
 def _key():
-    k = _clean(os.environ.get("GEMINI_API_KEY"), "GEMINI_API_KEY")
+    k = (os.environ.get("GEMINI_API_KEY") or "").strip()
     if not k: raise GeminiError("未设置 GEMINI_API_KEY")
     return k
 
 RETRY_CODES = (429, 500, 502, 503, 504)
 
-def _request(url, payload=None, timeout=180, retries=4):
-    """临时性错误（限流、拥堵、网关错误）按 5s、15s、45s、90s 退避重试。"""
+def _request(url, payload=None, timeout=300, retries=4):
+    """临时性错误（限流、拥堵、网关错误、超时、连接中断）按 5s、15s、45s、90s 退避重试。"""
     data = json.dumps(payload).encode() if payload is not None else None
     delays = [5, 15, 45, 90]
     for attempt in range(retries + 1):
@@ -45,10 +37,12 @@ def _request(url, payload=None, timeout=180, retries=4):
                 print(f"[gemini] HTTP {e.code}，{delays[attempt]}s 后重试（第 {attempt+1}/{retries} 次）", file=sys.stderr)
                 time.sleep(delays[attempt]); continue
             raise GeminiError(f"HTTP {e.code} {url.split('/models/')[-1].split(':')[0]}: {body}") from None
-        except urllib.error.URLError as e:
+        except (urllib.error.URLError, TimeoutError, ConnectionError, http.client.HTTPException) as e:
+            reason = getattr(e, "reason", None) or type(e).__name__
             if attempt < retries:
+                print(f"[gemini] 网络错误（{reason}），{delays[attempt]}s 后重试（第 {attempt+1}/{retries} 次）", file=sys.stderr)
                 time.sleep(delays[attempt]); continue
-            raise GeminiError(f"网络错误: {e.reason}") from None
+            raise GeminiError(f"网络错误: {reason}") from None
 
 def list_models():
     out = _request(f"{BASE}/models?pageSize=100")
@@ -63,7 +57,7 @@ def resolve_model():
     """返回可用的模型名；必要时自动发现并缓存。"""
     global _resolved
     if _resolved: return _resolved
-    want = _clean(os.environ.get("GEMINI_MODEL"), "GEMINI_MODEL") or DEFAULT_MODEL
+    want = (os.environ.get("GEMINI_MODEL") or "").strip() or DEFAULT_MODEL
     try:
         _request(f"{BASE}/models/{want}")
         _resolved = want

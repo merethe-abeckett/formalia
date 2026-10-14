@@ -1,5 +1,8 @@
-# 用 Gemini 为新增或修改过的表述生成导读，并直接提交到 main 的 Guides/ 目录。
-# 需要仓库密钥 GEMINI_API_KEY。手动触发，或在表述文件变动合并到 main 后自动触发。
+# 用 Gemini 为新增或修改过的表述生成导读，提交到 main 的 Guides/ 目录。
+# 需要仓库密钥 GEMINI_API_KEY，可选仓库变量 GEMINI_MODEL。
+#
+# 安全设计：编译 Lean 的任务不持有密钥、只读；持有 Gemini 密钥和写权限的任务不编译 Lean，
+# 只读取前一个任务产出的检查器报告和钉死版本的 Mathlib 源码。
 name: Guides
 on:
   workflow_dispatch:
@@ -12,39 +15,72 @@ on:
     branches: [main]
     paths: ["Conjectures/**/*.lean"]
 
-permissions:
-  contents: write
+permissions: {}
+
+concurrency:
+  group: guides
+  cancel-in-progress: false
 
 jobs:
-  guides:
+  checks:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          persist-credentials: false
       - name: 安装 elan
         run: |
           curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
           ./elan-init -y --no-modify-path --default-toolchain "$(cat lean-toolchain)"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-
       - name: 获取 Mathlib 缓存
         run: lake exe cache get
-
       - name: 生成检查器报告（提供定义链）
         run: scripts/run_checks.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: check-reports
+          path: build/check/
+          retention-days: 3
 
+  guides:
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/download-artifact@v4
+        with:
+          name: check-reports
+          path: build/check
+      - name: 取钉死版本的 Mathlib 源码（只读文本，不编译）
+        run: |
+          rev=$(python3 -c "import json;print(next(p['rev'] for p in json.load(open('lake-manifest.json'))['packages'] if p['name']=='mathlib'))")
+          mkdir -p .lake/packages/mathlib && cd .lake/packages/mathlib
+          git init -q && git remote add origin https://github.com/leanprover-community/mathlib4
+          git fetch -q --depth 1 origin "$rev" && git checkout -q FETCH_HEAD
       - name: 生成导读
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          FORCE: ${{ inputs.force }}
         run: |
-          if [ "${{ inputs.force }}" = "true" ]; then python3 scripts/gen_guides.py --force; else python3 scripts/gen_guides.py; fi
-
-      - name: 提交导读
+          if [ "$FORCE" = "true" ]; then python3 scripts/gen_guides.py --force; else python3 scripts/gen_guides.py; fi
+      - name: 提交导读并更新网站
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "formalia-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Guides
-          git diff --cached --quiet && echo "无变化" && exit 0
-          git commit -m "Guides: 更新 AI 导读"
-          git push
+          if git diff --cached --quiet; then echo "无变化"; exit 0; fi
+          git commit -m "导读：更新 AI 导读"
+          for _ in 1 2 3; do git push origin HEAD:main && break; git pull --rebase origin main; done
+          # 用 GITHUB_TOKEN 推送不会自动触发其他工作流
+          gh workflow run pages.yml --ref main

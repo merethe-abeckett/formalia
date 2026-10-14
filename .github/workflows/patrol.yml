@@ -11,28 +11,47 @@ on:
         description: "Only this statement id (e.g. 20261014-01)"
         required: false
 
-permissions:
-  contents: read
-  issues: write
+permissions: {}
 
 jobs:
-  patrol:
+  checks:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          persist-credentials: false
       - name: Install elan
         run: |
           curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
           ./elan-init -y --no-modify-path --default-toolchain "$(cat lean-toolchain)"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-
       - name: Get Mathlib cache
         run: lake exe cache get
-
       - name: Produce fresh CI evidence (checker reports)
         run: scripts/run_checks.sh || true   # a failing entry is evidence, not a reason to stop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: check-reports
+          path: build/check/
+          retention-days: 3
 
+  # 持有模型密钥和议题写权限的任务不编译 Lean，只读检查器报告
+  patrol:
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: check-reports
+          path: build/check
       - name: Run patrol
         env:
           QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
@@ -42,9 +61,10 @@ jobs:
           QWEN_BASE_URL: ${{ vars.QWEN_BASE_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          ONLY: ${{ inputs.only }}
         run: |
-          if [ -n "${{ inputs.only }}" ]; then
-            python3 patrol/patrol.py --only "${{ inputs.only }}"
+          if [ -n "$ONLY" ]; then
+            python3 patrol/patrol.py --only "$ONLY"
           else
             python3 patrol/patrol.py
           fi

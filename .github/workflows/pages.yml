@@ -6,10 +6,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# 构建任务会编译 Lean，只给只读权限；发布权限只给不编译 Lean 的部署任务
+permissions: {}
 
 concurrency:
   group: pages
@@ -18,10 +16,13 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # full history, so "first commit" per entry can be shown
+          fetch-depth: 0   # full history, so "first commit" and edit history can be shown
+          persist-credentials: false
 
       - name: Install elan
         run: |
@@ -45,6 +46,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
