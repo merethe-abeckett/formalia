@@ -12,8 +12,10 @@
 需要环境变量 GEMINI_API_KEY（可选 GEMINI_MODEL，默认 gemini-2.5-flash）。
 代码许可：Apache-2.0。
 """
-import argparse, json, os, re, sys, urllib.request, datetime
+import argparse, json, os, re, sys, datetime
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import llm_gemini
 
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
@@ -40,19 +42,6 @@ PROMPT = """你在为“Lean 表述登记库”撰写一条形式化表述的导
 直接依赖的定义及其在 Mathlib（{mathlib_rev}）中的源码片段：
 {snippets}
 """
-
-def http_json(url, payload, headers, timeout=180):
-    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json", **headers})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read().decode())
-
-def ask_gemini(prompt):
-    key = os.environ["GEMINI_API_KEY"]
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-    out = http_json(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-        {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"temperature": 0.2}},
-        {"x-goog-api-key": key})
-    return out["candidates"][0]["content"]["parts"][0]["text"].strip()
 
 def mathlib_rev():
     try:
@@ -130,8 +119,8 @@ def main():
         if a.fake:
             text = "**定义解释**\n\n- （占位）\n\n**逐句翻译**\n\n（占位）"
         else:
-            text = ask_gemini(prompt)
-        model = "fake" if a.fake else os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+            text = llm_gemini.generate(prompt, temperature=0.2)
+        model = "fake" if a.fake else llm_gemini.resolve_model()
         header = f"<!-- 由 {model} 于 {datetime.date.today().isoformat()} 生成，依据 Mathlib {rev} 的源码片段。可人工修改。 -->\n\n"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(header + text + "\n", encoding="utf-8")

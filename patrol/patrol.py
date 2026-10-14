@@ -28,6 +28,8 @@ Code licence: Apache-2.0.
 """
 import argparse, json, os, sys, urllib.request, urllib.error, time
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+import llm_gemini
 
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
@@ -75,13 +77,7 @@ def ask_qwen(prompt):
     return out["choices"][0]["message"]["content"]
 
 def ask_gemini(prompt):
-    key = os.environ["GEMINI_API_KEY"]
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-    out = http_json(url,
-        {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"temperature": 0, "responseMimeType": "application/json"}},
-        {"x-goog-api-key": key})
-    return out["candidates"][0]["content"]["parts"][0]["text"]
+    return llm_gemini.generate(prompt, temperature=0, json_mode=True)
 
 def ask_fake(prompt):
     # Stub for testing the plumbing: flags anything containing `True ∧` or `sorry`.
@@ -97,7 +93,8 @@ def parse_verdict(text):
         obj = json.loads(text)
         return {"problem": bool(obj.get("problem")), "category": str(obj.get("category", "")), "reason": str(obj.get("reason", "")), "raw": None}
     except Exception:
-        return {"problem": False, "category": "unparseable", "reason": "", "raw": text[:500]}
+        print(f"[警告] 模型输出不是 JSON: {text[:200]!r}", file=sys.stderr)
+        return {"problem": False, "category": "unparseable", "reason": "输出无法解析", "raw": text[:500]}
 
 def entries():
     tc = (ROOT / "lean-toolchain").read_text().strip()
@@ -174,6 +171,7 @@ def main():
     can_post = not args.dry_run and os.environ.get("GITHUB_TOKEN") and os.environ.get("GITHUB_REPOSITORY")
 
     summary = []
+    had_error = False
     for e in entries():
         if args.only and e["meta"]["id"] != args.only: continue
         prompt = PROMPT.format(toolchain=e["toolchain"], report=json.dumps(e["report"]), path=e["path"], code=e["code"])
@@ -181,8 +179,10 @@ def main():
         for name, fn in providers.items():
             try:
                 verdicts[name] = parse_verdict(fn(prompt))
-            except (urllib.error.URLError, KeyError, json.JSONDecodeError) as ex:
-                verdicts[name] = {"problem": False, "category": "error", "reason": f"provider error: {ex}", "raw": None}
+            except (llm_gemini.GeminiError, urllib.error.URLError, KeyError, json.JSONDecodeError) as ex:
+                verdicts[name] = {"problem": False, "category": "error", "reason": f"接口错误: {ex}", "raw": None}
+                had_error = True
+                print(f"[错误] {name} 审查 #{e['meta']['id']} 失败: {ex}", file=sys.stderr)
             time.sleep(0.5)
         flags = [v["problem"] for v in verdicts.values()]
         if len(flags) == 1:
@@ -195,7 +195,10 @@ def main():
             kind = None
         sid = e["meta"]["id"]
         summary.append((sid, kind, verdicts))
-        print(f"#{sid}: {kind or 'clean'}  " + "  ".join(f"{n}={'FLAG' if v['problem'] else 'ok'}" for n, v in verdicts.items()))
+        def tag(v):
+            if v["category"] in ("error", "unparseable"): return "ERR"
+            return "FLAG" if v["problem"] else "ok"
+        print(f"#{sid}: {kind or 'clean'}  " + "  ".join(f"{n}={tag(v)}" for n, v in verdicts.items()))
         if kind and can_post:
             marker, lines = issue_text(kind, e, verdicts)
             url, created = open_issue_once(marker, f"[{kind}] 表述 #{sid}", "\n".join(lines), [kind])
@@ -203,6 +206,9 @@ def main():
         elif kind:
             marker, lines = issue_text(kind, e, verdicts)
             print("    (dry run) would open issue:\n    " + "\n    ".join(lines[:6]))
+    if had_error:
+        print("巡查未完成：至少一个模型接口出错，上面的“clean”不可信。", file=sys.stderr)
+        return 1
     return 0
 
 if __name__ == "__main__":
