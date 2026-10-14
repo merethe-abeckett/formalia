@@ -1,0 +1,17 @@
+{
+  "slug": "lemoine",
+  "name": "Lemoine's conjecture",
+  "name_zh": "勒穆瓦纳猜想",
+  "informal": "每个不小于 7 的奇数都可以写成一个素数与另一个素数的两倍之和。",
+  "references": [
+    {
+      "label": "Wikipedia (English)",
+      "url": "https://en.wikipedia.org/wiki/%C3%89mile_Lemoine#Lemoine's_conjecture_and_extensions"
+    },
+    {
+      "label": "formal-conjectures（DeepMind）",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Lemoine.lean"
+    }
+  ],
+  "informal_en": "Every odd integer n ≥ 7 can be written as p + 2q with p and q prime."
+}

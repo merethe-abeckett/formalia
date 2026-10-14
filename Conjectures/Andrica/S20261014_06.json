@@ -1,0 +1,20 @@
+{
+  "id": "20261014-06",
+  "conjecture": "andrica",
+  "module": "Conjectures.Andrica.S20261014_06",
+  "declaration": "Registry.Andrica.S20261014_06",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Andrica.lean",
+    "note": "命题取自 formal-conjectures 的 `Andrica.lean`，去掉了 `answer(sorry)` 外壳与属性标注。"
+  },
+  "informal_restatement": {
+    "author": "提交者",
+    "text": "记 p(n) 为 Nat.nth Nat.Prime n（0 起算的第 n 个素数），则对所有自然数 n，实数 √p(n+1) − √p(n) < 1。"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

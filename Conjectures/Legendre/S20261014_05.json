@@ -1,0 +1,20 @@
+{
+  "id": "20261014-05",
+  "conjecture": "legendre",
+  "module": "Conjectures.Legendre.S20261014_05",
+  "declaration": "Registry.Legendre.S20261014_05",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/LegendreConjecture.lean",
+    "note": "命题取自 formal-conjectures 的 `LegendreConjecture.lean`，去掉了 `answer(sorry)` 外壳与属性标注。"
+  },
+  "informal_restatement": {
+    "author": "提交者",
+    "text": "对任意自然数 n ≥ 1，在 n² 与 (n+1)² 之间（不含端点）存在素数 p。"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}
