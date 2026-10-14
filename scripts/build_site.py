@@ -189,11 +189,11 @@ def page(title, crumbs, body, depth, home=False):
 <meta name="description" content="Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。">
 <link rel="stylesheet" href="{rel}style.css"></head><body>
 <header class="top"><div class="in"><a class="brand" href="{rel}index.html">{SITE_NAME}</a>
-<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a></nav></div></header>
+<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
 {crumb_html}<main>{body}</main>
 <footer>Formalia 只列出形式化表述及其事实，不判断某条表述是否等价于原猜想。<br>
 代码 Apache-2.0 · 条目内容按各自声明的许可，默认 CC-BY-4.0 · <a href="{rel}about/privacy.html">隐私与编辑规则</a> ·
-<a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · <a href="{rel}about/index.html#联系">联系我们</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
+<a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · <a href="{rel}about/contact.html">联系作者</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
 </body></html>"""
 
 def status_cell(rep):
@@ -443,6 +443,8 @@ def write_edit_pages(index_rows):
         "<h1>使用说明</h1>" + md_to_html((SITE_SRC / "guide.md").read_text(encoding="utf-8")), 1), encoding="utf-8")
     about = (SITE_SRC / "about.md").read_text(encoding="utf-8").replace("{{PREFACE}}", "## 作者的话\n\n" + readme_preface())
     (OUT / "about" / "index.html").write_text(page("关于", [("关于", None)], "<h1>关于 Formalia</h1>" + md_to_html(about), 1), encoding="utf-8")
+    contact = (SITE_SRC / "contact.md").read_text(encoding="utf-8").replace("{{QUOTE}}", founder_quote()).replace("{{EMAIL}}", CONTACT)
+    (OUT / "about" / "contact.html").write_text(page("联系作者", [("联系作者", None)], "<h1>联系作者</h1>" + md_to_html(contact), 1), encoding="utf-8")
 
 def write_search(index_rows):
     """站内搜索：生成 search.json 和搜索页。"""
@@ -491,6 +493,11 @@ def readme_preface():
     if not m: return ""
     keep = [l for l in m.group(1).splitlines() if not re.search(r"域名|网址", l) and "我觉得中国" not in l]
     return "\n".join(keep).strip()
+
+def founder_quote():
+    """README“阅读前说明”里以“我觉得中国”开头的那段引文，只放在“联系作者”页。"""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    return next((l for l in text.splitlines() if l.startswith(">") and "我觉得中国" in l), "")
 
 def main():
     tc, deps = pinned_versions()
