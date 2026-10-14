@@ -180,6 +180,7 @@ mark{background:#fde68a;color:inherit;border-radius:2px;padding:0 1px}
 .ask .a{white-space:pre-wrap;line-height:1.7}.ask .a code{background:var(--box);padding:0 3px;border-radius:3px}
 .ask textarea{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:inherit;resize:vertical}
 .ask .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.ask .row button{margin-top:6px}
+.ask .a.err{color:var(--bad)}.ask .row .st{font-size:13px}
 @media(max-width:700px){.steps{grid-template-columns:1fr}.hero h1{font-size:2.1em}}
 @media(max-width:600px){th{width:auto}td,th{display:block;width:100%}tr{display:block;border-bottom:1px solid var(--line)}}
 """
@@ -191,8 +192,8 @@ def ver(text):
     """静态文件的版本号：内容一变，链接就变，浏览器和 Cloudflare 不会用旧缓存。"""
     return hashlib.sha256(text.encode()).hexdigest()[:10]
 
-def script(name):
-    return f'<script src="{name}?v={ver((SITE_SRC / name).read_text(encoding="utf-8"))}" defer></script>'
+def script(name, prefix=""):
+    return f'<script src="{prefix}{name}?v={ver((SITE_SRC / name).read_text(encoding="utf-8"))}" defer></script>'
 
 REPO_URL = "https://github.com/merethe-abeckett/formalia"
 CONTACT = "merethe.abeckett@outlook.com"
@@ -348,6 +349,12 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
         body += md_to_html(gtext)
     else:
         body += '<p class="muted">尚未生成</p>'
+    if not meta.get("archived"):
+        body += (f'<h3>问 Gemini</h3><div class="ask" id="ask" data-id="{esc(sid)}"><div class="log" aria-live="polite"></div>'
+                 '<textarea rows="2" maxlength="500" placeholder="针对这条表述随便问，例如：Nat.Prime 是什么意思？n 从几开始？"></textarea>'
+                 '<div class="row"><button type="button">提问</button><span class="muted st"></span></div>'
+                 '<p class="muted" style="font-size:13px;margin:8px 0 0">回答由 Gemini 现场生成，可能出错，不代表登记库的判断。'
+                 '它只解释这段 Lean 代码，不回答“是否等价于原猜想”。</p></div>' + script("ask.js", "../../"))
 
     ir = meta.get("informal_restatement") or {}
     body += "<h2>非正式复述</h2>"
@@ -464,6 +471,22 @@ def write_edit_pages(index_rows):
     contact = (SITE_SRC / "contact.md").read_text(encoding="utf-8").replace("{{QUOTE}}", founder_quote()).replace("{{EMAIL}}", CONTACT)
     (OUT / "about" / "contact.html").write_text(page("联系作者", [("联系作者", None)], "<h1>联系作者</h1>" + md_to_html(contact), 1), encoding="utf-8")
 
+def write_ask_context(conj, meta, lean_src, decl, tc, deps):
+    """交互式导读的材料：Worker 的 /api/ask 从 /ask/<编号>.json 读取，不接受浏览器传来的代码。"""
+    guide = GUIDES / conj["_dir"] / (meta["_stem"] + ".md")
+    ir = meta.get("informal_restatement") or {}
+    ctx = {
+        "id": meta["id"], "declaration": meta["declaration"], "module": meta["module"],
+        "conjecture": {"name": conj["name"], "name_zh": conj.get("name_zh") or "", "informal": conj.get("informal") or ""},
+        "lean": lean_src, "toolchain": tc,
+        "mathlib": next((r for n, r, _ in deps if n == "mathlib"), "?"),
+        "dependencies": [{"name": d["name"], "module": d.get("module") or ""} for d in (decl or {}).get("direct_dependencies", [])],
+        "guide": re.sub(r"<!--.*?-->", "", guide.read_text(encoding="utf-8"), flags=re.S).strip() if guide.exists() else "",
+        "restatement": {"text": ir.get("text") or "", "author": ir.get("author") or ""},
+    }
+    (OUT / "ask").mkdir(exist_ok=True)
+    (OUT / "ask" / f"{meta['id']}.json").write_text(json.dumps(ctx, ensure_ascii=False), encoding="utf-8")
+
 def write_search(index_rows):
     """站内搜索：生成 search.json 和搜索页。"""
     docs = []
@@ -541,6 +564,7 @@ def main():
             if decl is None or not decl.get("ok"): all_ok = False
             d = OUT / conj["slug"] / meta["id"]; d.mkdir(parents=True, exist_ok=True)
             (d / "index.html").write_text(render_statement(conj, meta, lean_src, check, tc, deps), encoding="utf-8")
+            write_ask_context(conj, meta, lean_src, decl, tc, deps)
             entries.append((meta, decl))
         archived = []
         adir = ARCH / cdir.name
@@ -558,6 +582,7 @@ def main():
     write_edit_pages(index_rows)
     write_chat_page()
     write_search(index_rows)
+    (OUT / "ask.js").write_text((SITE_SRC / "ask.js").read_text(encoding="utf-8"), encoding="utf-8")
     (OUT / ".nojekyll").write_text("")
     print(f"wrote {OUT} ({sum(n for _,n in index_rows)} statements, {len(index_rows)} conjectures)")
 
