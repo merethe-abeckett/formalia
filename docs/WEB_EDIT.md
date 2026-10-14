@@ -58,7 +58,7 @@ Lean 在编译期可以执行任意代码，所以匿名提交的 Lean 代码有
 
 Cloudflare 左侧菜单点 **Workers & Pages**，页面右侧有 **Account ID**，点旁边的复制按钮。
 
-**3. 创建 KV 存储，复制它的 ID**
+**3. 创建 KV 存储**（已完成，ID 已写进 `worker/wrangler.toml`，换新的 KV 时才需要改）
 
 1. 左侧菜单 **Storage & Databases** → **KV** → **Create a namespace**（有的界面叫 Create instance）。
 2. 名字填 `formalia`，创建。
@@ -76,12 +76,6 @@ Cloudflare 左侧菜单点 **Workers & Pages**，页面右侧有 **Account ID**�
 | `CLOUDFLARE_ACCOUNT_ID` | 第 2 步的 Account ID |
 | `ANON_SECRET` | 随便打一串至少 32 个字符的乱码，例如在键盘上乱敲。填好后不要再改，改了所有人的匿名编号都会变 |
 | `CHAT_ADMIN_TOKEN` | 再打一串至少 16 个字符的乱码，这是你的聊天室管理员口令，自己记下来 |
-
-切到 **Variables** 标签页，点 **New repository variable**：
-
-| Name | Value |
-| --- | --- |
-| `KV_NAMESPACE_ID` | 第 3 步的 KV ID |
 
 **5. 运行部署**
 

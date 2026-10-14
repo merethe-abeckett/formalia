@@ -2,6 +2,8 @@
 name = "formalia-edit"
 main = "src/index.js"
 compatibility_date = "2026-10-01"
+workers_dev = false     # 不用 xxx.workers.dev 子域名，只挂在自己的域名上
+preview_urls = false
 routes = [
   { pattern = "formalnaturalist.co.nz/api/*", zone_name = "formalnaturalist.co.nz" },
   { pattern = "www.formalnaturalist.co.nz/api/*", zone_name = "formalnaturalist.co.nz" },
@@ -15,7 +17,7 @@ TURNSTILE_SITEKEY = ""   # 在后台填写
 
 [[kv_namespaces]]
 binding = "FORMALIA_KV"
-id = ""                  # 在后台创建 KV 命名空间后填写
+id = "ed74a50b108f486383c7812f4850f51e"   # KV 命名空间 formalia（不是机密）
 
 [[durable_objects.bindings]]
 name = "CHAT"
