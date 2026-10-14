@@ -1,10 +1,11 @@
 /-
 Lean 表述登记库 · 条目 #20261014-02
 猜想：哥德巴赫猜想
-内容许可：CC-BY-4.0（见 LICENSE-CONTENT）
+内容许可：Apache-2.0（与原作相同）
+原作版权：Copyright 2025 The Formal Conjectures Authors，Apache License 2.0
 
 改编自 google-deepmind/formal-conjectures 仓库的
-FormalConjectures/Wikipedia/GoldbachConjecture.lean（Apache-2.0）。原文中该命题
+FormalConjectures/Wikipedia/GoldbachConjecture.lean。改动：原文中该命题
 出现在 `answer(sorry) ↔ ...` 的右侧；这里只登记命题本身，写成 `def`，因此文件中
 不含 sorry。
 -/

@@ -13,6 +13,8 @@ informal conjecture"; that discussion happens offline among mathematicians.
 """
 import html, json, os, re, sys, subprocess, datetime
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import licenses
 
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
@@ -97,7 +99,7 @@ def page(title, crumbs, body, depth):
 <header><a href="{rel}index.html"><strong>Lean 表述登记库</strong></a> <span class="crumb">›</span> {crumb_html}</header>
 <main>{body}</main>
 <footer>本登记库只列出形式化表述及其事实，不记录任何关于“该表述是否等价于原猜想”的判断。
-代码：Apache-2.0 · 条目内容：CC-BY-4.0 · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code>。</footer>
+代码：Apache-2.0 · 条目内容：各条目按其声明的许可，未声明默认 CC-BY-4.0 · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code>。</footer>
 </body></html>"""
 
 def status_cell(rep):
@@ -134,6 +136,12 @@ def history_html(paths):
             "".join(f"<tr><td>{esc(d)}</td><td>{esc(sj)}</td><td>{esc(e) or '<span class=muted>维护者</span>'}</td></tr>" for d, sj, e in rows) +
             "</table>")
 
+def license_html(meta):
+    lic = licenses.of(meta)
+    name, url = licenses.ALLOWED.get(lic, (lic, ""))
+    tag = f'<a href="{esc(url)}">{esc(lic)}</a>' if url else esc(lic)
+    return f'{tag} <span class="muted">{esc(name)}{"（默认）" if not meta.get("license") else ""}</span>'
+
 def edit_link(rel, **q):
     from urllib.parse import urlencode
     return f"{rel}edit/index.html?{esc(urlencode(q))}"
@@ -156,6 +164,7 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
         ("提交日期", esc(meta.get("submitted_at",""))),
         ("首次提交", f"<code>{esc(first_commit)}</code>" if first_commit else '<span class="muted">尚未提交</span>'),
         ("来源", src_html),
+        ("许可", license_html(meta)),
         ("Lean 工具链", f"<code>{esc(tc)}</code>"),
         ("依赖（钉死版本）", "<br>".join(f"<code>{esc(n)}</code> @ <code>{esc(r)}</code>" + (f" ({esc(i)})" if i else "") for n,r,i in deps) or "—"),
         ("CI 检查", status_cell(decl)),

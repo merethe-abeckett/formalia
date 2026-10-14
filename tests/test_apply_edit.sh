@@ -25,8 +25,13 @@ expect 0 "statement"        '{"v":1,"type":"statement",'"$ED"',"data":{"conjectu
 expect 0 "statement 2 → next id" '{"v":1,"type":"statement",'"$ED"',"data":{"conjecture":"goldbach","imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"False"}}' "#20261015-02"
 expect 1 "eval injection"   '{"v":1,"type":"statement",'"$ED"',"data":{"conjecture":"goldbach","imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"True\n#eval 1"}}' "不允许"
 expect 1 "bad import"       '{"v":1,"type":"statement",'"$ED"',"data":{"conjecture":"goldbach","imports":["Lean"],"proposition":"True"}}' "import"
-expect 1 "adapted no url"   '{"v":1,"type":"statement",'"$ED"',"data":{"conjecture":"goldbach","imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"True","source":{"kind":"adapted"}}}' "来源链接"
+expect 1 "adapted no url"   '{"v":1,"type":"statement",'"$ED"',"data":{"conjecture":"goldbach","imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"True","license":"CC-BY-4.0","source":{"kind":"adapted"}}}' "来源链接"
 expect 1 "dup conjecture"   '{"v":1,"type":"statement",'"$ED"',"data":{"new_conjecture":{"name":"Goldbach","informal":"x"},"imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"True"}}' "同名"
+expect 1 "adapted no licence" '{"v":1,"type":"statement",'"$ED"',"data":{"conjecture":"goldbach","imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"True","source":{"kind":"adapted","url":"https://e.org/src"}}}' "必须选择许可"
+expect 1 "unknown licence"  '{"v":1,"type":"statement",'"$ED"',"data":{"conjecture":"goldbach","imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"True","license":"GPL-3.0"}}' "许可只能是"
+expect 0 "adapted Apache"   '{"v":1,"type":"statement",'"$ED"',"data":{"conjecture":"goldbach","imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"True ∧ True","license":"Apache-2.0","source":{"kind":"adapted","url":"https://e.org/src"}}}' "已通过"
+grep -q '"license": "Apache-2.0"' Conjectures/Goldbach/S20261015_03.json && grep -q "内容许可：Apache-2.0" Conjectures/Goldbach/S20261015_03.lean && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: licence not written to json/lean"; }
+grep -q '"license": "CC-BY-4.0"' Conjectures/Goldbach/S20261015_01.json && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: default licence not applied"; }
 before=$(find Conjectures -type f | wc -l)
 expect 1 "atomic on failure" '{"v":1,"type":"statement",'"$ED"',"data":{"new_conjecture":{"name":"Brand New","informal":"x"},"imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"sorry"}}' "sorry"
 after=$(find Conjectures -type f | wc -l)

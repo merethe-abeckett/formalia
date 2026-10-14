@@ -95,6 +95,12 @@
         field("自然语言表述 *", area("nc_informal", "", 3, { maxlength: 4000 })));
       const toggle = () => { nc.hidden = !!sel.value; };
       sel.addEventListener("change", toggle);
+      const lic = el("select", { name: "license" },
+        el("option", { value: "CC-BY-4.0", text: "CC-BY-4.0 知识共享 署名（默认）" }),
+        el("option", { value: "CC-BY-SA-4.0", text: "CC-BY-SA-4.0 署名-相同方式共享" }),
+        el("option", { value: "CC0-1.0", text: "CC0-1.0 公有领域" }),
+        el("option", { value: "Apache-2.0", text: "Apache-2.0" }),
+        el("option", { value: "MIT", text: "MIT" }));
       const kind = el("select", { name: "kind" }, el("option", { value: "original", text: "原创" }), el("option", { value: "adapted", text: "改编" }), el("option", { value: "verbatim", text: "照录" }));
       form.append(field("所属猜想", sel), nc,
         field("import *", area("imports", "Mathlib.Data.Nat.Prime.Defs", 3, { spellcheck: "false", class: "mono" }), "每行一个 Mathlib 或 Batteries 模块名。"),
@@ -104,12 +110,13 @@
         field("说明", area("doc", "", 2, { maxlength: 2000 }), "可选，会写进文档字符串。"),
         field("来源类型", kind), field("来源链接", text("source_url", "", { maxlength: 500 }), "改编或照录时必填。"),
         field("来源备注", area("source_note", "", 2, { maxlength: 2000 })),
+        field("许可", lic, "你自己写的表述可以任选。改编或照录别人的作品，必须选与原作相同或兼容的许可，并在来源备注里写明原作版权。"),
         field("非正式复述", area("restatement", "", 3, { maxlength: 4000 })));
       toggle();
       collect = (f) => {
         const d = { imports: f.imports.value.split("\n").map(s => s.trim()).filter(Boolean), helpers: f.helpers.value,
           proposition: f.proposition.value, doc: f.doc.value, restatement: f.restatement.value,
-          source: { kind: f.kind.value, url: f.source_url.value.trim(), note: f.source_note.value } };
+          source: { kind: f.kind.value, url: f.source_url.value.trim(), note: f.source_note.value }, license: f.license.value };
         if (f.conjecture.value) d.conjecture = f.conjecture.value;
         else d.new_conjecture = { name: f.nc_name.value, name_zh: f.nc_name_zh.value, informal: f.nc_informal.value };
         return { data: d };
@@ -122,7 +129,7 @@
     form.append(
       field("编辑摘要", text("summary", "", { maxlength: 200, placeholder: "一句话说明改了什么" })),
       field("署名", text("name", "", { maxlength: 40, placeholder: "可不填" }), "不填就显示为“匿名者 xxxxxxxx”。"),
-      el("p", { class: "fh" }, "提交即表示同意以 CC-BY-4.0 发布你的内容。系统会记录你的 IP 地址以防滥用，只有维护者可见，90 天后删除；公开显示的只是由 IP 派生的匿名编号。",
+      el("p", { class: "fh" }, (type === "statement" ? "提交即表示同意按你选择的许可发布这条表述。" : "提交即表示同意按该条目的许可发布你的修改。") + "系统会记录你的 IP 地址以防滥用，只有维护者可见，90 天后删除；公开显示的只是由 IP 派生的匿名编号。",
          el("a", { href: "../about/privacy.html", text: "隐私与编辑规则" })),
       ts, btn, out);
     root.replaceChildren(form);
