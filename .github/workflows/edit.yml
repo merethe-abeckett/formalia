@@ -12,9 +12,8 @@ on:
 
 permissions: {}
 
-concurrency:
-  group: edit-apply        # 串行处理，编号分配和写入不会互相踩
-  cancel-in-progress: false
+# 不用 concurrency：GitHub 的并发组只保留一个排队中的运行，会静默取消多出来的编辑。
+# 并发写入由 commit 任务里的“在最新 main 上重新应用再推送”循环处理。
 
 jobs:
   check:
@@ -61,7 +60,7 @@ jobs:
         with:
           ref: main
       - id: apply
-        name: 在最新 main 上重新应用
+        name: 在最新 main 上重新应用并推送
         env:
           BODY: ${{ github.event.issue.body }}
           ISSUE: ${{ github.event.issue.number }}
@@ -70,41 +69,43 @@ jobs:
           MODE: ${{ (github.event.issue.user.login == github.repository_owner && contains(github.event.issue.body, '<!-- formalia-edit v1 -->')) && 'web' || 'claim-form' }}
           EXPECT_TARGET: ${{ needs.check.outputs.target }}
         run: |
+          git config user.name "formalia-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           args=(--issue "$ISSUE" --created-at "$CREATED" --result /tmp/result.json)
           [ "$MODE" = "claim-form" ] && args+=(--claim-form --author "$AUTHOR")
-          printf '%s' "$BODY" | python3 scripts/apply_edit.py "${args[@]}"
-          python3 scripts/validate_meta.py
-          python3 - <<'PY'
-          import json, os, subprocess, sys
+          for attempt in 1 2 3 4 5; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            printf '%s' "$BODY" | python3 scripts/apply_edit.py "${args[@]}"
+            python3 scripts/validate_meta.py
+            # 新增表述在并发时编号可能顺延，内容不变；其他编辑的目标必须和检查时一致
+            python3 - <<'PY'
+          import json, os, sys
           r = json.load(open("/tmp/result.json"))
-          if r["target"] != os.environ["EXPECT_TARGET"]:
-              sys.exit(f"目标从 {os.environ['EXPECT_TARGET']} 变成了 {r['target']}（main 在检查期间有变动），需要重新提交")
+          if r["kind"] != "statement" and r["target"] != os.environ["EXPECT_TARGET"]:
+              sys.exit(f"目标从 {os.environ['EXPECT_TARGET']} 变成了 {r['target']}，需要重新提交")
           open("/tmp/commit_msg.txt", "w").write(r["commit_message"])
           open("/tmp/changed.txt", "w").write("\n".join(r["changed"]) + "\n")
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write(f"kind={r['kind']}\n")
+              f.write(f"kind={r['kind']}\ntarget={r['target']}\n")
           PY
-      - name: 提交并推送
-        run: |
-          git config user.name "formalia-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          xargs -d '\n' git add -- < /tmp/changed.txt
-          git commit -F /tmp/commit_msg.txt
-          for _ in 1 2 3; do
-            git push origin HEAD:main && exit 0
-            git pull --rebase origin main
+            xargs -d '\n' git add -- < /tmp/changed.txt
+            git commit -q -F /tmp/commit_msg.txt
+            if git push -q origin HEAD:main; then exit 0; fi
+            echo "推送冲突，第 ${attempt} 次重试"; sleep $((attempt * 3))
           done
           exit 1
       - name: 回复并关闭议题
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE: ${{ github.event.issue.number }}
+          TARGET: ${{ steps.apply.outputs.target }}
         run: |
           sha=$(git rev-parse --short HEAD)
+          case "$TARGET" in [0-9]*) label="表述 #${TARGET}";; *) label="猜想 ${TARGET}";; esac
           { echo "<!-- formalia-bot -->"
             echo "### 已写入"
             echo
-            echo "提交 ${sha}。网站几分钟后更新。"
+            echo "${label}，提交 ${sha}。网站几分钟后更新。"
             echo
             echo "如果这条编辑有问题，任何人都可以再提交一条编辑把它改回来；维护者也可以直接回退这个提交。"
           } > /tmp/reply.md
