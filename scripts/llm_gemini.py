@@ -15,8 +15,16 @@ DEFAULT_MODEL = "gemini-3.8-flash"
 class GeminiError(Exception):
     pass
 
+def _clean(v, name):
+    """容忍把整行“NAME = value”或带引号、空白的值填进仓库变量/密钥的情况。"""
+    if not v: return v
+    v = v.strip()
+    if "=" in v and v.split("=", 1)[0].strip().upper() == name:
+        v = v.split("=", 1)[1].strip()
+    return v.strip("\"'").strip()
+
 def _key():
-    k = os.environ.get("GEMINI_API_KEY")
+    k = _clean(os.environ.get("GEMINI_API_KEY"), "GEMINI_API_KEY")
     if not k: raise GeminiError("未设置 GEMINI_API_KEY")
     return k
 
@@ -55,7 +63,7 @@ def resolve_model():
     """返回可用的模型名；必要时自动发现并缓存。"""
     global _resolved
     if _resolved: return _resolved
-    want = os.environ.get("GEMINI_MODEL") or DEFAULT_MODEL
+    want = _clean(os.environ.get("GEMINI_MODEL"), "GEMINI_MODEL") or DEFAULT_MODEL
     try:
         _request(f"{BASE}/models/{want}")
         _resolved = want
