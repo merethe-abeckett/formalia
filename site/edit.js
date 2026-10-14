@@ -16,7 +16,9 @@
   const type = params.get("type") || "";
   const target = params.get("target") || "";
   const root = $("#edit-root");
-  const TITLES = { claim: "声明证明了一条表述", meta: "编辑表述信息", conjecture: "编辑猜想信息", statement: "新增一条表述" };
+  const TITLES = { claim: "声明证明了一条表述", meta: "编辑表述信息", conjecture: "编辑猜想信息", statement: "新增一条表述", essay: target ? "修改解读" : "写一篇解读" };
+  const sha256 = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s.trim())))].map(b => b.toString(16).padStart(2, "0")).join("");
+  const splitAbout = (s) => s.split(/[\s,，、;；]+/).map(x => x.trim().replace(/^#/, "")).filter(Boolean);
 
   function field(label, input, hint) {
     return el("label", { class: "f" }, el("span", { class: "fl", text: label }), input, hint ? el("span", { class: "fh", text: hint }) : "");
@@ -85,6 +87,31 @@
         for (const k of Object.keys(now)) if (JSON.stringify(now[k] || null) !== JSON.stringify(cur[k] || null)) { d[k] = now[k]; base[k] = cur[k]; }
         return { data: d };
       };
+    } else if (type === "essay") {
+      const e = target ? (data.essays || {})[target] : null;
+      if (target && !e) return fail(`找不到解读 ${target}。`);
+      const cur = e ? { title: e.title, about: e.about, body: e.body } : { title: "", about: splitAbout(params.get("about") || ""), body: "" };
+      if (e) form.append(el("p", {}, "对象：", el("a", { href: `../essays/${target}/index.html`, text: `《${e.title}》` })));
+      const lic = el("select", { name: "license" },
+        el("option", { value: "CC-BY-4.0", text: "CC-BY-4.0 知识共享 署名（默认）" }),
+        el("option", { value: "CC-BY-SA-4.0", text: "CC-BY-SA-4.0 署名-相同方式共享" }),
+        el("option", { value: "CC0-1.0", text: "CC0-1.0 公有领域" }));
+      form.append(
+        field("标题 *", text("title", cur.title, { required: true, maxlength: 120 })),
+        field("相关条目 *", text("about", cur.about.join(" "), { required: true, maxlength: 400, placeholder: "例如 20261014-01 goldbach" }),
+          "这篇解读讨论的表述编号或猜想标识，空格分开，最多 10 个。"),
+        field("正文 *", area("body", cur.body, 18, { required: true, maxlength: 20000 }),
+          "支持简单格式：## 小标题、- 列表、**粗体**、`代码`、``` 代码块 ```、[文字](https://链接)。不支持 $公式$，公式请写成代码。"),
+        e ? "" : field("许可", lic, "解读发表后，任何人都可以修改它，修改按同一许可发布。"));
+      collect = async (f) => {
+        const now = { title: f.title.value.trim(), about: splitAbout(f.about.value), body: f.body.value.trim() };
+        if (!e) return { data: { ...now, license: f.license.value } };
+        const d = {};
+        if (now.title !== cur.title) { d.title = now.title; base.title = cur.title; }
+        if (JSON.stringify(now.about) !== JSON.stringify(cur.about)) { d.about = now.about; base.about = cur.about; }
+        if (now.body !== cur.body.trim()) { d.body = now.body; base.body_sha256 = await sha256(cur.body); }
+        return { data: d };
+      };
     } else {
       const pre = params.get("conjecture") || "";
       const sel = el("select", { name: "conjecture" }, el("option", { value: "", text: "＋ 登记一个新猜想" }),
@@ -129,7 +156,7 @@
     form.append(
       field("编辑摘要", text("summary", "", { maxlength: 200, placeholder: "一句话说明改了什么" })),
       field("署名", text("name", "", { maxlength: 40, placeholder: "可不填" }), "不填就显示为“匿名者 xxxxxxxx”。"),
-      el("p", { class: "fh" }, (type === "statement" ? "提交即表示同意按你选择的许可发布这条表述。" : "提交即表示同意按该条目的许可发布你的修改。") + "系统会记录你的 IP 地址以防滥用，只有维护者可见，90 天后删除；公开显示的只是由 IP 派生的匿名编号。",
+      el("p", { class: "fh" }, (type === "statement" ? "提交即表示同意按你选择的许可发布这条表述。" : type === "essay" && !target ? "提交即表示同意按你选择的许可发布这篇解读。" : "提交即表示同意按该条目的许可发布你的修改。") + "系统会记录你的 IP 地址以防滥用，只有维护者可见，90 天后删除；公开显示的只是由 IP 派生的匿名编号。",
          el("a", { href: "../about/privacy.html", text: "隐私与编辑规则" })),
       ts, btn, out);
     root.replaceChildren(form);
@@ -141,8 +168,8 @@
       out.hidden = false; out.className = "note";
       const f = form.elements;
       for (const i of form.querySelectorAll("[required]")) if (!i.value.trim()) { out.textContent = "请填写所有带 * 的项目。"; i.focus(); return; }
-      const { data: d } = collect(f);
-      if ((type === "meta" || type === "conjecture") && !Object.keys(d).length) { out.textContent = "你还没有修改任何内容。"; return; }
+      const { data: d } = await collect(f);
+      if ((type === "meta" || type === "conjecture" || (type === "essay" && target)) && !Object.keys(d).length) { out.textContent = "你还没有修改任何内容。"; return; }
       const token = (f["cf-turnstile-response"] || {}).value;
       if (!token) { out.textContent = "请先完成人机验证。"; return; }
       btn.disabled = true; out.textContent = "正在提交……";

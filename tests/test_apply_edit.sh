@@ -36,6 +36,22 @@ before=$(find Conjectures -type f | wc -l)
 expect 1 "atomic on failure" '{"v":1,"type":"statement",'"$ED"',"data":{"new_conjecture":{"name":"Brand New","informal":"x"},"imports":["Mathlib.Data.Nat.Prime.Defs"],"proposition":"sorry"}}' "sorry"
 after=$(find Conjectures -type f | wc -l)
 if [ "$before" = "$after" ] && [ ! -d Conjectures/BrandNew ]; then pass=$((pass+1)); else fail=$((fail+1)); echo "FAIL: failed edit left files behind"; fi
+# 解读
+expect 0 "essay new"        '{"v":1,"type":"essay",'"$ED"',"target":"","data":{"title":"关于 Nat.Prime","about":["20261014-01","#goldbach"],"body":"## 小标题\n正文 <script>x</script>"}}' "J20261015-01"
+expect 0 "essay new 2"      '{"v":1,"type":"essay",'"$ED"',"data":{"title":"第二篇","about":["20261014-02"],"body":"x","license":"CC0-1.0"}}' "J20261015-02"
+grep -q '"about": \[' Essays/J20261015_01.json && grep -q '"goldbach"' Essays/J20261015_01.json && grep -q '"license": "CC-BY-4.0"' Essays/J20261015_01.json \
+  && grep -q "正文 <script>" Essays/J20261015_01.md && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: essay files"; }
+expect 1 "essay no about"   '{"v":1,"type":"essay",'"$ED"',"data":{"title":"t","about":[],"body":"x"}}' "至少"
+expect 1 "essay bad about"  '{"v":1,"type":"essay",'"$ED"',"data":{"title":"t","about":["nope"],"body":"x"}}' "找不到"
+expect 1 "essay bad target" '{"v":1,"type":"essay",'"$ED"',"target":"J2026","data":{"title":"t"}}' "编号格式"
+expect 1 "essay unknown field" '{"v":1,"type":"essay",'"$ED"',"data":{"title":"t","about":["goldbach"],"body":"x","author":"me"}}' "不认识"
+expect 1 "essay licence"    '{"v":1,"type":"essay",'"$ED"',"data":{"title":"t","about":["goldbach"],"body":"x","license":"GPL-3.0"}}' "许可只能是"
+SHA=$(python3 -c 'import hashlib;print(hashlib.sha256("## 小标题\n正文 <script>x</script>".encode()).hexdigest())')
+expect 0 "essay edit"       '{"v":1,"type":"essay","editor":{"label":"匿名者 11111111"},"target":"J20261015-01","data":{"body":"改过的正文"},"base":{"body_sha256":"'"$SHA"'"}}' "已通过"
+grep -q "匿名者 11111111" Essays/J20261015_01.json && grep -q "改过的正文" Essays/J20261015_01.md && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: essay edit not written"; }
+expect 1 "essay edit conflict" '{"v":1,"type":"essay",'"$ED"',"target":"J20261015-01","data":{"body":"又改"},"base":{"body_sha256":"'"$SHA"'"}}' "编辑冲突"
+expect 1 "essay edit no change" '{"v":1,"type":"essay",'"$ED"',"target":"J20261015-01","data":{"title":"关于 Nat.Prime"}}' "完全相同"
+expect 1 "essay edit missing" '{"v":1,"type":"essay",'"$ED"',"target":"J20991231-01","data":{"title":"x"}}' "找不到"
 python3 scripts/validate_meta.py > /dev/null && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: validate_meta after edits"; }
 echo "apply_edit tests: $pass passed, $fail failed"
 [ "$fail" = 0 ]

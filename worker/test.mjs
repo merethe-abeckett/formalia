@@ -77,6 +77,12 @@ r = await post(claim, "192.0.2.99"); assert.equal(r.status, 403);
 assert.deepEqual(banKeys("192.0.2.99"), ["ban:192.0.2.99", "ban:192.0.2.0/24"]); ok("ban by /24");
 // GitHub 出错
 ghFail = true; r = await post(claim, "198.51.100.50"); assert.equal(r.status, 502); ghFail = false; ok("GitHub failure → 502");
+// 解读
+r = await post({ type: "essay", target: "", turnstile: "tok", data: { title: "关于 <Nat.Prime>", about: ["20261014-01"], body: "正文" } }, "198.51.100.90");
+j = await r.json(); assert.equal(r.status, 200, JSON.stringify(j)); assert.match(created.at(-1).title, /解读 · 《关于 ＜Nat.Prime＞》/);
+r = await post({ type: "essay", target: "../x", turnstile: "tok", data: { title: "t" } }, "198.51.100.91"); assert.equal(r.status, 400);
+r = await post({ type: "essay", target: "J20261014-01", turnstile: "tok", data: { body: "改" } }, "198.51.100.92"); assert.equal(r.status, 200);
+ok("essay submissions");
 // 查询状态
 r = await get("/api/status?issue=41"); j = await r.json();
 assert.equal(j.state, "applied"); assert.equal(j.message, "已写入。"); ok("status");

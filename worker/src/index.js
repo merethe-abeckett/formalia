@@ -36,8 +36,9 @@
 
 const LOG_TTL = 90 * 24 * 3600;
 const MAX_BODY = 64 * 1024;
-const TYPES = { claim: "声明证明", meta: "编辑表述信息", conjecture: "编辑猜想信息", statement: "新增表述" };
+const TYPES = { claim: "声明证明", meta: "编辑表述信息", conjecture: "编辑猜想信息", statement: "新增表述", essay: "解读" };
 const ID_RE = /^\d{8}-\d{2}$/;
+const ESSAY_ID_RE = /^J\d{8}-\d{2}$/;
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,59}$/;
 const MARKER = "<!-- formalia-edit v1 -->";
 const BOT_MARKER = "<!-- formalia-bot -->";
@@ -157,6 +158,7 @@ async function submit(request, env, reply) {
   const target = String(req.target ?? "");
   if ((type === "claim" || type === "meta") && !ID_RE.test(target)) return reply(400, { ok: false, error: "表述编号格式不对" });
   if (type === "conjecture" && !SLUG_RE.test(target)) return reply(400, { ok: false, error: "猜想标识格式不对" });
+  if (type === "essay" && target && !ESSAY_ID_RE.test(target)) return reply(400, { ok: false, error: "解读编号格式不对" });
   if (req.data == null || typeof req.data !== "object" || Array.isArray(req.data)) return reply(400, { ok: false, error: "缺少编辑内容" });
 
   const ip = clientIp(request);
@@ -181,6 +183,7 @@ async function submit(request, env, reply) {
 
   const where = type === "statement"
     ? (req.data.conjecture ? `猜想 ${safeText(req.data.conjecture, 60)}` : `新猜想 ${safeText(req.data.new_conjecture?.name, 80)}`)
+    : type === "essay" ? (target || `《${safeText(req.data.title, 60)}》`)
     : (ID_RE.test(target) ? `#${target}` : target);
   const title = `[网页编辑] ${TYPES[type]} · ${where} · ${label}`.slice(0, 250);
   const body = [
