@@ -7,7 +7,7 @@
 - 其他 HTTP 错误原样抛出 GeminiError，调用方不得把它当成“无问题”。
 代码许可：Apache-2.0。
 """
-import json, os, sys, urllib.request, urllib.error
+import json, os, sys, time, urllib.request, urllib.error
 
 BASE = "https://generativelanguage.googleapis.com/v1beta"
 DEFAULT_MODEL = "gemini-3.8-flash"
@@ -20,17 +20,27 @@ def _key():
     if not k: raise GeminiError("未设置 GEMINI_API_KEY")
     return k
 
-def _request(url, payload=None, timeout=180):
+RETRY_CODES = (429, 500, 502, 503, 504)
+
+def _request(url, payload=None, timeout=180, retries=4):
+    """临时性错误（限流、拥堵、网关错误）按 5s、15s、45s、90s 退避重试。"""
     data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json", "x-goog-api-key": _key()})
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return json.loads(r.read().decode())
-    except urllib.error.HTTPError as e:
-        body = e.read().decode(errors="replace")[:300]
-        raise GeminiError(f"HTTP {e.code} {url.split('/models/')[-1].split(':')[0]}: {body}") from None
-    except urllib.error.URLError as e:
-        raise GeminiError(f"网络错误: {e.reason}") from None
+    delays = [5, 15, 45, 90]
+    for attempt in range(retries + 1):
+        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json", "x-goog-api-key": _key()})
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            body = e.read().decode(errors="replace")[:300]
+            if e.code in RETRY_CODES and attempt < retries:
+                print(f"[gemini] HTTP {e.code}，{delays[attempt]}s 后重试（第 {attempt+1}/{retries} 次）", file=sys.stderr)
+                time.sleep(delays[attempt]); continue
+            raise GeminiError(f"HTTP {e.code} {url.split('/models/')[-1].split(':')[0]}: {body}") from None
+        except urllib.error.URLError as e:
+            if attempt < retries:
+                time.sleep(delays[attempt]); continue
+            raise GeminiError(f"网络错误: {e.reason}") from None
 
 def list_models():
     out = _request(f"{BASE}/models?pageSize=100")
