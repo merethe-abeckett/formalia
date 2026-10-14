@@ -140,9 +140,6 @@ form.edit button,.ask button{padding:8px 22px;border:0;border-radius:6px;backgro
 form.edit button:disabled,.ask button:disabled{opacity:.5;cursor:default}
 pre.msg{white-space:pre-wrap}
 .cf-turnstile{margin-top:12px}
-/* 首页引文 */
-figure.quote{margin:22px 0 4px;max-width:760px}figure.quote blockquote{margin:0;font-size:15.5px;line-height:1.85}
-figure.quote figcaption{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:6px 0 0 21px}
 /* 搜索 */
 .search{display:flex;gap:8px;margin:16px 0 4px;max-width:640px}
 .search input{flex:1;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);font:16px var(--sans)}
@@ -401,7 +398,6 @@ Formalia 把每一种写法固定下来，给它一个永久编号，再记录�
 <form class="search" action="search/index.html" method="get" role="search"><input name="q" placeholder="搜索猜想、表述、编号，例如“素数”" aria-label="搜索"><button>搜索</button></form>
 <div class="actions"><a class="btn primary" href="#conjectures">浏览猜想</a><a class="btn" href="about/guide.html">使用说明</a>
 <a class="btn" href="{edit_link("", type="statement")}">＋ 登记一条表述</a></div></section>
-{author_quote()}
 <div class="steps">
 <div class="step"><span class="k">猜想</span><b>自然语言的命题</b><p>例如哥德巴赫猜想。每个猜想一个页面，列出它的各种 Lean 写法。</p></div>
 <div class="step"><span class="k">#20261014-01</span><b>表述</b><p>一段 Lean 代码，一个永久编号。编号指向的代码永远不变。</p></div>
@@ -487,15 +483,6 @@ def write_chat_page():
             '<form id="chat-form" autocomplete="off"><input id="chat-input" maxlength="500" placeholder="说点什么，回车发送"><button>发送</button></form></div>'
             '<noscript><p class="note bad">聊天需要启用 JavaScript。</p></noscript><script src="chat.js" defer></script>')
     (OUT / "chat" / "index.html").write_text(page("灌水区", [("灌水区", None)], body, 1), encoding="utf-8")
-
-def author_quote():
-    """首页引文：README“阅读前说明”里以“我觉得中国”开头的那一段，标为作者的话。"""
-    for line in readme_preface().splitlines():
-        t = line.lstrip("> ").strip()
-        if t.startswith("我觉得中国"):
-            return (f'<figure class="quote"><blockquote><p>{esc(t)}</p></blockquote>'
-                    '<figcaption>作者的话 · <a href="about/index.html">全文与本站原则</a></figcaption></figure>')
-    return ""
 
 def readme_preface():
     """README 里“阅读前说明”一节，网站与 README 共用一份原文。"""
