@@ -15,7 +15,7 @@ TURNSTILE_SITEKEY = ""   # 在后台填写
 
 [[kv_namespaces]]
 binding = "FORMALIA_KV"
-id = ""                  # 在后台创建 KV 命名空间后填写
+id = "ed74a50b108f486383c7812f4850f51e"   # KV 命名空间 formalia（不是机密）
 
 [[durable_objects.bindings]]
 name = "CHAT"
