@@ -45,6 +45,7 @@ jobs:
         env:
           KV_NAMESPACE_ID: ${{ vars.KV_NAMESPACE_ID || secrets.KV_NAMESPACE_ID }}
           TURNSTILE_SITEKEY: ${{ vars.TURNSTILE_SITEKEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
         run: |
           python3 - <<'PY'
           import os, re
@@ -55,6 +56,9 @@ jobs:
               s = re.sub(r'(?m)^id = "[^"]*"(.*)$', f'id = "{kv}"', s)
           site = os.environ.get("TURNSTILE_SITEKEY", "").strip()
           s = re.sub(r'(?m)^TURNSTILE_SITEKEY = ""(.*)$', f'TURNSTILE_SITEKEY = "{site}"', s)
+          model = os.environ.get("GEMINI_MODEL", "").strip()
+          if model and not re.fullmatch(r"[A-Za-z0-9.\-]+", model): raise SystemExit("GEMINI_MODEL 只能是模型名，例如 gemini-3.8-flash")
+          s = re.sub(r'(?m)^GEMINI_MODEL = ""(.*)$', f'GEMINI_MODEL = "{model}"', s)
           open(p, "w", encoding="utf-8").write(s)
           PY
       - name: 安装 wrangler
