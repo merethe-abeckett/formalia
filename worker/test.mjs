@@ -1,6 +1,6 @@
 // 本地测试：node worker/test.mjs
 // 模拟 KV、Turnstile 和 GitHub API，检查 Worker 的各条路径。
-import worker, { anonId, ipKey, banKeys, safeText, fencedJson } from "./src/index.js";
+import worker, { anonId, ipKey, banKeys, safeText, fencedJson, AskGate, askSystemPrompt } from "./src/index.js";
 import { writeFileSync } from "node:fs";
 import assert from "node:assert/strict";
 
@@ -83,4 +83,62 @@ assert.equal(j.state, "applied"); assert.equal(j.message, "已写入。"); ok("s
 r = await get("/api/status?issue=999"); assert.equal(r.status, 404); ok("status of non-web issue → 404");
 assert.equal(safeText("a\u0000b<c>`@x", 99), "ab＜c＞｀@​x");
 assert.ok(!fencedJson({ s: "``` <!--" }).match(/[<`]/)); ok("escaping helpers");
+// ---------- 交互式导读 ----------
+const CTX = { id: "20261014-01", declaration: "Registry.Goldbach.S20261014_01", module: "Conjectures.Goldbach.S20261014_01",
+  conjecture: { name: "Goldbach's conjecture", name_zh: "哥德巴赫猜想", informal: "每个大于 2 的偶数都是两个素数之和。" },
+  lean: "def S20261014_01 : Prop := ∀ n : ℕ, 2 < n → Even n → ∃ p q, Nat.Prime p ∧ Nat.Prime q ∧ n = p + q",
+  dependencies: [{ name: "Nat.Prime", module: "Mathlib.Data.Nat.Prime.Defs" }], guide: "导读", restatement: { text: "复述" } };
+const gemCalls = []; let gemStatus = [200]; let gemModels = [];
+const baseFetch = globalThis.fetch;
+globalThis.fetch = async (url, init = {}) => {
+  url = String(url);
+  if (url === `${ORIGIN}/ask/20261014-01.json`) return new Response(JSON.stringify(CTX));
+  if (url.startsWith(`${ORIGIN}/ask/`)) return new Response("not found", { status: 404 });
+  if (url.includes("generativelanguage.googleapis.com") && url.includes(":generateContent")) {
+    assert.equal(init.headers["x-goog-api-key"], "gemkey");
+    const body = JSON.parse(init.body); gemCalls.push({ url, body });
+    const st = gemStatus.length > 1 ? gemStatus.shift() : gemStatus[0];
+    if (st !== 200) return new Response("err", { status: st });
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: "思考", thought: true }, { text: "`Nat.Prime p` 表示 p 是素数。" }] } }] }));
+  }
+  if (url.includes("generativelanguage.googleapis.com/v1beta/models?")) return new Response(JSON.stringify({ models: gemModels }));
+  return baseFetch(url, init);
+};
+class Storage { constructor() { this.m = new Map(); } async get(k) { return structuredClone(this.m.get(k)); } async put(k, v) { this.m.set(k, structuredClone(v)); } }
+const askEnv = { ...env, GEMINI_API_KEY: "gemkey", GEMINI_MODEL: "gemini-x-flash", ASK_PER_HOUR: "2", ASK_PER_DAY: "3" };
+let gate = new AskGate({ storage: new Storage() }, askEnv); let hint = null;
+askEnv.ASK = { idFromName: (n) => n, get: (id, opt) => { hint = opt; return { fetch: (req) => gate.fetch(req) }; } };
+const askPost = (body, ip = "203.0.113.20", e = askEnv) => worker.fetch(new Request(`${ORIGIN}/api/ask`, {
+  method: "POST", body: typeof body === "string" ? body : JSON.stringify(body),
+  headers: { "Content-Type": "application/json", Origin: ORIGIN, "CF-Connecting-IP": ip } }), e, {});
+
+r = await askPost({ id: "20261014-01", question: "x" }, "203.0.113.20", { ...env }); assert.equal(r.status, 503); ok("ask: not configured → 503");
+r = await askPost({ id: "20261014-01", question: "Nat.Prime 是什么？", history: [{ q: "上一问", a: "上一答" }, { q: "", a: "丢弃" }] });
+j = await r.json(); assert.equal(r.status, 200, JSON.stringify(j));
+assert.equal(j.answer, "`Nat.Prime p` 表示 p 是素数。"); assert.equal(j.model, "gemini-x-flash"); assert.equal(hint.locationHint, "wnam");
+const call = gemCalls.at(-1);
+assert.match(call.url, /models\/gemini-x-flash:generateContent$/);
+assert.deepEqual(call.body.contents.map(c => c.role), ["user", "model", "user"]);
+assert.equal(call.body.contents[2].parts[0].text, "Nat.Prime 是什么？");
+assert.ok(call.body.systemInstruction.parts[0].text.includes(CTX.lean), "Lean code comes from the site, not the browser");
+ok("ask: answer from Gemini, thoughts dropped, history kept, US placement");
+r = await askPost({ id: "20261014-01", question: "又一问" }); assert.equal(r.status, 200);
+r = await askPost({ id: "20261014-01", question: "第三问" }); assert.equal(r.status, 429); ok("ask: per-anon hourly limit");
+r = await askPost({ id: "20261014-01", question: "别人" }, "198.51.100.77"); assert.equal(r.status, 200);
+r = await askPost({ id: "20261014-01", question: "又一个人" }, "198.51.100.78"); assert.equal(r.status, 429);
+assert.match((await r.json()).error, /今天全站/); ok("ask: site-wide daily limit");
+gate = new AskGate({ storage: new Storage() }, askEnv);
+r = await askPost({ id: "20261099-01", question: "x" }); assert.equal(r.status, 404);
+r = await askPost({ id: "../x", question: "x" }); assert.equal(r.status, 400);
+r = await askPost({ id: "20261014-01", question: "   " }); assert.equal(r.status, 400);
+r = await askPost("{bad"); assert.equal(r.status, 400);
+r = await worker.fetch(new Request(`${ORIGIN}/api/ask`, { method: "POST", body: "{}", headers: { Origin: "https://evil.example" } }), askEnv, {});
+assert.equal(r.status, 403); ok("ask: bad input / unknown id / foreign origin rejected");
+gemStatus = [503, 200]; r = await askPost({ id: "20261014-01", question: "重试" }); assert.equal(r.status, 200); ok("ask: retries on 503");
+gate = new AskGate({ storage: new Storage() }, askEnv);
+gemStatus = [404, 200]; gemModels = [{ name: "models/gemini-9-flash", supportedGenerationMethods: ["generateContent"] }, { name: "models/gemini-9-flash-lite", supportedGenerationMethods: ["generateContent"] }];
+r = await askPost({ id: "20261014-01", question: "换模型" }); j = await r.json(); assert.equal(r.status, 200); assert.equal(j.model, "gemini-9-flash");
+ok("ask: falls back to newest flash model on 404");
+gemStatus = [400]; r = await askPost({ id: "20261014-01", question: "坏请求" }); assert.equal(r.status, 502); gemStatus = [200]; ok("ask: Gemini error → 502");
+assert.ok(askSystemPrompt(CTX).includes("不可以")); 
 console.log(`worker tests: ${n} passed`);
