@@ -1,0 +1,28 @@
+# Lean Statement Registry
+# Code: Apache-2.0. Entry content: CC-BY-4.0. See LICENSE and LICENSE-CONTENT.
+
+name = "registry"
+defaultTargets = ["Conjectures"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+pp.unicode.fun = true
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.29.0"
+
+# Every registered statement lives under Conjectures/<Conjecture>/S<id>.lean
+[[lean_lib]]
+name = "Conjectures"
+globs = ["Conjectures.+"]
+
+# Checker tool: collects axioms per declaration and writes a JSON report.
+[[lean_lib]]
+name = "RegistryTools"
+
+[[lean_exe]]
+name = "check"
+root = "RegistryTools.Check"

@@ -1,0 +1,19 @@
+{
+  "id": "20261014-01",
+  "conjecture": "goldbach",
+  "module": "Conjectures.Goldbach.S20261014_01",
+  "declaration": "Registry.Goldbach.S20261014_01",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "source": {
+    "kind": "original",
+    "url": "",
+    "note": "Written for the registry as the first example entry, using Nat.Prime."
+  },
+  "informal_restatement": {
+    "author": "submitter",
+    "text": "For every natural number n, if n > 2 and n is even, then there exist natural numbers p and q, both prime in the sense of Nat.Prime, with n = p + q."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}
