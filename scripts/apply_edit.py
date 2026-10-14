@@ -11,13 +11,13 @@
 退出码：0 成功，1 提交内容有问题（message 写给提交者看），2 用法错误。
 
 提交格式（v1）：
-  {"v":1, "type":"claim"|"meta"|"conjecture"|"statement",
+  {"v":1, "type":"claim"|"meta"|"conjecture"|"statement"|"essay",
    "editor":{"label":"匿名者 7f3a1c2e","anon":"7f3a1c2e","name":""},
-   "summary":"编辑摘要", "target":"20261014-01" 或猜想 slug,
+   "summary":"编辑摘要", "target":"20261014-01"、猜想 slug、解读编号 J20261014-01，新增时为空,
    "data":{...}, "base":{...}}
 代码许可：Apache-2.0。
 """
-import argparse, datetime, json, re, sys
+import argparse, datetime, hashlib, json, re, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -27,10 +27,13 @@ import licenses
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
 ARCH = ROOT / "Archive"
+ESSAYS = ROOT / "Essays"
 MARKER = "<!-- formalia-edit v1 -->"
 ID_RE = re.compile(r"^(\d{8})-(\d{2})$")
+ESSAY_ID_RE = re.compile(r"^J(\d{8})-(\d{2})$")
+ESSAY_MAX = 20000   # 议题正文上限 65536 字符，留足余量
 URL_RE = re.compile(r"^https?://[^\s<>\"'`]+$")
-TYPE_ZH = {"claim": "声明证明", "meta": "编辑表述信息", "conjecture": "编辑猜想信息", "statement": "新增表述"}
+TYPE_ZH = {"claim": "声明证明", "meta": "编辑表述信息", "conjecture": "编辑猜想信息", "statement": "新增表述", "essay": "解读"}
 
 class EditError(Exception):
     pass
@@ -270,6 +273,77 @@ def apply_statement(sub, editor, created_at):
     changed += [lean_path, cdir / f"{stem}.json"]
     return sid, changed, True
 
+# ---------- 解读 ----------
+def essay_about(v, conjs):
+    """解读挂在哪些表述或猜想下面：至少一个，最多 10 个，必须都存在。"""
+    if not isinstance(v, list) or not v: raise EditError("请至少填写一个相关的表述编号或猜想")
+    if len(v) > 10: raise EditError("相关条目最多 10 个")
+    out = []
+    for x in v:
+        x = clean(x, 80, "相关条目").lstrip("#")
+        m = ID_RE.match(x)
+        if m:
+            if not any(b.exists() and list(b.glob(f"*/S{m.group(1)}_{m.group(2)}.json")) for b in (CONJ, ARCH)):
+                raise EditError(f"找不到表述 #{x}")
+        elif x not in conjs:
+            raise EditError(f"找不到表述或猜想：{x}（表述写编号如 20261014-01，猜想写标识如 goldbach）")
+        if x not in out: out.append(x)
+    return out
+
+def body_sha(text):
+    return hashlib.sha256(text.strip().encode("utf-8")).hexdigest()
+
+def apply_essay(sub, editor, created_at):
+    d, base = sub.get("data") or {}, sub.get("base") or {}
+    conjs = load_conjectures()
+    target = sub.get("target") or ""
+    if target:                                     # 修改已有的解读
+        m = ESSAY_ID_RE.match(target)
+        if not m: raise EditError(f"解读编号格式不对：{target!r}，应为 JYYYYMMDD-NN")
+        stem = f"J{m.group(1)}_{m.group(2)}"
+        mp, bp = ESSAYS / f"{stem}.json", ESSAYS / f"{stem}.md"
+        if not mp.exists(): raise EditError(f"找不到解读 {target}")
+        meta, body = json.loads(mp.read_text(encoding="utf-8")), bp.read_text(encoding="utf-8")
+        unknown = set(d) - {"title", "about", "body"}
+        if unknown: raise EditError("不能编辑这些字段：" + "、".join(sorted(unknown)))
+        if not d: raise EditError("没有可编辑的字段")
+        changed = False
+        if "title" in d:
+            check_base(base, "title", meta["title"])
+            v = clean(d["title"], 120, "标题", required=True)
+            if v != meta["title"]: meta["title"] = v; changed = True
+        if "about" in d:
+            check_base(base, "about", meta["about"])
+            v = essay_about(d["about"], conjs)
+            if v != meta["about"]: meta["about"] = v; changed = True
+        if "body" in d:
+            if "body_sha256" in base and base["body_sha256"] != body_sha(body):
+                raise EditError("编辑冲突：正文在你打开页面之后已被别人修改。请刷新页面，在最新内容上重新编辑。")
+            v = clean(d["body"], ESSAY_MAX, "正文", multiline=True, required=True)
+            if v != body.strip(): body = v + "\n"; changed = True
+        if not changed: raise EditError("提交的内容和现有内容完全相同，没有需要修改的地方")
+        if editor != meta.get("author") and editor not in meta.setdefault("editors", []): meta["editors"].append(editor)
+        write_json(mp, meta); write_text(bp, body)
+        return target, [mp, bp], False
+
+    unknown = set(d) - {"title", "about", "body", "license"}
+    if unknown: raise EditError("不认识这些字段：" + "、".join(sorted(unknown)))
+    title = clean(d.get("title"), 120, "标题", required=True)
+    about = essay_about(d.get("about"), conjs)
+    body = clean(d.get("body"), ESSAY_MAX, "正文", multiline=True, required=True)
+    lic = clean(d.get("license"), 40, "许可") or licenses.DEFAULT
+    if lic not in licenses.ALLOWED: raise EditError("许可只能是：" + "、".join(licenses.ALLOWED))
+    date = datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00")).astimezone(datetime.timezone.utc).strftime("%Y%m%d")
+    nns = [int(m.group(1)) for f in (ESSAYS.glob(f"J{date}_*.json") if ESSAYS.exists() else []) for m in [re.match(rf"J{date}_(\d\d)\.", f.name)] if m]
+    nn = max(nns, default=0) + 1
+    if nn > 99: raise EditError("今天的解读已达 99 篇上限，请明天再试")
+    eid, stem = f"J{date}-{nn:02d}", f"J{date}_{nn:02d}"
+    meta = {"id": eid, "title": title, "about": about, "author": editor,
+            "submitted_at": f"{date[:4]}-{date[4:6]}-{date[6:]}", "license": lic}
+    mp, bp = ESSAYS / f"{stem}.json", ESSAYS / f"{stem}.md"
+    write_json(mp, meta); write_text(bp, body + "\n")
+    return eid, [mp, bp], False
+
 # ---------- 解析议题 ----------
 def parse_web(body):
     i = body.rfind(MARKER)   # 取最后一个标记：标记之前的人类可读部分不能伪造数据
@@ -312,6 +386,7 @@ def main():
         if kind == "claim": target, changed, lean = apply_claim(sub, editor)
         elif kind == "meta": target, changed, lean = apply_meta(sub, editor)
         elif kind == "conjecture": target, changed, lean = apply_conjecture(sub, editor)
+        elif kind == "essay": target, changed, lean = apply_essay(sub, editor, a.created_at)
         else: target, changed, lean = apply_statement(sub, editor, a.created_at)
         flush()
         label = f"#{target}" if ID_RE.match(target) else target

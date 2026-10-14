@@ -13,7 +13,11 @@ routes = [
 REPO = "merethe-abeckett/formalia"
 ALLOWED_ORIGINS = "https://formalnaturalist.co.nz,https://www.formalnaturalist.co.nz"
 RATE_LIMIT_PER_HOUR = "6"
+SUBMIT_PER_DAY = "200"   # 全站每天网页编辑次数上限（没有人机验证时防刷）
 TURNSTILE_SITEKEY = ""   # 在后台填写
+GEMINI_MODEL = ""        # 部署时从仓库变量 GEMINI_MODEL 填入；留空则用 gemini-3.8-flash
+ASK_PER_HOUR = "20"      # 交互式导读：每个匿名编号每小时提问次数
+ASK_PER_DAY = "300"      # 交互式导读：全站每天提问次数
 
 [[kv_namespaces]]
 binding = "FORMALIA_KV"
@@ -23,9 +27,17 @@ id = "ed74a50b108f486383c7812f4850f51e"   # KV 命名空间 formalia（不是机
 name = "CHAT"
 class_name = "ChatRoom"
 
+[[durable_objects.bindings]]
+name = "ASK"
+class_name = "AskGate"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["ChatRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["AskGate"]
 
 [placement]
 mode = "smart"   # 让 Worker 跑在离 Gemini 等后端近的机房，避开不受支持的地区

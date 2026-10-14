@@ -11,7 +11,7 @@ Writes:
 The site states facts only. It carries no field for "is this equivalent to the
 informal conjecture"; that discussion happens offline among mathematicians.
 """
-import html, json, os, re, sys, subprocess, datetime
+import hashlib, html, json, os, re, sys, subprocess, datetime, urllib.parse
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import licenses
@@ -31,24 +31,30 @@ def _inline(t):
     t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
     def link(m):
         label, url = m.group(1), m.group(2)
-        if not re.match(r"^(https?://|[a-zA-Z0-9_./#-]+$)", url) or url.lower().startswith("javascript"):
+        if not re.match(r"^(https?://|mailto:[^\s<>\"]+@[^\s<>\"]+$|[\w./#-]+$)", url) or url.lower().startswith("javascript"):
             return label
         return f'<a href="{url}">{label}</a>'
     return re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link, t)
 
 def md_to_html(md):
     """够用的 Markdown：标题、段落、无序/有序列表、引用、粗体、代码、链接。"""
-    out, mode = [], None          # mode: None | "ul" | "ol" | "quote"
+    out, mode = [], None          # mode: None | "ul" | "ol" | "quote" | "code"
     def close():
         nonlocal mode
-        if mode: out.append({"ul": "</ul>", "ol": "</ol>", "quote": "</blockquote>"}[mode]); mode = None
+        if mode: out.append({"ul": "</ul>", "ol": "</ol>", "quote": "</blockquote>", "code": "</code></pre>"}[mode]); mode = None
     for raw in md.splitlines():
         line = raw.strip()
+        if mode == "code":        # 代码块：原样显示，直到 ```
+            if line.startswith("```"): close()
+            else: out.append(esc(raw.rstrip()))
+            continue
+        if line.startswith("```"):
+            close(); out.append("<pre><code>"); mode = "code"; continue
         if line.startswith("<!--"): continue
         if not line: close(); continue
         h = re.match(r"^(#{2,4})\s+(.*)$", line)
         if h:
-            close(); n = len(h.group(1)); out.append(f"<h{n}>{_inline(h.group(2))}</h{n}>"); continue
+            close(); n = len(h.group(1)); out.append(f'<h{n} id="{esc(h.group(2).strip())}">{_inline(h.group(2))}</h{n}>'); continue
         if line.startswith(("- ", "* ")):
             if mode != "ul": close(); out.append("<ul>"); mode = "ul"
             out.append(f"<li>{_inline(line[2:])}</li>"); continue
@@ -61,7 +67,7 @@ def md_to_html(md):
             out.append(f"<p>{_inline(line.lstrip('>').strip())}</p>"); continue
         close(); out.append(f"<p>{_inline(line)}</p>")
     close()
-    return "\n".join(out)
+    return re.sub(r"<pre><code>\n", "<pre><code>", "\n".join(out))
 
 def esc(s): return html.escape(str(s), quote=True)
 
@@ -140,6 +146,32 @@ form.edit button,.ask button{padding:8px 22px;border:0;border-radius:6px;backgro
 form.edit button:disabled,.ask button:disabled{opacity:.5;cursor:default}
 pre.msg{white-space:pre-wrap}
 .cf-turnstile{margin-top:12px}
+/* 搜索 */
+.search{display:flex;align-items:center;max-width:680px;margin:18px 0 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:4px 4px 4px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(31,95,139,.15)}
+.search svg{flex:none;width:18px;height:18px;color:var(--muted);margin-right:6px}
+.search input{flex:1;min-width:0;border:0;background:transparent;padding:9px 4px;font:16px var(--sans);color:var(--fg);outline:none}
+.search input::-webkit-search-cancel-button{cursor:pointer}
+.search button{flex:none;border:0;border-radius:999px;background:var(--accent);color:#fff;padding:9px 22px;font:15px var(--sans);cursor:pointer}
+@media(prefers-color-scheme:dark){.search button{color:#0d1b26}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 22px}
+.chips a{border:1px solid var(--line);border-radius:999px;padding:3px 12px;text-decoration:none;color:var(--fg);background:var(--card)}
+.chips a:hover{border-color:var(--muted)}
+#search-info{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 10px}
+#results{list-style:none;padding:0;margin:0;font-family:var(--sans);display:flex;flex-direction:column;gap:10px}
+#results li{background:var(--card);border:1px solid var(--line);border-radius:10px}#results li:hover{border-color:var(--muted)}
+#results a{display:block;padding:12px 16px;text-decoration:none;color:var(--fg)}
+#results .t{font-weight:600}#results .e{color:var(--muted);font-size:14px}
+#results .tag{display:inline-block;font-size:11.5px;border-radius:999px;padding:1px 8px;margin-right:8px;vertical-align:1px;background:var(--box);color:var(--muted)}
+#results .tag.c{background:var(--accent);color:var(--card)}
+#results .snip{font-size:13.5px;color:var(--muted);margin-top:4px;line-height:1.6}
+#results li.new{background:none;border-style:dashed}
+mark{background:#fde68a;color:inherit;border-radius:2px;padding:0 1px}
+@media(prefers-color-scheme:dark){mark{background:#6b5310}}
+/* 解读 */
+ul.essays{list-style:none;padding:0;font-family:var(--sans)}ul.essays li{padding:10px 0;border-bottom:1px solid var(--line)}
+ul.essays .t{font-weight:600;font-size:16px}ul.essays a{text-decoration:none}ul.essays .e{font-size:13px;color:var(--muted);margin-top:2px}
+article.essay{max-width:760px;line-height:1.85;margin-top:18px}article.essay pre{line-height:1.5}
 /* 灌水区 */
 .chat{font-family:var(--mono);font-size:14px;border:1px solid var(--line);border-radius:10px;background:var(--card);display:flex;flex-direction:column;height:min(70vh,640px)}
 .chat .bar{display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12.5px;font-family:var(--sans)}
@@ -158,11 +190,23 @@ pre.msg{white-space:pre-wrap}
 .ask .a{white-space:pre-wrap;line-height:1.7}.ask .a code{background:var(--box);padding:0 3px;border-radius:3px}
 .ask textarea{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:inherit;resize:vertical}
 .ask .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.ask .row button{margin-top:6px}
+.ask .a.err{color:var(--bad)}.ask .row .st{font-size:13px}
 @media(max-width:700px){.steps{grid-template-columns:1fr}.hero h1{font-size:2.1em}}
 @media(max-width:600px){th{width:auto}td,th{display:block;width:100%}tr{display:block;border-bottom:1px solid var(--line)}}
 """
 
 SITE_NAME = "Formalia"
+SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>'
+
+def ver(text):
+    """静态文件的版本号：内容一变，链接就变，浏览器和 Cloudflare 不会用旧缓存。"""
+    return hashlib.sha256(text.encode()).hexdigest()[:10]
+
+def script(name, prefix=""):
+    return f'<script src="{prefix}{name}?v={ver((SITE_SRC / name).read_text(encoding="utf-8"))}" defer></script>'
+
+REPO_URL = "https://github.com/merethe-abeckett/formalia"
+CONTACT = "merethe.abeckett@outlook.com"
 
 def page(title, crumbs, body, depth, home=False):
     rel = "../" * depth
@@ -172,13 +216,13 @@ def page(title, crumbs, body, depth, home=False):
     return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(full)}</title>
 <meta name="description" content="Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。">
-<link rel="stylesheet" href="{rel}style.css"></head><body>
+<link rel="stylesheet" href="{rel}style.css?v={ver(CSS)}"></head><body>
 <header class="top"><div class="in"><a class="brand" href="{rel}index.html">{SITE_NAME}</a>
-<nav><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a></nav></div></header>
+<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}essays/index.html">解读</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
 {crumb_html}<main>{body}</main>
 <footer>Formalia 只列出形式化表述及其事实，不判断某条表述是否等价于原猜想。<br>
 代码 Apache-2.0 · 条目内容按各自声明的许可，默认 CC-BY-4.0 · <a href="{rel}about/privacy.html">隐私与编辑规则</a> ·
-<a href="https://github.com/merethe-abeckett/formalia">源代码</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
+<a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · <a href="{rel}about/contact.html">联系作者</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
 </body></html>"""
 
 def status_cell(rep):
@@ -265,6 +309,7 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
         ("Lean 工具链", f"<code>{esc(tc)}</code>"),
         ("依赖（钉死版本）", "<br>".join(f"<code>{esc(n)}</code> @ <code>{esc(r)}</code>" + (f" ({esc(i)})" if i else "") for n,r,i in deps) or "—"),
         ("CI 检查", status_cell(decl)),
+        ("解读", essays_line(sid, "../../")),
     ]
     table = "<table>" + "".join(f"<tr><th>{k}</th><td>{v}</td></tr>" for k,v in rows) + "</table>"
 
@@ -315,6 +360,12 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
         body += md_to_html(gtext)
     else:
         body += '<p class="muted">尚未生成</p>'
+    if not meta.get("archived"):
+        body += (f'<h3>问 Gemini</h3><div class="ask" id="ask" data-id="{esc(sid)}"><div class="log" aria-live="polite"></div>'
+                 '<textarea rows="2" maxlength="500" placeholder="针对这条表述随便问，例如：Nat.Prime 是什么意思？n 从几开始？"></textarea>'
+                 '<div class="row"><button type="button">提问</button><span class="muted st"></span></div>'
+                 '<p class="muted" style="font-size:13px;margin:8px 0 0">回答由 Gemini 现场生成，可能出错，不代表登记库的判断。'
+                 '它只解释这段 Lean 代码，不回答“是否等价于原猜想”。</p></div>' + script("ask.js", "../../"))
 
     ir = meta.get("informal_restatement") or {}
     body += "<h2>非正式复述</h2>"
@@ -365,6 +416,7 @@ def render_conjecture(conj, entries, archived=()):
             a = meta.get("archived", {})
             body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(a.get("at",""))}</td><td>{esc(a.get("reason",""))}</td><td><a href="{esc(a.get("issue",""))}">议题</a></td></tr>'
         body += "</table>"
+    body += f'<p class="muted" style="font-family:var(--sans);font-size:14px;margin-top:14px">关于这个猜想的解读：{essays_line(conj["slug"], "../")}</p>'
     refs = conj.get("references") or []
     if refs:
         body += "<h2>参考资料</h2><ul class='plain'>" + "".join(f'<li><a href="{esc(r["url"])}">{esc(r.get("label", r["url"]))}</a></li>' for r in refs) + "</ul>"
@@ -380,6 +432,7 @@ def render_index(conjs, tc, deps, check_ok):
 <p class="sub">数学猜想的 Lean 表述目录</p>
 <p>当有人说“AI 证明了某个猜想”，真正被证明的是一段 Lean 代码。这段代码写得是否忠实于原猜想，机器回答不了。
 Formalia 把每一种写法固定下来，给它一个永久编号，再记录谁声称证明了哪个编号。只列出，不判断。</p>
+<form class="search" action="search/index.html" method="get" role="search">{SEARCH_ICON}<input type="search" name="q" placeholder="搜索猜想、编号或关键词" aria-label="搜索"><button>搜索</button></form>
 <div class="actions"><a class="btn primary" href="#conjectures">浏览猜想</a><a class="btn" href="about/guide.html">使用说明</a>
 <a class="btn" href="{edit_link("", type="statement")}">＋ 登记一条表述</a></div></section>
 <div class="steps">
@@ -400,10 +453,69 @@ Formalia 把每一种写法固定下来，给它一个永久编号，再记录�
     return page(SITE_NAME, [], body, 0, home=True)
 
 SITE_SRC = ROOT / "site"
+ESSAYS = ROOT / "Essays"
+ESSAYS_BY = {}   # 表述编号或猜想 slug -> [解读 meta]，main() 里填好
+
+def load_essays():
+    out = []
+    if ESSAYS.exists():
+        for mj in sorted(ESSAYS.glob("J*.json"), reverse=True):
+            m = read_json(mj); m["_body"] = mj.with_suffix(".md").read_text(encoding="utf-8"); m["_stem"] = mj.stem
+            out.append(m)
+    return out
+
+def essays_line(key, rel):
+    """表述页、猜想页上的一行小字：有几篇解读、写一篇。不占版面。"""
+    es = ESSAYS_BY.get(key, [])
+    write = f'<a href="{edit_link(rel, type="essay", about=key)}">写一篇</a>'
+    if not es: return f'<span class="muted">还没有</span> · {write}'
+    return f'<a href="{rel}essays/index.html?about={esc(key)}">{len(es)} 篇</a> · {write}'
+
+def write_essays(essays, index_rows):
+    """解读：列表页 + 每篇一页。"""
+    names = {c["slug"]: (c.get("name_zh") or c["name"]) for c, _ in index_rows}
+    def about_links(m, rel):
+        out = []
+        for a in m.get("about") or []:
+            if re.match(r"^\d{8}-\d{2}$", a):
+                sid_conj = STATEMENT_CONJ.get(a)
+                out.append(f'<a href="{rel}{esc(sid_conj)}/{esc(a)}/index.html">#{esc(a)}</a>' if sid_conj else f"#{esc(a)}")
+            else:
+                out.append(f'<a href="{rel}{esc(a)}/index.html">{esc(names.get(a, a))}</a>')
+        return "、".join(out)
+    d = OUT / "essays"; d.mkdir(exist_ok=True)
+    items = "".join(
+        f'<li data-about="{esc(" ".join(m.get("about") or []))}"><a href="{esc(m["id"])}/index.html"><span class="t">{esc(m["title"])}</span></a>'
+        f'<div class="e">关于 {about_links(m, "../")} · {esc(m.get("author",""))} · {esc(m.get("submitted_at",""))}</div></li>' for m in essays)
+    body = ('<h1>解读</h1><p class="muted" style="font-family:var(--sans);font-size:14px">对已登记的表述或猜想的讨论文章：这段 Lean 代码说了什么、和别的写法有什么不同、'
+            '从证明里能读出什么。谁都可以写，谁都可以修改。解读是作者的个人观点，不代表 Formalia 的判断。</p>'
+            f'<div class="actions"><a class="btn" href="{edit_link("../", type="essay")}">＋ 写一篇解读</a></div>'
+            '<p id="essay-filter" class="note" hidden></p>'
+            + (f'<ul class="essays">{items}</ul>' if essays else '<p class="muted">还没有解读。</p>')
+            + "<script>(function(){var a=new URLSearchParams(location.search).get('about');if(!a)return;var n=0;"
+              "document.querySelectorAll('.essays li').forEach(function(li){var ok=(' '+li.dataset.about+' ').indexOf(' '+a+' ')>=0;li.hidden=!ok;if(ok)n++;});"
+              "var f=document.getElementById('essay-filter');f.hidden=false;f.textContent='只显示关于 '+a+' 的解读（'+n+' 篇）。';"
+              "var l=document.createElement('a');l.href='index.html';l.textContent=' 显示全部';f.append(l);})();</script>")
+    (d / "index.html").write_text(page("解读", [("解读", None)], body, 1), encoding="utf-8")
+    for m in essays:
+        e = d / m["id"]; e.mkdir(exist_ok=True)
+        eds = m.get("editors") or []
+        info = (f'<p class="muted" style="font-family:var(--sans);font-size:14px">关于 {about_links(m, "../../")} · 作者 {esc(m.get("author",""))}'
+                + (f' · 修改者 {esc("、".join(eds))}' if eds else "") + f' · {esc(m.get("submitted_at",""))} · 解读 {esc(m["id"])} · 许可 {license_html(m)}</p>')
+        html_body = md_to_html(m["_body"]).replace('<a href="http', '<a rel="nofollow ugc noopener" href="http')
+        body = (f"<h1>{esc(m['title'])}</h1>" + info
+                + '<p class="note">这是作者的个人解读，不代表 Formalia 的判断。谁都可以修改；每次修改都记录在下面的编辑历史里。</p>'
+                + f'<article class="essay">{html_body}</article>'
+                + f'<div class="actions"><a class="btn" href="{edit_link("../../", type="essay", target=m["id"])}">修改这篇解读</a></div>'
+                + "<h2>编辑历史</h2>" + history_html([f"Essays/{m['_stem']}.md", f"Essays/{m['_stem']}.json"]))
+        (e / "index.html").write_text(page(m["title"], [("解读", "../index.html"), (m["title"], None)], body, 2), encoding="utf-8")
+
+STATEMENT_CONJ = {}   # 表述编号 -> 猜想 slug
 
 def write_edit_pages(index_rows):
     """编辑表单需要的数据，以及编辑、状态、隐私三个页面。"""
-    data = {"statements": {}, "conjectures": {}}
+    data = {"statements": {}, "conjectures": {},
+            "essays": {m["id"]: {"title": m["title"], "about": m.get("about") or [], "body": m["_body"].strip()} for m in load_essays()}}
     for conj, _ in index_rows:
         cdir = CONJ / conj["_dir"]
         data["conjectures"][conj["slug"]] = {k: conj.get(k) or ([] if k == "references" else "") for k in ("name", "name_zh", "informal", "references")}
@@ -416,7 +528,7 @@ def write_edit_pages(index_rows):
     (OUT / "data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     (OUT / "edit").mkdir(exist_ok=True); (OUT / "about").mkdir(exist_ok=True)
     (OUT / "edit" / "edit.js").write_text((SITE_SRC / "edit.js").read_text(encoding="utf-8"), encoding="utf-8")
-    js = '<script src="edit.js" defer></script>'
+    js = script("edit.js")
     (OUT / "edit" / "index.html").write_text(page("编辑", [("编辑", None)],
         '<h1 id="edit-title">编辑</h1><div id="edit-root"><p class="muted">正在加载……</p></div><noscript><p class="note bad">编辑需要启用 JavaScript。</p></noscript>' + js, 1), encoding="utf-8")
     (OUT / "edit" / "status.html").write_text(page("编辑状态", [("编辑状态", None)],
@@ -427,6 +539,60 @@ def write_edit_pages(index_rows):
         "<h1>使用说明</h1>" + md_to_html((SITE_SRC / "guide.md").read_text(encoding="utf-8")), 1), encoding="utf-8")
     about = (SITE_SRC / "about.md").read_text(encoding="utf-8").replace("{{PREFACE}}", "## 作者的话\n\n" + readme_preface())
     (OUT / "about" / "index.html").write_text(page("关于", [("关于", None)], "<h1>关于 Formalia</h1>" + md_to_html(about), 1), encoding="utf-8")
+    contact = (SITE_SRC / "contact.md").read_text(encoding="utf-8").replace("{{QUOTE}}", founder_quote()).replace("{{EMAIL}}", CONTACT)
+    (OUT / "about" / "contact.html").write_text(page("联系作者", [("联系作者", None)], "<h1>联系作者</h1>" + md_to_html(contact), 1), encoding="utf-8")
+
+def write_ask_context(conj, meta, lean_src, decl, tc, deps):
+    """交互式导读的材料：Worker 的 /api/ask 从 /ask/<编号>.json 读取，不接受浏览器传来的代码。"""
+    guide = GUIDES / conj["_dir"] / (meta["_stem"] + ".md")
+    ir = meta.get("informal_restatement") or {}
+    ctx = {
+        "id": meta["id"], "declaration": meta["declaration"], "module": meta["module"],
+        "conjecture": {"name": conj["name"], "name_zh": conj.get("name_zh") or "", "informal": conj.get("informal") or ""},
+        "lean": lean_src, "toolchain": tc,
+        "mathlib": next((r for n, r, _ in deps if n == "mathlib"), "?"),
+        "dependencies": [{"name": d["name"], "module": d.get("module") or ""} for d in (decl or {}).get("direct_dependencies", [])],
+        "guide": re.sub(r"<!--.*?-->", "", guide.read_text(encoding="utf-8"), flags=re.S).strip() if guide.exists() else "",
+        "restatement": {"text": ir.get("text") or "", "author": ir.get("author") or ""},
+    }
+    (OUT / "ask").mkdir(exist_ok=True)
+    (OUT / "ask" / f"{meta['id']}.json").write_text(json.dumps(ctx, ensure_ascii=False), encoding="utf-8")
+
+def write_search(index_rows, essays=()):
+    """站内搜索：生成 search.json 和搜索页。"""
+    docs = []
+    for conj, n in index_rows:
+        cdir = CONJ / conj["_dir"]
+        cname = conj.get("name_zh") or conj["name"]
+        refs = " ".join(r.get("label", "") for r in conj.get("references") or [])
+        docs.append({"kind": "c", "url": f'{conj["slug"]}/index.html', "title": cname,
+                     "sub": conj["name"] if conj.get("name_zh") else "", "text": f'{conj.get("informal","")} {refs}'.strip(), "code": ""})
+        for mj in sorted(cdir.glob("S*.json")):
+            m = read_json(mj)
+            lean = (cdir / (mj.stem + ".lean")).read_text(encoding="utf-8")
+            code = re.sub(r"\s+", " ", re.sub(r"--[^\n]*", "", re.sub(r"/-.*?-/", " ", lean, flags=re.S))).strip()
+            guide = GUIDES / conj["_dir"] / (mj.stem + ".md")
+            gtext = re.sub(r"<!--.*?-->", "", guide.read_text(encoding="utf-8"), flags=re.S) if guide.exists() else ""
+            doc = " ".join(x for x in [(m.get("informal_restatement") or {}).get("text"), (m.get("source") or {}).get("note"),
+                                       " ".join(c.get("claimant", "") for c in m.get("claimed_proofs") or []),
+                                       re.sub(r"[*`#]", "", gtext)] if x)
+            docs.append({"kind": "s", "url": f'{conj["slug"]}/{m["id"]}/index.html', "title": f'#{m["id"]}',
+                         "sub": cname, "text": re.sub(r"\s+", " ", doc).strip(), "code": f'{m["declaration"]} {code}'})
+    for m in essays:
+        docs.append({"kind": "e", "url": f'essays/{m["id"]}/index.html', "title": m["title"], "sub": "解读 · " + " ".join(m.get("about") or []),
+                     "text": re.sub(r"\s+", " ", re.sub(r"[*`#>\[\]]", "", m["_body"])).strip()[:6000], "code": ""})
+    (OUT / "search.json").write_text(json.dumps({"docs": docs}, ensure_ascii=False), encoding="utf-8")
+    (OUT / "search").mkdir(exist_ok=True)
+    (OUT / "search" / "search.js").write_text((SITE_SRC / "search.js").read_text(encoding="utf-8"), encoding="utf-8")
+    examples = ["素数", "偶数"] + [c.get("name_zh") or c["name"] for c, _ in index_rows[:2]]
+    examples += [m["id"] for m in (read_json(mj) for c, _ in index_rows[:1] for mj in sorted((CONJ / c["_dir"]).glob("S*.json"))[:1])]
+    chips = "".join(f'<a href="?q={urllib.parse.quote(x)}">{esc(x)}</a>' for x in dict.fromkeys(examples))
+    body = (f'<h1>搜索</h1><form class="search" id="search-form" role="search">{SEARCH_ICON}'
+            '<input type="search" id="q" placeholder="搜索猜想、编号或关键词" aria-label="搜索" autocomplete="off">'
+            f'<button>搜索</button></form><div class="chips" id="chips"><span>试试</span>{chips}</div>'
+            '<p id="search-info">正在加载……</p><ol id="results"></ol>'
+            '<noscript><p class="note bad">搜索需要启用 JavaScript。</p></noscript>' + script("search.js"))
+    (OUT / "search" / "index.html").write_text(page("搜索", [("搜索", None)], body, 1), encoding="utf-8")
 
 def write_chat_page():
     (OUT / "chat").mkdir(exist_ok=True)
@@ -437,7 +603,7 @@ def write_chat_page():
             '<div class="chat"><div class="bar"><span>#formalia</span><span id="chat-status">连接中……</span></div>'
             '<div id="chat-log" role="log" aria-live="polite"></div>'
             '<form id="chat-form" autocomplete="off"><input id="chat-input" maxlength="500" placeholder="说点什么，回车发送"><button>发送</button></form></div>'
-            '<noscript><p class="note bad">聊天需要启用 JavaScript。</p></noscript><script src="chat.js" defer></script>')
+            '<noscript><p class="note bad">聊天需要启用 JavaScript。</p></noscript>' + script("chat.js"))
     (OUT / "chat" / "index.html").write_text(page("灌水区", [("灌水区", None)], body, 1), encoding="utf-8")
 
 def readme_preface():
@@ -445,14 +611,26 @@ def readme_preface():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     m = re.search(r"^## 阅读前说明[^\n]*\n(.*?)^---", text, re.S | re.M)
     if not m: return ""
-    keep = [l for l in m.group(1).splitlines() if not re.search(r"域名|网址", l)]
+    keep = [l for l in m.group(1).splitlines() if not re.search(r"域名|网址", l) and "我觉得中国" not in l]
     return "\n".join(keep).strip()
+
+def founder_quote():
+    """README“阅读前说明”里以“我觉得中国”开头的那段引文，只放在“联系作者”页。"""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    return next((l for l in text.splitlines() if l.startswith(">") and "我觉得中国" in l), "")
 
 def main():
     tc, deps = pinned_versions()
     OUT.mkdir(exist_ok=True)
     (OUT / "style.css").write_text(CSS, encoding="utf-8")
     index_rows = []; all_ok = True
+    essays = load_essays()
+    for m in essays:
+        for a in m.get("about") or []: ESSAYS_BY.setdefault(a, []).append(m)
+    for base in (CONJ, ARCH):
+        if base.exists():
+            for mj in base.glob("*/S*.json"):
+                mm = read_json(mj); STATEMENT_CONJ[mm["id"]] = mm["conjecture"]
     for cdir in sorted(p for p in CONJ.iterdir() if p.is_dir()):
         cj = cdir / "conjecture.json"
         if not cj.exists(): continue
@@ -467,6 +645,7 @@ def main():
             if decl is None or not decl.get("ok"): all_ok = False
             d = OUT / conj["slug"] / meta["id"]; d.mkdir(parents=True, exist_ok=True)
             (d / "index.html").write_text(render_statement(conj, meta, lean_src, check, tc, deps), encoding="utf-8")
+            write_ask_context(conj, meta, lean_src, decl, tc, deps)
             entries.append((meta, decl))
         archived = []
         adir = ARCH / cdir.name
@@ -483,6 +662,9 @@ def main():
     (OUT / "index.html").write_text(render_index(index_rows, tc, deps, all_ok), encoding="utf-8")
     write_edit_pages(index_rows)
     write_chat_page()
+    write_search(index_rows, essays)
+    write_essays(essays, index_rows)
+    (OUT / "ask.js").write_text((SITE_SRC / "ask.js").read_text(encoding="utf-8"), encoding="utf-8")
     (OUT / ".nojekyll").write_text("")
     print(f"wrote {OUT} ({sum(n for _,n in index_rows)} statements, {len(index_rows)} conjectures)")
 

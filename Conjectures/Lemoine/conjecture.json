@@ -7,10 +7,6 @@
     {
       "label": "Wikipedia (English)",
       "url": "https://en.wikipedia.org/wiki/%C3%89mile_Lemoine#Lemoine's_conjecture_and_extensions"
-    },
-    {
-      "label": "formal-conjectures（DeepMind）",
-      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Lemoine.lean"
     }
   ],
   "informal_en": "Every odd integer n ≥ 7 can be written as p + 2q with p and q prime."

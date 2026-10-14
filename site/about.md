@@ -14,4 +14,9 @@ Formalia 是一个中立的目录，收录数学猜想的 Lean 4 形式化表述
 
 代码 Apache-2.0。条目内容按各条目声明的许可发布，未声明时默认 CC-BY-4.0；改编别人的作品沿用原作许可。
 
+## 联系
+
+- 仓库：[github.com/merethe-abeckett/formalia](https://github.com/merethe-abeckett/formalia)
+- 邮箱和作者的话：见[联系作者](contact.html)
+
 {{PREFACE}}
