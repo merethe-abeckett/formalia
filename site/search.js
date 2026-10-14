@@ -93,7 +93,7 @@
     for (const [, d] of hits) {
       const li = document.createElement("li");
       const a = document.createElement("a"); a.href = "../" + d.url;
-      const tag = document.createElement("span"); tag.className = "tag " + d.kind; tag.textContent = d.kind === "c" ? "猜想" : "表述";
+      const tag = document.createElement("span"); tag.className = "tag " + d.kind; tag.textContent = { c: "猜想", s: "表述", e: "解读" }[d.kind] || "";
       const t = document.createElement("span"); t.className = "t"; t.append(highlight(d.title, ts));
       a.append(tag, t);
       if (d.sub) { const s = document.createElement("span"); s.className = "e"; s.append(" · ", highlight(d.sub, ts)); a.append(s); }
