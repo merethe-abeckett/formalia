@@ -38,12 +38,18 @@ def _inline(t):
 
 def md_to_html(md):
     """够用的 Markdown：标题、段落、无序/有序列表、引用、粗体、代码、链接。"""
-    out, mode = [], None          # mode: None | "ul" | "ol" | "quote"
+    out, mode = [], None          # mode: None | "ul" | "ol" | "quote" | "code"
     def close():
         nonlocal mode
-        if mode: out.append({"ul": "</ul>", "ol": "</ol>", "quote": "</blockquote>"}[mode]); mode = None
+        if mode: out.append({"ul": "</ul>", "ol": "</ol>", "quote": "</blockquote>", "code": "</code></pre>"}[mode]); mode = None
     for raw in md.splitlines():
         line = raw.strip()
+        if mode == "code":        # 代码块：原样显示，直到 ```
+            if line.startswith("```"): close()
+            else: out.append(esc(raw.rstrip()))
+            continue
+        if line.startswith("```"):
+            close(); out.append("<pre><code>"); mode = "code"; continue
         if line.startswith("<!--"): continue
         if not line: close(); continue
         h = re.match(r"^(#{2,4})\s+(.*)$", line)
@@ -61,7 +67,7 @@ def md_to_html(md):
             out.append(f"<p>{_inline(line.lstrip('>').strip())}</p>"); continue
         close(); out.append(f"<p>{_inline(line)}</p>")
     close()
-    return "\n".join(out)
+    return re.sub(r"<pre><code>\n", "<pre><code>", "\n".join(out))
 
 def esc(s): return html.escape(str(s), quote=True)
 
@@ -162,6 +168,10 @@ pre.msg{white-space:pre-wrap}
 #results li.new{background:none;border-style:dashed}
 mark{background:#fde68a;color:inherit;border-radius:2px;padding:0 1px}
 @media(prefers-color-scheme:dark){mark{background:#6b5310}}
+/* 解读 */
+ul.essays{list-style:none;padding:0;font-family:var(--sans)}ul.essays li{padding:10px 0;border-bottom:1px solid var(--line)}
+ul.essays .t{font-weight:600;font-size:16px}ul.essays a{text-decoration:none}ul.essays .e{font-size:13px;color:var(--muted);margin-top:2px}
+article.essay{max-width:760px;line-height:1.85;margin-top:18px}article.essay pre{line-height:1.5}
 /* 灌水区 */
 .chat{font-family:var(--mono);font-size:14px;border:1px solid var(--line);border-radius:10px;background:var(--card);display:flex;flex-direction:column;height:min(70vh,640px)}
 .chat .bar{display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12.5px;font-family:var(--sans)}
@@ -208,7 +218,7 @@ def page(title, crumbs, body, depth, home=False):
 <meta name="description" content="Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。">
 <link rel="stylesheet" href="{rel}style.css?v={ver(CSS)}"></head><body>
 <header class="top"><div class="in"><a class="brand" href="{rel}index.html">{SITE_NAME}</a>
-<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
+<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}essays/index.html">解读</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
 {crumb_html}<main>{body}</main>
 <footer>Formalia 只列出形式化表述及其事实，不判断某条表述是否等价于原猜想。<br>
 代码 Apache-2.0 · 条目内容按各自声明的许可，默认 CC-BY-4.0 · <a href="{rel}about/privacy.html">隐私与编辑规则</a> ·
@@ -299,6 +309,7 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
         ("Lean 工具链", f"<code>{esc(tc)}</code>"),
         ("依赖（钉死版本）", "<br>".join(f"<code>{esc(n)}</code> @ <code>{esc(r)}</code>" + (f" ({esc(i)})" if i else "") for n,r,i in deps) or "—"),
         ("CI 检查", status_cell(decl)),
+        ("解读", essays_line(sid, "../../")),
     ]
     table = "<table>" + "".join(f"<tr><th>{k}</th><td>{v}</td></tr>" for k,v in rows) + "</table>"
 
@@ -405,6 +416,7 @@ def render_conjecture(conj, entries, archived=()):
             a = meta.get("archived", {})
             body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(a.get("at",""))}</td><td>{esc(a.get("reason",""))}</td><td><a href="{esc(a.get("issue",""))}">议题</a></td></tr>'
         body += "</table>"
+    body += f'<p class="muted" style="font-family:var(--sans);font-size:14px;margin-top:14px">关于这个猜想的解读：{essays_line(conj["slug"], "../")}</p>'
     refs = conj.get("references") or []
     if refs:
         body += "<h2>参考资料</h2><ul class='plain'>" + "".join(f'<li><a href="{esc(r["url"])}">{esc(r.get("label", r["url"]))}</a></li>' for r in refs) + "</ul>"
@@ -441,10 +453,69 @@ Formalia 把每一种写法固定下来，给它一个永久编号，再记录�
     return page(SITE_NAME, [], body, 0, home=True)
 
 SITE_SRC = ROOT / "site"
+ESSAYS = ROOT / "Essays"
+ESSAYS_BY = {}   # 表述编号或猜想 slug -> [解读 meta]，main() 里填好
+
+def load_essays():
+    out = []
+    if ESSAYS.exists():
+        for mj in sorted(ESSAYS.glob("J*.json"), reverse=True):
+            m = read_json(mj); m["_body"] = mj.with_suffix(".md").read_text(encoding="utf-8"); m["_stem"] = mj.stem
+            out.append(m)
+    return out
+
+def essays_line(key, rel):
+    """表述页、猜想页上的一行小字：有几篇解读、写一篇。不占版面。"""
+    es = ESSAYS_BY.get(key, [])
+    write = f'<a href="{edit_link(rel, type="essay", about=key)}">写一篇</a>'
+    if not es: return f'<span class="muted">还没有</span> · {write}'
+    return f'<a href="{rel}essays/index.html?about={esc(key)}">{len(es)} 篇</a> · {write}'
+
+def write_essays(essays, index_rows):
+    """解读：列表页 + 每篇一页。"""
+    names = {c["slug"]: (c.get("name_zh") or c["name"]) for c, _ in index_rows}
+    def about_links(m, rel):
+        out = []
+        for a in m.get("about") or []:
+            if re.match(r"^\d{8}-\d{2}$", a):
+                sid_conj = STATEMENT_CONJ.get(a)
+                out.append(f'<a href="{rel}{esc(sid_conj)}/{esc(a)}/index.html">#{esc(a)}</a>' if sid_conj else f"#{esc(a)}")
+            else:
+                out.append(f'<a href="{rel}{esc(a)}/index.html">{esc(names.get(a, a))}</a>')
+        return "、".join(out)
+    d = OUT / "essays"; d.mkdir(exist_ok=True)
+    items = "".join(
+        f'<li data-about="{esc(" ".join(m.get("about") or []))}"><a href="{esc(m["id"])}/index.html"><span class="t">{esc(m["title"])}</span></a>'
+        f'<div class="e">关于 {about_links(m, "../")} · {esc(m.get("author",""))} · {esc(m.get("submitted_at",""))}</div></li>' for m in essays)
+    body = ('<h1>解读</h1><p class="muted" style="font-family:var(--sans);font-size:14px">对已登记的表述或猜想的讨论文章：这段 Lean 代码说了什么、和别的写法有什么不同、'
+            '从证明里能读出什么。谁都可以写，谁都可以修改。解读是作者的个人观点，不代表 Formalia 的判断。</p>'
+            f'<div class="actions"><a class="btn" href="{edit_link("../", type="essay")}">＋ 写一篇解读</a></div>'
+            '<p id="essay-filter" class="note" hidden></p>'
+            + (f'<ul class="essays">{items}</ul>' if essays else '<p class="muted">还没有解读。</p>')
+            + "<script>(function(){var a=new URLSearchParams(location.search).get('about');if(!a)return;var n=0;"
+              "document.querySelectorAll('.essays li').forEach(function(li){var ok=(' '+li.dataset.about+' ').indexOf(' '+a+' ')>=0;li.hidden=!ok;if(ok)n++;});"
+              "var f=document.getElementById('essay-filter');f.hidden=false;f.textContent='只显示关于 '+a+' 的解读（'+n+' 篇）。';"
+              "var l=document.createElement('a');l.href='index.html';l.textContent=' 显示全部';f.append(l);})();</script>")
+    (d / "index.html").write_text(page("解读", [("解读", None)], body, 1), encoding="utf-8")
+    for m in essays:
+        e = d / m["id"]; e.mkdir(exist_ok=True)
+        eds = m.get("editors") or []
+        info = (f'<p class="muted" style="font-family:var(--sans);font-size:14px">关于 {about_links(m, "../../")} · 作者 {esc(m.get("author",""))}'
+                + (f' · 修改者 {esc("、".join(eds))}' if eds else "") + f' · {esc(m.get("submitted_at",""))} · 解读 {esc(m["id"])} · 许可 {license_html(m)}</p>')
+        html_body = md_to_html(m["_body"]).replace('<a href="http', '<a rel="nofollow ugc noopener" href="http')
+        body = (f"<h1>{esc(m['title'])}</h1>" + info
+                + '<p class="note">这是作者的个人解读，不代表 Formalia 的判断。谁都可以修改；每次修改都记录在下面的编辑历史里。</p>'
+                + f'<article class="essay">{html_body}</article>'
+                + f'<div class="actions"><a class="btn" href="{edit_link("../../", type="essay", target=m["id"])}">修改这篇解读</a></div>'
+                + "<h2>编辑历史</h2>" + history_html([f"Essays/{m['_stem']}.md", f"Essays/{m['_stem']}.json"]))
+        (e / "index.html").write_text(page(m["title"], [("解读", "../index.html"), (m["title"], None)], body, 2), encoding="utf-8")
+
+STATEMENT_CONJ = {}   # 表述编号 -> 猜想 slug
 
 def write_edit_pages(index_rows):
     """编辑表单需要的数据，以及编辑、状态、隐私三个页面。"""
-    data = {"statements": {}, "conjectures": {}}
+    data = {"statements": {}, "conjectures": {},
+            "essays": {m["id"]: {"title": m["title"], "about": m.get("about") or [], "body": m["_body"].strip()} for m in load_essays()}}
     for conj, _ in index_rows:
         cdir = CONJ / conj["_dir"]
         data["conjectures"][conj["slug"]] = {k: conj.get(k) or ([] if k == "references" else "") for k in ("name", "name_zh", "informal", "references")}
@@ -487,7 +558,7 @@ def write_ask_context(conj, meta, lean_src, decl, tc, deps):
     (OUT / "ask").mkdir(exist_ok=True)
     (OUT / "ask" / f"{meta['id']}.json").write_text(json.dumps(ctx, ensure_ascii=False), encoding="utf-8")
 
-def write_search(index_rows):
+def write_search(index_rows, essays=()):
     """站内搜索：生成 search.json 和搜索页。"""
     docs = []
     for conj, n in index_rows:
@@ -507,6 +578,9 @@ def write_search(index_rows):
                                        re.sub(r"[*`#]", "", gtext)] if x)
             docs.append({"kind": "s", "url": f'{conj["slug"]}/{m["id"]}/index.html', "title": f'#{m["id"]}',
                          "sub": cname, "text": re.sub(r"\s+", " ", doc).strip(), "code": f'{m["declaration"]} {code}'})
+    for m in essays:
+        docs.append({"kind": "e", "url": f'essays/{m["id"]}/index.html', "title": m["title"], "sub": "解读 · " + " ".join(m.get("about") or []),
+                     "text": re.sub(r"\s+", " ", re.sub(r"[*`#>\[\]]", "", m["_body"])).strip()[:6000], "code": ""})
     (OUT / "search.json").write_text(json.dumps({"docs": docs}, ensure_ascii=False), encoding="utf-8")
     (OUT / "search").mkdir(exist_ok=True)
     (OUT / "search" / "search.js").write_text((SITE_SRC / "search.js").read_text(encoding="utf-8"), encoding="utf-8")
@@ -550,6 +624,13 @@ def main():
     OUT.mkdir(exist_ok=True)
     (OUT / "style.css").write_text(CSS, encoding="utf-8")
     index_rows = []; all_ok = True
+    essays = load_essays()
+    for m in essays:
+        for a in m.get("about") or []: ESSAYS_BY.setdefault(a, []).append(m)
+    for base in (CONJ, ARCH):
+        if base.exists():
+            for mj in base.glob("*/S*.json"):
+                mm = read_json(mj); STATEMENT_CONJ[mm["id"]] = mm["conjecture"]
     for cdir in sorted(p for p in CONJ.iterdir() if p.is_dir()):
         cj = cdir / "conjecture.json"
         if not cj.exists(): continue
@@ -581,7 +662,8 @@ def main():
     (OUT / "index.html").write_text(render_index(index_rows, tc, deps, all_ok), encoding="utf-8")
     write_edit_pages(index_rows)
     write_chat_page()
-    write_search(index_rows)
+    write_search(index_rows, essays)
+    write_essays(essays, index_rows)
     (OUT / "ask.js").write_text((SITE_SRC / "ask.js").read_text(encoding="utf-8"), encoding="utf-8")
     (OUT / ".nojekyll").write_text("")
     print(f"wrote {OUT} ({sum(n for _,n in index_rows)} statements, {len(index_rows)} conjectures)")
