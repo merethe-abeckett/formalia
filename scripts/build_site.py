@@ -31,7 +31,7 @@ def _inline(t):
     t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
     def link(m):
         label, url = m.group(1), m.group(2)
-        if not re.match(r"^(https?://|[a-zA-Z0-9_./#-]+$)", url) or url.lower().startswith("javascript"):
+        if not re.match(r"^(https?://|mailto:[^\s<>\"]+@[^\s<>\"]+$|[\w./#-]+$)", url) or url.lower().startswith("javascript"):
             return label
         return f'<a href="{url}">{label}</a>'
     return re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link, t)
@@ -48,7 +48,7 @@ def md_to_html(md):
         if not line: close(); continue
         h = re.match(r"^(#{2,4})\s+(.*)$", line)
         if h:
-            close(); n = len(h.group(1)); out.append(f"<h{n}>{_inline(h.group(2))}</h{n}>"); continue
+            close(); n = len(h.group(1)); out.append(f'<h{n} id="{esc(h.group(2).strip())}">{_inline(h.group(2))}</h{n}>'); continue
         if line.startswith(("- ", "* ")):
             if mode != "ul": close(); out.append("<ul>"); mode = "ul"
             out.append(f"<li>{_inline(line[2:])}</li>"); continue
@@ -140,6 +140,19 @@ form.edit button,.ask button{padding:8px 22px;border:0;border-radius:6px;backgro
 form.edit button:disabled,.ask button:disabled{opacity:.5;cursor:default}
 pre.msg{white-space:pre-wrap}
 .cf-turnstile{margin-top:12px}
+/* 搜索 */
+.search{display:flex;gap:8px;margin:16px 0 4px;max-width:640px}
+.search input{flex:1;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);font:16px var(--sans)}
+.search input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.search button{padding:0 18px;border:0;border-radius:8px;background:var(--accent);color:#fff;font:15px var(--sans);cursor:pointer}
+#search-info{font-family:var(--sans);font-size:13px;color:var(--muted);margin:6px 0 10px}
+#results{list-style:none;padding:0;margin:0;font-family:var(--sans)}
+#results li{border-bottom:1px solid var(--line)}#results a{display:block;padding:10px 4px;text-decoration:none;color:var(--fg)}
+#results a:hover{background:var(--box)}#results .t{font-weight:600}#results .e{color:var(--muted);font-size:14px}
+#results .tag{display:inline-block;font-size:11.5px;border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-right:8px;color:var(--muted);vertical-align:1px}
+#results .snip{font-size:13.5px;color:var(--muted);margin-top:3px;line-height:1.6}
+mark{background:#fde68a;color:inherit;border-radius:2px;padding:0 1px}
+@media(prefers-color-scheme:dark){mark{background:#6b5310}}
 /* 灌水区 */
 .chat{font-family:var(--mono);font-size:14px;border:1px solid var(--line);border-radius:10px;background:var(--card);display:flex;flex-direction:column;height:min(70vh,640px)}
 .chat .bar{display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12.5px;font-family:var(--sans)}
@@ -163,6 +176,8 @@ pre.msg{white-space:pre-wrap}
 """
 
 SITE_NAME = "Formalia"
+REPO_URL = "https://github.com/merethe-abeckett/formalia"
+CONTACT = "merethe.abeckett@outlook.com"
 
 def page(title, crumbs, body, depth, home=False):
     rel = "../" * depth
@@ -174,11 +189,11 @@ def page(title, crumbs, body, depth, home=False):
 <meta name="description" content="Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。">
 <link rel="stylesheet" href="{rel}style.css"></head><body>
 <header class="top"><div class="in"><a class="brand" href="{rel}index.html">{SITE_NAME}</a>
-<nav><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a></nav></div></header>
+<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a></nav></div></header>
 {crumb_html}<main>{body}</main>
 <footer>Formalia 只列出形式化表述及其事实，不判断某条表述是否等价于原猜想。<br>
 代码 Apache-2.0 · 条目内容按各自声明的许可，默认 CC-BY-4.0 · <a href="{rel}about/privacy.html">隐私与编辑规则</a> ·
-<a href="https://github.com/merethe-abeckett/formalia">源代码</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
+<a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · <a href="{rel}about/index.html#联系">联系我们</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
 </body></html>"""
 
 def status_cell(rep):
@@ -380,6 +395,7 @@ def render_index(conjs, tc, deps, check_ok):
 <p class="sub">数学猜想的 Lean 表述目录</p>
 <p>当有人说“AI 证明了某个猜想”，真正被证明的是一段 Lean 代码。这段代码写得是否忠实于原猜想，机器回答不了。
 Formalia 把每一种写法固定下来，给它一个永久编号，再记录谁声称证明了哪个编号。只列出，不判断。</p>
+<form class="search" action="search/index.html" method="get" role="search"><input name="q" placeholder="搜索猜想、表述、编号，例如“素数”" aria-label="搜索"><button>搜索</button></form>
 <div class="actions"><a class="btn primary" href="#conjectures">浏览猜想</a><a class="btn" href="about/guide.html">使用说明</a>
 <a class="btn" href="{edit_link("", type="statement")}">＋ 登记一条表述</a></div></section>
 <div class="steps">
@@ -428,6 +444,34 @@ def write_edit_pages(index_rows):
     about = (SITE_SRC / "about.md").read_text(encoding="utf-8").replace("{{PREFACE}}", "## 作者的话\n\n" + readme_preface())
     (OUT / "about" / "index.html").write_text(page("关于", [("关于", None)], "<h1>关于 Formalia</h1>" + md_to_html(about), 1), encoding="utf-8")
 
+def write_search(index_rows):
+    """站内搜索：生成 search.json 和搜索页。"""
+    docs = []
+    for conj, n in index_rows:
+        cdir = CONJ / conj["_dir"]
+        cname = conj.get("name_zh") or conj["name"]
+        refs = " ".join(r.get("label", "") for r in conj.get("references") or [])
+        docs.append({"kind": "c", "url": f'{conj["slug"]}/index.html', "title": cname,
+                     "sub": conj["name"] if conj.get("name_zh") else "", "text": f'{conj.get("informal","")} {refs}'.strip(), "code": ""})
+        for mj in sorted(cdir.glob("S*.json")):
+            m = read_json(mj)
+            lean = (cdir / (mj.stem + ".lean")).read_text(encoding="utf-8")
+            code = re.sub(r"\s+", " ", re.sub(r"--[^\n]*", "", re.sub(r"/-.*?-/", " ", lean, flags=re.S))).strip()
+            guide = GUIDES / conj["_dir"] / (mj.stem + ".md")
+            gtext = re.sub(r"<!--.*?-->", "", guide.read_text(encoding="utf-8"), flags=re.S) if guide.exists() else ""
+            doc = " ".join(x for x in [(m.get("informal_restatement") or {}).get("text"), (m.get("source") or {}).get("note"),
+                                       " ".join(c.get("claimant", "") for c in m.get("claimed_proofs") or []),
+                                       re.sub(r"[*`#]", "", gtext)] if x)
+            docs.append({"kind": "s", "url": f'{conj["slug"]}/{m["id"]}/index.html', "title": f'#{m["id"]}',
+                         "sub": cname, "text": re.sub(r"\s+", " ", doc).strip(), "code": f'{m["declaration"]} {code}'})
+    (OUT / "search.json").write_text(json.dumps({"docs": docs}, ensure_ascii=False), encoding="utf-8")
+    (OUT / "search").mkdir(exist_ok=True)
+    (OUT / "search" / "search.js").write_text((SITE_SRC / "search.js").read_text(encoding="utf-8"), encoding="utf-8")
+    body = ('<h1>搜索</h1><form class="search" id="search-form" role="search"><input id="q" placeholder="猜想名、关键词、编号，例如“素数”" aria-label="搜索" autocomplete="off">'
+            '<button>搜索</button></form><p id="search-info">正在加载……</p><ol id="results"></ol>'
+            '<noscript><p class="note bad">搜索需要启用 JavaScript。</p></noscript><script src="search.js" defer></script>')
+    (OUT / "search" / "index.html").write_text(page("搜索", [("搜索", None)], body, 1), encoding="utf-8")
+
 def write_chat_page():
     (OUT / "chat").mkdir(exist_ok=True)
     (OUT / "chat" / "chat.js").write_text((SITE_SRC / "chat.js").read_text(encoding="utf-8"), encoding="utf-8")
@@ -445,7 +489,7 @@ def readme_preface():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     m = re.search(r"^## 阅读前说明[^\n]*\n(.*?)^---", text, re.S | re.M)
     if not m: return ""
-    keep = [l for l in m.group(1).splitlines() if not re.search(r"域名|网址", l)]
+    keep = [l for l in m.group(1).splitlines() if not re.search(r"域名|网址", l) and "我觉得中国" not in l]
     return "\n".join(keep).strip()
 
 def main():
@@ -483,6 +527,7 @@ def main():
     (OUT / "index.html").write_text(render_index(index_rows, tc, deps, all_ok), encoding="utf-8")
     write_edit_pages(index_rows)
     write_chat_page()
+    write_search(index_rows)
     (OUT / ".nojekyll").write_text("")
     print(f"wrote {OUT} ({sum(n for _,n in index_rows)} statements, {len(index_rows)} conjectures)")
 
