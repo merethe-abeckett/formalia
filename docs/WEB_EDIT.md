@@ -42,63 +42,76 @@ Lean 在编译期可以执行任意代码，所以匿名提交的 Lean 代码有
 
 ## 一次性设置
 
-以下都在网页上点，不需要命令行。顺序不能乱：后面的步骤要用前面得到的值。
+服务器代码由 GitHub 自动部署到 Cloudflare。你只需要在 Cloudflare 拿三样东西，填进 GitHub，再点一次“运行”。不需要命令行，也不需要在 Cloudflare 里粘贴代码。
 
-### 1. GitHub：开议题用的令牌
+### 第一部分：开通灌水区（约 10 分钟）
 
-1. 打开 https://github.com/settings/personal-access-tokens/new （Fine-grained token）。
-2. Token name 填 `formalia-edit-gateway`，Expiration 选一年，并在日历里记一个续期提醒。
-3. Repository access 选 **Only select repositories**，只勾 `formalia`。
-4. Permissions → Repository permissions → **Issues** 选 **Read and write**。其他全部保持 No access。
-5. 生成，复制 `github_pat_` 开头的令牌。这个值只出现一次。
+**1. 在 Cloudflare 创建一个 API 令牌**
 
-这个令牌只能开议题和读议题，不能推代码，泄露了也改不了仓库内容。
+1. 登录 Cloudflare，点右上角头像 → **My Profile** → 左边 **API Tokens** → **Create Token**。
+2. 找到模板 **Edit Cloudflare Workers**，点右边的 **Use template**。
+3. **Account Resources** 选你的账号；**Zone Resources** 选 `Specific zone` → `formalnaturalist.co.nz`。
+4. 拉到底点 **Continue to summary** → **Create Token**。
+5. 复制显示出来的令牌。它只显示这一次。
 
-### 2. Cloudflare：Turnstile 人机验证
+**2. 复制 Account ID**
 
-1. Cloudflare 后台左侧 **Turnstile** → **Add widget**。
-2. Widget name 填 `formalia`，Hostname 添加 `formalnaturalist.co.nz` 和 `www.formalnaturalist.co.nz`。
-3. Widget Mode 选 **Managed**，创建。
-4. 记下 **Site Key**（公开的）和 **Secret Key**（保密的）。
+Cloudflare 左侧菜单点 **Workers & Pages**，页面右侧有 **Account ID**，点旁边的复制按钮。
 
-### 3. Cloudflare：KV 存储
+**3. 创建 KV 存储，复制它的 ID**
 
-1. 左侧 **Storage & Databases** → **KV** → **Create a namespace**，名字填 `formalia`。
+1. 左侧菜单 **Storage & Databases** → **KV** → **Create a namespace**（有的界面叫 Create instance）。
+2. 名字填 `formalia`，创建。
+3. 列表里这一行有一串 32 位的 ID，复制下来。
 
-### 4. Cloudflare：创建 Worker
+**4. 填进 GitHub**
 
-1. 左侧 **Workers & Pages** → **Create** → **Create Worker**，名字填 `formalia-edit`，先部署默认的 Hello World。
-2. 点 **Edit code**，删掉默认代码，把仓库里 `worker/src/index.js` 的全部内容粘贴进去，**Deploy**。
-3. 回到 Worker 页面 → **Settings** → **Bindings** → **Add binding** → **KV namespace**，Variable name 填 `FORMALIA_KV`，选第 3 步建的 `formalia`。
-4. **Settings** → **Variables and Secrets**，逐个添加：
+打开 formalia 仓库 → **Settings** → **Secrets and variables** → **Actions**。
 
-   | 类型 | 名字 | 值 |
-   | --- | --- | --- |
-   | Text | `REPO` | `merethe-abeckett/formalia` |
-   | Text | `ALLOWED_ORIGINS` | `https://formalnaturalist.co.nz,https://www.formalnaturalist.co.nz` |
-   | Text | `TURNSTILE_SITEKEY` | 第 2 步的 Site Key |
-   | Text | `RATE_LIMIT_PER_HOUR` | `6` |
-   | Secret | `GITHUB_TOKEN` | 第 1 步的令牌 |
-   | Secret | `TURNSTILE_SECRET` | 第 2 步的 Secret Key |
-   | Secret | `ANON_SECRET` | 一串随机字符，至少 32 位。可以在 PowerShell 里运行 `[guid]::NewGuid().ToString() + [guid]::NewGuid().ToString()` 生成 |
+在 **Secrets** 标签页，点 **New repository secret**，逐个添加：
 
-   `ANON_SECRET` 设定后不要随便改：改了以后所有人的匿名编号都会变。
+| Name | Secret |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | 第 1 步的令牌 |
+| `CLOUDFLARE_ACCOUNT_ID` | 第 2 步的 Account ID |
+| `ANON_SECRET` | 随便打一串至少 32 个字符的乱码，例如在键盘上乱敲。填好后不要再改，改了所有人的匿名编号都会变 |
+| `CHAT_ADMIN_TOKEN` | 再打一串至少 16 个字符的乱码，这是你的聊天室管理员口令，自己记下来 |
 
-5. **Settings** → **Domains & Routes** → **Add** → **Route**：Zone 选 `formalnaturalist.co.nz`，Route 填 `formalnaturalist.co.nz/api/*`。再加一条 `www.formalnaturalist.co.nz/api/*`。
+切到 **Variables** 标签页，点 **New repository variable**：
 
-### 5. 灌水区（聊天室）
+| Name | Value |
+| --- | --- |
+| `KV_NAMESPACE_ID` | 第 3 步的 KV ID |
 
-聊天室跑在同一个 Worker 里，用 Cloudflare 免费版的 Durable Objects（SQLite 存储）。
+**5. 运行部署**
 
-1. Worker → **Settings** → **Bindings** → **Add binding** → **Durable Object**，Variable name 填 `CHAT`，Class 选 `ChatRoom`。
-2. **Variables and Secrets** 里加一个 Secret：`CHAT_ADMIN_TOKEN`，值是一串至少 16 位的随机字符。
-3. 管理员模式：浏览器打开 `https://formalnaturalist.co.nz/chat/#admin=你的口令` 一次，口令存在这台电脑上，地址栏里会自动抹掉。之后每条消息旁边会出现“删”“封”两个按钮。“封”会暂停该 IP 7 天并删除他的全部消息。
+仓库顶部 **Actions** → 左边 **Deploy Worker** → **Run workflow** → **Run workflow**。等一两分钟变绿。
 
-用后台粘贴代码的方式部署时，如果添加 Durable Object 绑定的界面要求迁移（migration），以仓库里 `worker/wrangler.toml` 的 `[[migrations]]` 为准。
+**6. 试一下**
 
-### 6. 验证
+打开 https://formalnaturalist.co.nz/chat/ ，能看到“欢迎来到灌水区”就成功了。
 
-浏览器打开 https://formalnaturalist.co.nz/api/config ，应该看到 `{"sitekey":"0x…","repo":"merethe-abeckett/formalia"}`。然后在网站上随便找一条表述，点“声明证明了这条表述”，提交一条测试声明，几分钟内状态页应显示“已写入”。测试完可以用一条编辑把它删掉，或者在 GitHub 上回退那次提交。
+管理员模式：打开 `https://formalnaturalist.co.nz/chat/#admin=你的CHAT_ADMIN_TOKEN` 一次。口令会存在这台电脑的浏览器里，地址栏会自动抹掉。之后每条消息旁边会出现“删”和“封”两个按钮。“封”会暂停这个人的网络地址 7 天，并删除他的全部消息。
+
+### 第二部分：开通网页编辑（以后再做也行）
+
+**1. GitHub 令牌**：打开 https://github.com/settings/personal-access-tokens/new 。Token name 填 `formalia-edit`，Expiration 选一年。Repository access 选 **Only select repositories** → `formalia`。Permissions → Repository permissions → **Issues** 选 **Read and write**，其余不动。生成后复制。
+
+**2. 人机验证**：Cloudflare 左侧 **Turnstile** → **Add widget**。名字填 `formalia`，Hostname 加 `formalnaturalist.co.nz` 和 `www.formalnaturalist.co.nz`，模式选 **Managed**。创建后复制 **Site Key** 和 **Secret Key**。
+
+**3. 填进 GitHub**：
+
+| 位置 | Name | 值 |
+| --- | --- | --- |
+| Secrets | `EDIT_GITHUB_TOKEN` | 第 1 步的令牌 |
+| Secrets | `TURNSTILE_SECRET` | Secret Key |
+| Variables | `TURNSTILE_SITEKEY` | Site Key |
+
+**4. 再运行一次 Deploy Worker。** 之后网站上的编辑表单就能用了。打开 https://formalnaturalist.co.nz/api/config 能看到你的 Site Key 就说明通了。
+
+### 以后
+
+`worker/` 里的代码有改动、合并到 main 后，GitHub 会自动重新部署，不用再手动运行。令牌到期时，更新 GitHub 里对应的 Secret，再运行一次 Deploy Worker。
 
 ## 日常管理
 

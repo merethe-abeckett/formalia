@@ -1,4 +1,4 @@
-# 用 wrangler 部署时的配置；也可以直接在 Cloudflare 后台粘贴 src/index.js，见 docs/WEB_EDIT.md
+# 由 .github/workflows/deploy-worker.yml 部署；KV 编号和站点密钥在部署时从 GitHub 仓库变量填入。见 docs/WEB_EDIT.md
 name = "formalia-edit"
 main = "src/index.js"
 compatibility_date = "2026-10-01"
