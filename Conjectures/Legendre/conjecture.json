@@ -11,10 +11,6 @@
     {
       "label": "Wikipedia (English)",
       "url": "https://en.wikipedia.org/wiki/Legendre%27s_conjecture"
-    },
-    {
-      "label": "formal-conjectures（DeepMind）",
-      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/LegendreConjecture.lean"
     }
   ],
   "informal_en": "For every positive integer n there is a prime between n² and (n+1)²."

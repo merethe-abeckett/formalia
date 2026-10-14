@@ -1,10 +1,13 @@
 /-
 Formalia · 条目 #20261014-01
 猜想：哥德巴赫猜想
-内容许可：CC-BY-4.0
+内容许可：Apache-2.0（与原作相同）
+原作版权：Copyright 2025 The Formal Conjectures Authors，Apache License 2.0
 
-本文件只登记一条形式化表述。它不对“该表述是否等价于原猜想”作任何判断，
-这个问题留给数学家讨论；登记库只负责列出。
+改编自 google-deepmind/formal-conjectures 仓库的
+FormalConjectures/Wikipedia/GoldbachConjecture.lean。改动：把环论的 `Prime`
+换成 `Nat.Prime`；原文中该命题出现在 `answer(sorry) ↔ ...` 的右侧，这里只登记
+命题本身，写成 `def`，因此文件中不含 sorry。（最初误标为原创，2026-10-14 更正。）
 -/
 module
 

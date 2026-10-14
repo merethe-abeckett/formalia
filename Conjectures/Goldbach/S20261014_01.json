@@ -5,11 +5,11 @@
   "declaration": "Registry.Goldbach.S20261014_01",
   "submitted_by": "merethe-abeckett",
   "submitted_at": "2026-10-14",
-  "license": "CC-BY-4.0",
+  "license": "Apache-2.0",
   "source": {
-    "kind": "original",
-    "url": "",
-    "note": "为登记库撰写的第一条示例，使用 Nat.Prime。"
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/GoldbachConjecture.lean",
+    "note": "命题取自 formal-conjectures 的 `GoldbachConjecture.goldbach`，把环论的 `Prime` 换成了 `Nat.Prime`；外层 `answer(sorry) ↔` 已去掉。最初误标为原创，2026-10-14 更正。"
   },
   "informal_restatement": {
     "author": "提交者",
