@@ -375,16 +375,30 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
         body += '<p class="muted">未提供</p>'
 
     body += "<h2>声称的证明</h2>"
-    body += '<p class="note">登记库只记录“谁声称证明了这个编号”，不托管证明，也不判断证明是否正确。</p>'
+    body += ('<p class="note">每条证明在登记前都经过机器验证：用钉死版本的 Lean 和 Mathlib 编译，定理的类型正好是这条 Lean 表述，'
+             '没有 sorry，只用标准公理，并经 Lean 内核重放。验证的是“证明了这段 Lean 代码”，不是“证明了原猜想”。'
+             '有问题可以提出质疑，按提删流程处理。</p>')
     if not meta.get("archived"):
         body += f'<p><a class="btn" href="{edit_link("../../", type="claim", target=sid)}">＋ 声明证明了这条表述</a></p>'
     cps = meta.get("claimed_proofs") or []
     if cps:
-        body += "<table><tr><th>声称方</th><th>日期</th><th>链接</th><th>备注</th><th>登记者</th></tr>"
+        body += "<table><tr><th>声称方</th><th>日期</th><th>证明</th><th>验证</th><th>备注</th><th>登记者</th></tr>"
         for c in cps:
             note = esc(c.get('note',''))
             if c.get('issue'): note += f' <a href="{esc(c["issue"])}">议题</a>'
-            body += f"<tr><td>{esc(c.get('claimant',''))}</td><td>{esc(c.get('date',''))}</td><td><a href=\"{esc(c.get('url',''))}\" rel=\"nofollow ugc\">{esc(c.get('url',''))}</a></td><td>{note}</td><td>{esc(c.get('recorded_by',''))}</td></tr>"
+            if c.get('announcement'): note += f' <a href="{esc(c["announcement"])}" rel="nofollow ugc">公告</a>'
+            pr = c.get("proof") or {}
+            if pr.get("source") == "github":
+                where = (f'<a href="{esc(c["url"])}" rel="nofollow ugc">{esc(pr["repo"].removeprefix("https://github.com/"))}</a>'
+                         f'<br><code>{esc(pr["commit"][:12])}</code> · <code>{esc(pr["theorem"])}</code>')
+            elif pr.get("source") == "pasted":
+                where = f'<a href="../../{esc(pr["file"].replace("Proofs/", "proofs/").replace(".lean", ".txt"))}">粘贴的文件</a><br><code>{esc(pr["theorem"])}</code>'
+            else:
+                where = f'<a href="{esc(c.get("url",""))}" rel="nofollow ugc">{esc(c.get("url",""))}</a>'
+            v = c.get("verification") or {}
+            ver = (f'<span class="ok">通过</span><br><span class="muted">Lean {esc(v.get("lean",""))} · Mathlib {esc(v.get("mathlib",""))} · {esc(v.get("checked_at",""))}</span>'
+                   + (f' <a href="{esc(v["run"])}">记录</a>' if v.get("run") else "")) if v.get("status") == "passed" else '<span class="warn">未验证</span>'
+            body += f"<tr><td>{esc(c.get('claimant',''))}</td><td>{esc(c.get('date',''))}</td><td>{where}</td><td>{ver}</td><td>{note}</td><td>{esc(c.get('recorded_by',''))}</td></tr>"
         body += "</table>"
     else:
         body += '<p class="muted">暂无记录</p>'
@@ -524,7 +538,8 @@ def write_edit_pages(index_rows):
             data["statements"][m["id"]] = {
                 "conjecture": conj["slug"], "conjecture_name": conj.get("name_zh") or conj["name"],
                 "source_note": (m.get("source") or {}).get("note") or "", "source_url": (m.get("source") or {}).get("url") or "",
-                "restatement": (m.get("informal_restatement") or {}).get("text") or "", "external_links": m.get("external_links") or []}
+                "restatement": (m.get("informal_restatement") or {}).get("text") or "", "external_links": m.get("external_links") or [],
+                "module": m["module"], "declaration": m["declaration"]}
     (OUT / "data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     (OUT / "edit").mkdir(exist_ok=True); (OUT / "about").mkdir(exist_ok=True)
     (OUT / "edit" / "edit.js").write_text((SITE_SRC / "edit.js").read_text(encoding="utf-8"), encoding="utf-8")
@@ -664,6 +679,10 @@ def main():
     write_chat_page()
     write_search(index_rows, essays)
     write_essays(essays, index_rows)
+    if (ROOT / "Proofs").exists():
+        (OUT / "proofs").mkdir(exist_ok=True)
+        for f in (ROOT / "Proofs").glob("*.lean"):
+            (OUT / "proofs" / (f.stem + ".txt")).write_text(f.read_text(encoding="utf-8"), encoding="utf-8")
     (OUT / "ask.js").write_text((SITE_SRC / "ask.js").read_text(encoding="utf-8"), encoding="utf-8")
     (OUT / ".nojekyll").write_text("")
     print(f"wrote {OUT} ({sum(n for _,n in index_rows)} statements, {len(index_rows)} conjectures)")

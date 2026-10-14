@@ -1,13 +1,13 @@
 name: 声明证明了某条表述
-description: 记录“某人/某模型声称证明了 #编号”。登记库只记录声明，不认证。
+description: 登记“某人/某模型证明了 #编号”。证明会被自动编译检查，通不过不登记。
 title: "[claim] 表述 #"
 labels: ["claim"]
 body:
   - type: markdown
     attributes:
       value: |
-        填好后提交，机器人会自动检查并直接写进对应表述的元数据，几分钟后网站上就会显示。结果会回复在议题里。没有 GitHub 账号也可以在网站上直接提交。
-        登记库只记录“谁声称证明了哪个编号”，不托管证明，也不判断证明是否正确。
+        填好后提交，机器人会拉下你的证明，用 Lean 4.29.0 和 Mathlib v4.29.0 编译，检查定理的类型正好是这条表述、没有 sorry、只用标准公理。全部通过才会登记，结果会回复在议题里。没有 GitHub 账号也可以在网站上提交，还可以直接粘贴单个文件。
+        证明要求：只依赖 Mathlib v4.29.0 和本登记库；用 `import Conjectures.<猜想>.S<编号>` 导入表述；写成 `theorem 定理名 : Registry.<猜想>.S<编号> := …`。详见网站“使用说明”。
   - type: input
     id: statement
     attributes:
@@ -32,13 +32,39 @@ body:
     validations:
       required: true
   - type: input
-    id: url
+    id: repo
     attributes:
-      label: 证明链接
-      description: 指向证明代码所在处（仓库、提交、论文附录）。登记库不托管证明。
-      placeholder: "https://"
+      label: 证明仓库
+      description: 公开的 GitHub 仓库
+      placeholder: "https://github.com/用户名/仓库名"
     validations:
       required: true
+  - type: input
+    id: commit
+    attributes:
+      label: 提交号
+      description: 完整的 40 位 commit，不能是分支名。登记的是这个固定版本。
+    validations:
+      required: true
+  - type: input
+    id: module
+    attributes:
+      label: 证明所在模块
+      description: 定理所在文件的模块名，例如 MyProof.Main（对应仓库里的 MyProof/Main.lean）。只会拉取 MyProof.lean 和 MyProof/ 目录下的 .lean 文件。
+    validations:
+      required: true
+  - type: input
+    id: theorem
+    attributes:
+      label: 定理名
+      description: 完整的定理名，例如 MyProof.goldbach
+    validations:
+      required: true
+  - type: input
+    id: announcement
+    attributes:
+      label: 公告链接（可选）
+      placeholder: "https://"
   - type: textarea
     id: note
     attributes:

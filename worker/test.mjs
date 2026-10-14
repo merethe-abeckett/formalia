@@ -83,6 +83,8 @@ j = await r.json(); assert.equal(r.status, 200, JSON.stringify(j)); assert.match
 r = await post({ type: "essay", target: "../x", turnstile: "tok", data: { title: "t" } }, "198.51.100.91"); assert.equal(r.status, 400);
 r = await post({ type: "essay", target: "J20261014-01", turnstile: "tok", data: { body: "改" } }, "198.51.100.92"); assert.equal(r.status, 200);
 ok("essay submissions");
+r = await post({ type: "claim", target: "20261014-01", turnstile: "tok", data: { proof: "<".repeat(20000), theorem: "P.t" } }, "198.51.100.93");
+assert.equal(r.status, 413); ok("oversized issue body rejected before GitHub");
 // 不配 Turnstile：不需要人机验证，直接提交
 const envNoTs = { ...env, TURNSTILE_SECRET: "", FORMALIA_KV: new KV(), SUBMIT_PER_DAY: "2" };
 const postNoTs = (body, ip) => worker.fetch(new Request("https://formalnaturalist.co.nz/api/submit", { method: "POST", body: JSON.stringify(body),
