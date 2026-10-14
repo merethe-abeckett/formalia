@@ -8,11 +8,11 @@
   "source": {
     "kind": "adapted",
     "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/GoldbachConjecture.lean",
-    "note": "Proposition taken from the formal-conjectures statement `GoldbachConjecture.goldbach`, which uses the ring-theoretic `Prime` on ℕ. The surrounding `answer(sorry) ↔` wrapper is dropped."
+    "note": "命题取自 formal-conjectures 的 `GoldbachConjecture.goldbach`，其中使用 ℕ 上的环论 `Prime`。外层 `answer(sorry) ↔` 已去掉。"
   },
   "informal_restatement": {
-    "author": "submitter",
-    "text": "Same as #20261014-01, except 'prime' means the general ring-theoretic notion Prime (non-zero, non-unit, and divides a product only if it divides a factor), applied to ℕ."
+    "author": "提交者",
+    "text": "与 #20261014-01 相同，只是“素数”取一般环论意义上的 Prime（非零、非单位、整除乘积则必整除某一因子），作用于 ℕ。"
   },
   "claimed_proofs": [],
   "external_links": []

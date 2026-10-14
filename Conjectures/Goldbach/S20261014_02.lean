@@ -1,12 +1,12 @@
 /-
-Lean Statement Registry — entry #20261014-02
-Conjecture: Goldbach's conjecture
-Content licence: CC-BY-4.0 (see LICENSE-CONTENT)
+Lean 表述登记库 · 条目 #20261014-02
+猜想：哥德巴赫猜想
+内容许可：CC-BY-4.0（见 LICENSE-CONTENT）
 
-Adapted from google-deepmind/formal-conjectures,
-FormalConjectures/Wikipedia/GoldbachConjecture.lean (Apache-2.0), where the
-statement appears as the right-hand side of `answer(sorry) ↔ ...`. Only the
-proposition is registered here, as a `def`, so the file contains no `sorry`.
+改编自 google-deepmind/formal-conjectures 仓库的
+FormalConjectures/Wikipedia/GoldbachConjecture.lean（Apache-2.0）。原文中该命题
+出现在 `answer(sorry) ↔ ...` 的右侧；这里只登记命题本身，写成 `def`，因此文件中
+不含 sorry。
 -/
 module
 
@@ -18,10 +18,10 @@ public import Mathlib.Algebra.Group.Even
 
 namespace Registry.Goldbach
 
-/-- Statement #20261014-02.
+/-- 表述 #20261014-02。
 
-Same shape as #20261014-01, but "prime" is the general ring-theoretic `Prime`
-from Mathlib, specialised to `ℕ`, as written in formal-conjectures. -/
+形状与 #20261014-01 相同，但“素数”取 Mathlib 中一般环论意义上的 `Prime`，
+在 `ℕ` 上特化，与 formal-conjectures 的写法一致。 -/
 def S20261014_02 : Prop :=
   ∀ n : ℕ, 2 < n → Even n → ∃ p q : ℕ, Prime p ∧ Prime q ∧ n = p + q
 

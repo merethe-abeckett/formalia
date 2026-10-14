@@ -8,11 +8,11 @@
   "source": {
     "kind": "original",
     "url": "",
-    "note": "Written for the registry as the first example entry, using Nat.Prime."
+    "note": "为登记库撰写的第一条示例，使用 Nat.Prime。"
   },
   "informal_restatement": {
-    "author": "submitter",
-    "text": "For every natural number n, if n > 2 and n is even, then there exist natural numbers p and q, both prime in the sense of Nat.Prime, with n = p + q."
+    "author": "提交者",
+    "text": "对任意自然数 n，若 n > 2 且 n 为偶数，则存在自然数 p 和 q，二者在 Nat.Prime 的意义下均为素数，且 n = p + q。"
   },
   "claimed_proofs": [],
   "external_links": []

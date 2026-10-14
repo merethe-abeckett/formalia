@@ -1,44 +1,46 @@
-# Deletion proposals and archiving
+# 提删与归档
 
-The registry is locked by CI, not by people. But a statement that passed CI can still turn out to have a Lean-level problem: a later Mathlib bump breaks it, a hypothesis makes it vacuous, a helper definition does not mean what its name says. This page describes how such an entry is removed from the live catalogue.
+登记库由 CI 锁定，不由人锁定。但通过了 CI 的表述仍可能存在 Lean 层面的问题：Mathlib 升版本后编译失败、某个前提让命题变成空真、辅助定义名不副实。本页说明这类条目如何从现行目录中移出。
 
-## What can be proposed for deletion
+## 什么可以提删
 
-Only **Lean-level** problems:
+只有 **Lean 层面** 的问题：
 
-- the file is not a single `def … : Prop`;
-- the proposition is trivially true or trivially false;
-- `sorry`, `axiom`, `opaque`, `constant` or `native_decide` appear or are depended on;
-- a custom definition silently diverges from its name or docstring;
-- it no longer typechecks under the pinned Mathlib.
+- 文件不是单个 `def … : Prop`；
+- 命题平凡为真或平凡为假；
+- 出现或依赖 `sorry`、`axiom`、`opaque`、`constant`、`native_decide`；
+- 自定义定义与其名称或文档字符串悄然不符；
+- 在钉死版本的 Mathlib 下不再通过类型检查。
 
-**Not** a reason for deletion: "this statement is not equivalent to the informal conjecture", "a different Mathlib definition would be better", style. Those discussions happen offline among mathematicians. The disambiguation page exists precisely so that several non-equivalent statements can coexist.
+**不是**提删理由：“这条表述不等价于原猜想”“换一个 Mathlib 定义更好”“风格问题”。这些讨论由数学家线下进行。消歧义页存在的意义，就是让多条互不等价的表述并存。
 
-## Who can propose
+## 谁可以提
 
-Anyone, by opening an issue with the label `deletion-proposal`, citing the statement id and the CI evidence (a failing checker report or a reproducible build failure).
+任何人。开一个带 `deletion-proposal` 标签的议题，写明表述编号和 CI 证据（未通过的检查器报告，或可复现的编译失败）。
 
-The **patrol** (`patrol/patrol.py`, run weekly by GitHub Actions) also proposes. Two independent models review every statement for Lean-level problems only. The rule:
+**巡查**（`patrol/patrol.py`，由 GitHub Actions 每周运行）也会提。两个独立模型只审查 Lean 层面的问题。规则：
 
-| model A | model B | CI evidence | result |
+| 模型 A | 模型 B | CI 证据 | 结果 |
 | --- | --- | --- | --- |
-| flag | flag | checker not clean | issue `deletion-proposal`, notice period starts |
-| flag | flag | clean | issue `patrol-finding`, maintainer verifies; no notice period yet |
-| flag | ok | any | issue `patrol-disagreement`, maintainer decides |
-| ok | ok | any | nothing |
+| 标记 | 标记 | 检查器未通过 | 开 `deletion-proposal` 议题，公示期开始 |
+| 标记 | 标记 | 干净 | 开 `patrol-finding` 议题，维护者核实；没有 CI 证据前不进入公示 |
+| 标记 | 未标记 | 任意 | 开 `patrol-disagreement` 议题，维护者裁决 |
+| 未标记 | 未标记 | 任意 | 无动作 |
 
-The first two patrol seats are Qwen and Gemini. More seats are added when funded. Anyone may contribute a model's review as a comment on an issue; such reviews are reference opinions and do not change the rule above.
+只配置了一个模型时，巡查进入单模型模式：标记只能开 `patrol-finding`，提删公示始终需要两个独立模型。
 
-## Notice period
+前两个巡查席位是 Qwen 和 Gemini。有资助后再加席位。任何人都可以把其他模型的审查结果作为评论贴到议题里，这类评论是参考意见，不改变上表规则。
 
-A `deletion-proposal` stays open for **14 days**. Anyone may comment with a counter-argument or a fix. A fix that makes CI clean again closes the proposal; the entry stays.
+## 公示期
 
-## Archiving, not deletion
+`deletion-proposal` 议题保持开放 **14 天**。任何人都可以评论反驳或提交修复。修复使 CI 重新通过即关闭提案，条目保留。
 
-If the problem stands after the notice period, the maintainer runs
+## 归档，不是删除
+
+公示期满问题仍成立，维护者运行
 
 ```
-scripts/archive_entry.py <Conjecture> <id> --issue <issue url> --reason "<one line>"
+scripts/archive_entry.py <猜想目录名> <编号> --issue <议题链接> --reason "<一句话原因>"
 ```
 
-This moves the entry to `Archive/<Conjecture>/`, records the date, the issue and the reason in its metadata, and removes it from the build. The id is kept and never reused. The site lists archived entries under the conjecture, marked as archived, so that any proof that claimed `#id` can still be traced to the exact text it claimed to prove.
+该命令把条目移到 `Archive/<猜想>/`，在元数据中记录日期、议题和原因，并把它移出构建。编号保留，永不复用。网站在该猜想页下列出已归档条目并标注“已归档”，这样任何声称证明了 `#编号` 的证明，仍能追溯到它所声称证明的确切文本。

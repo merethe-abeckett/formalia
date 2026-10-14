@@ -1,0 +1,50 @@
+# 用 Gemini 为新增或修改过的表述生成导读，并直接提交到 main 的 Guides/ 目录。
+# 需要仓库密钥 GEMINI_API_KEY。手动触发，或在表述文件变动合并到 main 后自动触发。
+name: Guides
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "全部重新生成"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths: ["Conjectures/**/*.lean"]
+
+permissions:
+  contents: write
+
+jobs:
+  guides:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 elan
+        run: |
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./elan-init -y --no-modify-path --default-toolchain "$(cat lean-toolchain)"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: 获取 Mathlib 缓存
+        run: lake exe cache get
+
+      - name: 生成检查器报告（提供定义链）
+        run: scripts/run_checks.sh
+
+      - name: 生成导读
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then python3 scripts/gen_guides.py --force; else python3 scripts/gen_guides.py; fi
+
+      - name: 提交导读
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Guides
+          git diff --cached --quiet && echo "无变化" && exit 0
+          git commit -m "Guides: 更新 AI 导读"
+          git push

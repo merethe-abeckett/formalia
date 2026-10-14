@@ -1,99 +1,107 @@
-# Lean Statement Registry
+# Lean 表述登记库
 
-A neutral catalogue of formal statements of mathematical conjectures, written in Lean 4 against a pinned Mathlib.
+一个中立的目录，收录数学猜想的 Lean 4 形式化表述，全部针对钉死版本的 Mathlib 编译检查。
 
-The registry **lists**. It does not judge. For each informal conjecture there is a disambiguation page; under it, every registered Lean statement, each with a permanent id such as `#20261014-01`. Whether a given statement is equivalent to the informal conjecture is a question for mathematicians to discuss offline. The registry records only facts:
+登记库**只列出，不判断**。每个自然语言猜想有一个消歧义页，页下列出该猜想的各条 Lean 表述，每条有永久编号，例如 `#20261014-01`。某条表述是否等价于原猜想，由数学家线下讨论，登记库不作结论。登记库只记录事实：
 
-- the Lean code of the statement, as a `def … : Prop`,
-- the exact toolchain and dependency revisions it was checked against,
-- the definition chain it relies on, with the module that defines each constant,
-- who submitted it, when, and where it came from,
-- the automated check results (compiles, no `sorry`, no `native_decide`, only the standard axioms, independent re-check),
-- which proofs, by whom, *claim* to prove it,
-- optional external links, listed without comment.
+- 表述的 Lean 代码，形式为 `def … : Prop`；
+- 检查时所用的工具链和各依赖的精确版本；
+- 表述依赖的定义链，以及每个常量所在的模块；
+- 谁提交的、何时提交、来源何处；
+- 自动检查结果（能否编译、无 sorry、无 native_decide、只用标准公理、独立复核通过）；
+- 哪些证明、由谁、**声称**证明了它；
+- 可选的外部链接，只列不评。
 
-Anyone, human or AI lab, can only ever claim to have proved **a specific statement id**, never "the conjecture".
+任何人、任何 AI 公司，只能声称“证明了某个具体编号的表述”，不能声称“证明了某个猜想”。
 
-## Layout
+## 目录结构
 
 ```
 Conjectures/
   Goldbach/
-    conjecture.json          disambiguation page: name, informal statement, references
-    S20261014_01.lean        statement #20261014-01  (a single `def … : Prop`)
-    S20261014_01.json        its metadata
-    S20261014_02.lean        statement #20261014-02
+    conjecture.json          消歧义页：名称、自然语言表述、参考资料
+    S20261014_01.lean        表述 #20261014-01（一个 `def … : Prop`）
+    S20261014_01.json        它的元数据
+    S20261014_02.lean        表述 #20261014-02
     S20261014_02.json
-RegistryTools/Check.lean     axiom / sorry / native_decide / definition-chain checker
-scripts/run_checks.sh        build + run the checker, write build/check/*.json
-scripts/lean4checker.sh      independent kernel re-check of every statement module
-scripts/validate_meta.py     metadata and naming rules
-scripts/build_site.py        render the wiki-style static site into _site/
-scripts/archive_entry.py     move an entry to Archive/ after a deletion proposal
-patrol/patrol.py             two-model patrol for Lean-level problems (opens issues)
-Archive/                     archived entries (ids kept, not built)
-docs/DELETION.md             deletion proposals, patrol rule, notice period, archiving
-.github/workflows/ci.yml     lock-down checks on every push / PR
-.github/workflows/pages.yml  build and publish the site with GitHub Pages
-.github/workflows/patrol.yml weekly patrol run
+Guides/                      AI 生成的导读（Gemini），逐定义解释 Lean 代码，可被人工修改
+Archive/                     已归档的条目（编号保留，不再编译）
+RegistryTools/Check.lean     检查器：公理、sorry、native_decide、定义链
+scripts/run_checks.sh        编译并运行检查器，输出 build/check/*.json
+scripts/lean4checker.sh      用 lean4checker 独立复核每个表述模块
+scripts/validate_meta.py     元数据与命名规则校验
+scripts/build_site.py        生成维基风格静态网站到 _site/
+scripts/gen_guides.py        调用 Gemini 生成导读，写入 Guides/
+scripts/archive_entry.py     提删公示期满后归档条目
+patrol/patrol.py             巡查：双模型审查 Lean 层面问题，自动开议题
+docs/DELETION.md             提删流程、巡查规则、公示期、归档
+docs/ZENODO.md               用 Zenodo 为发布版本申请 DOI
+.github/workflows/ci.yml     每次推送和 PR 的锁定检查
+.github/workflows/pages.yml  构建并发布网站到 GitHub Pages
+.github/workflows/patrol.yml 每周巡查
+.github/workflows/guides.yml 生成或更新导读
 ```
 
-### Ids
+### 编号
 
-Ids are date-based: `YYYYMMDD-NN`, where `NN` is a two-digit counter for statements submitted on the same day. The Lean file for `#20261014-01` is `S20261014_01.lean` (Lean identifiers cannot start with a digit or contain `-`). Ids are never reused or renumbered.
+编号为日期式 `YYYYMMDD-NN`，`NN` 是同一天提交的流水号。`#20261014-01` 对应文件 `S20261014_01.lean`，因为 Lean 标识符不能以数字开头，也不能含连字符。编号永不复用、永不改号。
 
-### What a statement file must contain
+### 表述文件的要求
 
-- Start with `module`, use `public import` for Mathlib modules, and wrap declarations in `@[expose] public section`.
-- Exactly one `def <Name> : Prop := …` per file, matching `declaration` in the metadata. Helper definitions are allowed in the same file; the checker reports them as *custom definitions* so readers can see at a glance that the statement does not rely solely on Mathlib.
-- No `sorry`, no `axiom`/`opaque`/`constant`, no `native_decide`.
+- 文件以 `module` 开头，用 `public import` 引入 Mathlib 模块，声明放在 `@[expose] public section` 内。
+- 每个文件恰好一个 `def <名称> : Prop := …`，名称与元数据中的 `declaration` 一致。允许在同一文件内写辅助定义，检查器会把它们列为“自定义定义”，让读者一眼看出该表述并非只依赖 Mathlib。
+- 不得出现 `sorry`、`axiom`、`opaque`、`constant`、`native_decide`。
 
-### Metadata fields (`S<id>.json`)
+### 元数据字段（`S<编号>.json`）
 
-| field | meaning |
+| 字段 | 含义 |
 | --- | --- |
 | `id` | `YYYYMMDD-NN` |
-| `conjecture` | slug of the parent `conjecture.json` |
-| `module`, `declaration` | Lean module and fully qualified name of the `def` |
-| `submitted_by`, `submitted_at` | who registered it and when |
-| `source` | `kind` (`original`, `adapted`, `verbatim`), `url`, `note` |
-| `informal_restatement` | the submitter's own reading of the Lean code, in prose; labelled as such on the site |
-| `claimed_proofs` | list of `{claimant, date, url, note}`; a claim is recorded, not endorsed |
-| `external_links` | list of `{label, url}`; links only, no commentary |
+| `conjecture` | 所属 `conjecture.json` 的 slug |
+| `module`、`declaration` | Lean 模块名和 `def` 的完整限定名 |
+| `submitted_by`、`submitted_at` | 提交者与日期 |
+| `source` | `kind`（`original` 原创、`adapted` 改编、`verbatim` 照录）、`url`、`note` |
+| `informal_restatement` | 提交者对 Lean 代码的自然语言复述，网站上标注为提交者自述 |
+| `claimed_proofs` | `{claimant, date, url, note}` 列表；只记录声明，不表示认可 |
+| `external_links` | `{label, url}` 列表；只放链接，不加评论 |
 
-## Lock-down (CI)
+## 锁定机制（CI）
 
-Every push and pull request runs:
+每次推送和 PR 都会运行：
 
-1. `lake build` of all statements against the pinned Mathlib (`lake-manifest.json`, `lean-toolchain`).
-2. `lake exe check`, which for every declaration records its axioms via `collectAxioms`, flags `sorryAx`, flags the auxiliary axioms generated by `native_decide`, flags anything outside `propext`, `Classical.choice`, `Quot.sound`, and lists the constants the statement mentions together with their defining modules.
-3. `lean4checker`, built from the matching tag, replaying every statement module through a fresh kernel.
-4. `validate_meta.py` for naming and metadata rules.
+1. 对钉死版本的 Mathlib（见 `lake-manifest.json` 和 `lean-toolchain`）`lake build` 全部表述。
+2. `lake exe check`：对每个声明用 `collectAxioms` 记录公理，标出 `sorryAx`，标出 `native_decide` 生成的辅助公理，标出 `propext`、`Classical.choice`、`Quot.sound` 之外的任何公理，并列出表述直接使用的常量及其所在模块。
+3. `lean4checker`：从对应版本构建，把每个表述模块在全新内核中重放一遍。
+4. `validate_meta.py`：命名与元数据规则。
 
-A red check blocks the merge. There is no human "approval" step for mathematical content, only for the facts being in order.
+检查未通过就不能合并。对数学内容没有人工“批准”环节，只检查事实是否齐全。
 
-## Adding a statement
+## 登记一条表述
 
-1. Pick or create `Conjectures/<Name>/conjecture.json`.
-2. Add `S<YYYYMMDD>_<NN>.lean` and `S<YYYYMMDD>_<NN>.json`.
-3. Run locally: `lake exe cache get && scripts/run_checks.sh && scripts/lean4checker.sh && python3 scripts/validate_meta.py`.
-4. Open a pull request.
+1. 选择或新建 `Conjectures/<猜想>/conjecture.json`。
+2. 新增 `S<YYYYMMDD>_<NN>.lean` 和 `S<YYYYMMDD>_<NN>.json`。
+3. 本地运行：`lake exe cache get && scripts/run_checks.sh && scripts/lean4checker.sh && python3 scripts/validate_meta.py`。
+4. 提交 Pull Request。
 
-To record a claimed proof of an existing statement, add an entry to its `claimed_proofs` with a link to the proof. The registry does not host proofs; it points at them.
+要为已有表述记录一条证明声明，在它的 `claimed_proofs` 里加一项并附证明链接。登记库不托管证明，只指向证明。
 
-## Deletion proposals, patrol, archiving
+## 提删、巡查、归档
 
-See `docs/DELETION.md`. In short: only Lean-level problems can be proposed for deletion; equivalence to the informal conjecture never is. A weekly patrol (`patrol/patrol.py`, two independent models, Qwen and Gemini to start) opens issues per a fixed rule; a proposal has a 14-day public notice period; entries are then **archived** to `Archive/`, with their id kept forever, not deleted. The patrol needs the repository secrets `QWEN_API_KEY` and `GEMINI_API_KEY`.
+见 `docs/DELETION.md`。简而言之：只有 Lean 层面的问题可以提删，等价性问题永远不能。每周一次巡查（`patrol/patrol.py`，两个独立模型，起步用 Qwen 和 Gemini）按固定规则开议题；提删公示 14 天；之后条目被**归档**到 `Archive/`，编号永久保留，不是删除。巡查需要仓库密钥 `QWEN_API_KEY` 和/或 `GEMINI_API_KEY`；只有一个密钥时进入单模型模式，只能开“巡查发现”，不能开提删公示。
 
-## Site
+## AI 导读
 
-`python3 scripts/build_site.py` renders `_site/`. The Pages workflow publishes it on every push to `main`. Enable **Settings → Pages → Source: GitHub Actions** once.
+`scripts/gen_guides.py` 调用 Gemini，为每条表述生成一份导读，存在 `Guides/<猜想>/S<编号>.md`，网站上单独一栏展示。导读只做两件事：逐个解释表述用到的定义（把钉死版本 Mathlib 里的定义源码喂给模型，而不是让它凭记忆），以及把量词和条件翻译成自然语言。它不评价表述好坏，不与原猜想比较。导读是普通文件，任何人都可以提 PR 修正；页面上标注为 AI 生成、不代表登记库判断。
 
-## Versioning and citation
+## 网站
 
-Toolchain and dependency revisions are pinned in `lean-toolchain` and `lake-manifest.json` and shown on every statement page. When those pins are bumped, every statement is re-checked by CI, and the change is an ordinary commit in the history. For a citable snapshot, create a GitHub release and archive it with Zenodo (Zenodo's GitHub integration mints a DOI per release; see `docs/ZENODO.md`).
+`python3 scripts/build_site.py` 生成 `_site/`。Pages 工作流在每次推送到 `main` 时发布。需在仓库 **Settings → Pages → Source** 选择 GitHub Actions 一次。
 
-## Licences
+## 版本与引用
 
-- Code (checker, scripts, workflows): Apache-2.0, see `LICENSE`.
-- Entry content (`Conjectures/**`): CC-BY-4.0, see `LICENSE-CONTENT`. Statements adapted from other projects carry their origin in the file header and in `source`.
+工具链和依赖版本钉死在 `lean-toolchain` 和 `lake-manifest.json` 中，每个表述页面都会显示。升级版本时 CI 会重新检查全部表述，改动是历史中的普通提交。需要可引用的快照时，创建 GitHub Release 并用 Zenodo 归档，每个 Release 得到一个 DOI，见 `docs/ZENODO.md`。
+
+## 许可
+
+- 代码（检查器、脚本、工作流）：Apache-2.0，见 `LICENSE`。
+- 条目内容（`Conjectures/**`）：CC-BY-4.0，见 `LICENSE-CONTENT`。改编自其他项目的表述在文件头和 `source` 中注明来源。
