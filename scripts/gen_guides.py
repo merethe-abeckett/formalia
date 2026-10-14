@@ -12,7 +12,7 @@
 需要环境变量 GEMINI_API_KEY（可选 GEMINI_MODEL，默认 gemini-3.8-flash）。
 代码许可：Apache-2.0。
 """
-import argparse, json, os, re, sys, datetime
+import argparse, hashlib, json, os, re, sys, datetime
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import llm_gemini
@@ -108,8 +108,9 @@ def main():
     rev = mathlib_rev(); n = 0
     for cname, meta, lean, decl in entries():
         out = GUIDES / cname / (lean.stem + ".md")
-        if out.exists() and not a.force and out.stat().st_mtime >= lean.stat().st_mtime:
-            continue
+        digest = hashlib.sha256(lean.read_bytes()).hexdigest()[:12]
+        if out.exists() and not a.force and f"源文件 {digest}" in out.read_text(encoding="utf-8").split("\n", 1)[0]:
+            continue   # 导读对应的表述文件没有变化
         snippets = []
         for d in (decl or {}).get("direct_dependencies", []):
             sn = source_snippet(d.get("module"), d["name"])
@@ -121,7 +122,7 @@ def main():
         else:
             text = llm_gemini.generate(prompt, temperature=0.2)
         model = "fake" if a.fake else llm_gemini.resolve_model()
-        header = f"<!-- 由 {model} 于 {datetime.date.today().isoformat()} 生成，依据 Mathlib {rev} 的源码片段。可人工修改。 -->\n\n"
+        header = f"<!-- 由 {model} 于 {datetime.date.today().isoformat()} 生成，依据 Mathlib {rev} 的源码片段，源文件 {digest}。可人工修改。 -->\n\n"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(header + text + "\n", encoding="utf-8")
         print("wrote", out.relative_to(ROOT), f"({len(snippets)} 个源码片段)")

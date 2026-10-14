@@ -14,10 +14,30 @@ permissions:
   contents: read
 
 jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lean 规范对抗测试
+        run: python3 tests/test_lean_policy.py
+      - name: 编辑应用测试
+        run: bash tests/test_apply_edit.sh
+      - name: 编辑网关（Worker）测试
+        run: node worker/test.mjs "$RUNNER_TEMP/issue.md"
+      - name: 表述文件规范
+        run: python3 scripts/lean_policy.py Conjectures/*/*.lean
+
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install elan
         run: |

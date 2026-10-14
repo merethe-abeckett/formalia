@@ -54,8 +54,13 @@ docs/ZENODO.md               用 Zenodo 为发布版本申请 DOI
 .github/workflows/pages.yml  构建并发布网站到 GitHub Pages
 .github/workflows/patrol.yml 每周巡查
 .github/workflows/guides.yml 生成或更新导读
-.github/workflows/claim.yml  把“声明证明”表单议题自动转成 PR
-scripts/claim_from_issue.py  上述工作流调用的脚本
+.github/workflows/edit.yml   处理网页编辑和 GitHub 声明表单：检查、写入、发布
+scripts/apply_edit.py        把一条编辑确定性地写成文件
+scripts/lean_policy.py       表述文件只允许的受限 Lean 子集
+scripts/edit_check.sh        Edit 工作流的检查步骤
+worker/                      Cloudflare Worker：编辑网关（人机验证、限流、匿名编号、开议题）
+site/                        编辑表单脚本与隐私说明
+tests/                       Lean 规范、编辑应用、Worker 的测试
 ```
 
 ### 编号
@@ -67,6 +72,7 @@ scripts/claim_from_issue.py  上述工作流调用的脚本
 - 文件以 `module` 开头，用 `public import` 引入 Mathlib 模块，声明放在 `@[expose] public section` 内。
 - 每个文件恰好一个 `def <名称> : Prop := …`，名称与元数据中的 `declaration` 一致。允许在同一文件内写辅助定义，检查器会把它们列为“自定义定义”，让读者一眼看出该表述并非只依赖 Mathlib。
 - 不得出现 `sorry`、`axiom`、`opaque`、`constant`、`native_decide`。
+- 只允许受限的 Lean 子集：不能有 `#` 命令、属性标注、元编程、`set_option`、`IO` 等会在编译时执行代码的写法，import 只能来自 Mathlib 或 Batteries。规则见 `scripts/lean_policy.py`，CI 强制执行。
 
 ### 元数据字段（`S<编号>.json`）
 
@@ -92,6 +98,10 @@ scripts/claim_from_issue.py  上述工作流调用的脚本
 
 检查未通过就不能合并。对数学内容没有人工“批准”环节，只检查事实是否齐全。
 
+## 网页编辑
+
+谁都可以编辑，不需要注册，也不需要 GitHub 账号。网站每个页面上都有编辑按钮：声明证明、编辑表述信息、编辑猜想信息、新增表述。提交后机器自动检查，通过就直接写入，网站几分钟后更新；每条编辑都留有议题和提交记录，可以回退。公开显示的是由 IP 派生的匿名编号，完整 IP 只有维护者可见，90 天后删除。工作原理、安全设计和 Cloudflare 部署步骤见 `docs/WEB_EDIT.md`。
+
 ## 登记一条表述
 
 1. 选择或新建 `Conjectures/<猜想>/conjecture.json`。
@@ -99,7 +109,7 @@ scripts/claim_from_issue.py  上述工作流调用的脚本
 3. 本地运行：`lake exe cache get && scripts/run_checks.sh && scripts/lean4checker.sh && python3 scripts/validate_meta.py`。
 4. 提交 Pull Request。
 
-要为已有表述记录一条证明声明，最简单的办法是在表述页面点“声明证明了这条表述”，填一个 GitHub 表单；机器人会自动生成 PR，CI 通过后由维护者合并。也可以直接在它的 `claimed_proofs` 里加一项并提 PR。登记库不托管证明，只指向证明。
+要为已有表述记录一条证明声明，最简单的办法是在表述页面点“声明证明了这条表述”，在网站上填表即可，不需要 GitHub 账号。有 GitHub 账号的人也可以用仓库的“声明证明”议题表单，或者直接在 `claimed_proofs` 里加一项并提 PR。登记库不托管证明，只指向证明。
 
 ## 提删、巡查、归档
 

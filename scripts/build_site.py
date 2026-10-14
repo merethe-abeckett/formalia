@@ -73,6 +73,18 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.93em}.ok{color
 .muted{color:var(--muted)}footer{max-width:960px;margin:40px auto;padding:16px;border-top:1px solid var(--line);font-family:system-ui,sans-serif;font-size:13px;color:var(--muted)}
 .btn{display:inline-block;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--box);text-decoration:none;font-family:system-ui,sans-serif;font-size:14px}
 ul.plain{list-style:none;padding:0}ul.plain li{padding:4px 0;border-bottom:1px dotted var(--line)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+form.edit{font-family:system-ui,sans-serif;font-size:15px;max-width:760px}
+form.edit .f{display:block;margin:14px 0}form.edit .fl{display:block;font-weight:600;margin-bottom:4px}
+form.edit .fh{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+form.edit input[type=text],form.edit textarea,form.edit select{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:inherit}
+form.edit textarea.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
+form.edit fieldset{border:1px solid var(--line);border-radius:6px;padding:4px 12px}
+form.edit button{padding:8px 22px;border:0;border-radius:6px;background:var(--link);color:#fff;font:inherit;cursor:pointer;margin-top:12px}
+form.edit button:disabled{opacity:.5;cursor:default}
+pre.msg{white-space:pre-wrap}
+.cf-turnstile{margin-top:12px}
+@media(max-width:600px){th{width:auto}td,th{display:block;width:100%}tr{display:block;border-bottom:1px solid var(--line)}}
 """
 
 def page(title, crumbs, body, depth):
@@ -103,6 +115,29 @@ def find_decl(check, decl):
 
 KIND_ZH = {"original": "原创", "adapted": "改编", "verbatim": "照录"}
 
+def history(paths, limit=30):
+    """从 git 记录里读出编辑历史：日期、说明、编辑者。"""
+    out = git("log", f"-{limit}", "--format=%cs%x1f%s%x1f%b%x1e", "--", *paths)
+    rows = []
+    for rec in out.split("\x1e"):
+        rec = rec.strip()
+        if not rec: continue
+        date, subj, body = (rec.split("\x1f") + ["", ""])[:3]
+        editor = next((l.split("：", 1)[1].strip() for l in body.splitlines() if l.startswith("编辑者：")), "")
+        rows.append((date, subj, editor))
+    return rows
+
+def history_html(paths):
+    rows = history(paths)
+    if not rows: return '<p class="muted">暂无记录</p>'
+    return ("<table><tr><th>日期</th><th>说明</th><th>编辑者</th></tr>" +
+            "".join(f"<tr><td>{esc(d)}</td><td>{esc(sj)}</td><td>{esc(e) or '<span class=muted>维护者</span>'}</td></tr>" for d, sj, e in rows) +
+            "</table>")
+
+def edit_link(rel, **q):
+    from urllib.parse import urlencode
+    return f"{rel}edit/index.html?{esc(urlencode(q))}"
+
 def kind_zh(k): return KIND_ZH.get(k, k)
 
 def render_statement(conj, meta, lean_src, check, tc, deps):
@@ -131,6 +166,10 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     if meta.get("archived"):
         a = meta["archived"]
         body += f'<p class="note"><span class="bad">已于 {esc(a.get("at",""))} 归档。</span>{esc(a.get("reason",""))} 讨论：<a href="{esc(a.get("issue",""))}">{esc(a.get("issue",""))}</a>。仅供查阅，不再编译和检查。</p>'
+    if not meta.get("archived"):
+        body += (f'<div class="actions"><a class="btn" href="{edit_link("../../", type="meta", target=sid)}">编辑本条信息</a>'
+                 f'<a class="btn" href="{edit_link("../../", type="claim", target=sid)}">＋ 声明证明了这条表述</a>'
+                 f'<a class="btn" href="{edit_link("../../", type="statement", conjecture=conj["slug"])}">＋ 为该猜想新增一条表述</a></div>')
     body += table
     body += "<h2>Lean 代码</h2><pre><code>" + esc(lean_src) + "</code></pre>"
 
@@ -175,24 +214,26 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     else:
         body += '<p class="muted">未提供</p>'
 
-    repo = git("config", "--get", "remote.origin.url").replace(".git", "")
-    repo = re.sub(r"^git@github\.com:", "https://github.com/", repo)
-    claim_url = f"{repo}/issues/new?template=claim.yml&title=%5Bclaim%5D+%E8%A1%A8%E8%BF%B0+%23{esc(sid)}&statement={esc(sid)}"
-    body += f"<h2>声称的证明</h2><p><a class=\"btn\" href=\"{claim_url}\">＋ 声明证明了这条表述</a> <span class=\"muted\">（跳转到 GitHub 表单，需要 GitHub 账号；登记库只记录声明，不认证）</span></p>"
+    body += "<h2>声称的证明</h2>"
+    body += '<p class="note">登记库只记录“谁声称证明了这个编号”，不托管证明，也不判断证明是否正确。</p>'
+    if not meta.get("archived"):
+        body += f'<p><a class="btn" href="{edit_link("../../", type="claim", target=sid)}">＋ 声明证明了这条表述</a></p>'
     cps = meta.get("claimed_proofs") or []
     if cps:
-        body += "<table><tr><th>声称方</th><th>日期</th><th>链接</th><th>备注</th></tr>"
+        body += "<table><tr><th>声称方</th><th>日期</th><th>链接</th><th>备注</th><th>登记者</th></tr>"
         for c in cps:
             note = esc(c.get('note',''))
             if c.get('issue'): note += f' <a href="{esc(c["issue"])}">议题</a>'
-            body += f"<tr><td>{esc(c.get('claimant',''))}</td><td>{esc(c.get('date',''))}</td><td><a href=\"{esc(c.get('url',''))}\">{esc(c.get('url',''))}</a></td><td>{note}</td></tr>"
+            body += f"<tr><td>{esc(c.get('claimant',''))}</td><td>{esc(c.get('date',''))}</td><td><a href=\"{esc(c.get('url',''))}\" rel=\"nofollow ugc\">{esc(c.get('url',''))}</a></td><td>{note}</td><td>{esc(c.get('recorded_by',''))}</td></tr>"
         body += "</table>"
     else:
         body += '<p class="muted">暂无记录</p>'
 
     body += "<h2>外部链接</h2>"
     els = meta.get("external_links") or []
-    body += "<ul class='plain'>" + "".join(f'<li><a href="{esc(l["url"])}">{esc(l.get("label", l["url"]))}</a></li>' for l in els) + "</ul>" if els else '<p class="muted">暂无记录</p>'
+    body += "<ul class='plain'>" + "".join(f'<li><a href="{esc(l["url"])}" rel="nofollow ugc">{esc(l.get("label", l["url"]))}</a></li>' for l in els) + "</ul>" if els else '<p class="muted">暂无记录</p>'
+    base = "Archive" if meta.get("archived") else "Conjectures"
+    body += "<h2>编辑历史</h2>" + history_html([f"{base}/{conj['_dir']}/{meta['_stem']}.lean", f"{base}/{conj['_dir']}/{meta['_stem']}.json"])
     return page(f"#{sid} · {cname}", [(cname, "../index.html"), (f"#{sid}", None)], body, 2)
 
 def render_conjecture(conj, entries, archived=()):
@@ -200,6 +241,8 @@ def render_conjecture(conj, entries, archived=()):
     if conj.get("name_zh"): body += f'<p class="muted">{esc(conj["name"])}</p>'
     body += f"<p><em>自然语言表述：</em>{esc(conj.get('informal',''))}</p>"
     body += '<p class="note">这是一个消歧义页，列出登记在该猜想之下的全部形式化表述。登记库不判断其中哪一条（如果有）等价于自然语言表述。</p>'
+    body += (f'<div class="actions"><a class="btn" href="{edit_link("../", type="statement", conjecture=conj["slug"])}">＋ 新增一条表述</a>'
+             f'<a class="btn" href="{edit_link("../", type="conjecture", target=conj["slug"])}">编辑猜想信息</a></div>')
     body += "<h2>已登记的表述</h2><table><tr><th>编号</th><th>Lean 声明</th><th>提交</th><th>来源</th><th>CI 检查</th><th>声称的证明</th></tr>"
     for meta, decl in entries:
         body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(meta.get("submitted_at",""))} · {esc(meta.get("submitted_by",""))}</td><td>{esc(kind_zh(meta.get("source",{}).get("kind","")))}</td><td>{status_cell(decl)}</td><td>{len(meta.get("claimed_proofs") or [])}</td></tr>'
@@ -214,6 +257,7 @@ def render_conjecture(conj, entries, archived=()):
     refs = conj.get("references") or []
     if refs:
         body += "<h2>参考资料</h2><ul class='plain'>" + "".join(f'<li><a href="{esc(r["url"])}">{esc(r.get("label", r["url"]))}</a></li>' for r in refs) + "</ul>"
+    body += "<h2>编辑历史</h2>" + history_html([f"Conjectures/{conj['_dir']}/conjecture.json"])
     cname = conj.get("name_zh") or conj["name"]
     return page(cname, [(cname, None)], body, 1)
 
@@ -225,8 +269,38 @@ def render_index(conjs, tc, deps, check_ok):
     for c, n in conjs:
         body += f'<tr><td><a href="{esc(c["slug"])}/index.html">{esc(c.get("name_zh") or c["name"])}</a>' + (f' <span class="muted">{esc(c["name"])}</span>' if c.get("name_zh") else "") + f'</td><td>{n}</td></tr>'
     body += "</table>"
-    body += '<h2>如何登记一条表述</h2><p>提交 Pull Request，新增 <code>Conjectures/&lt;猜想&gt;/S&lt;YYYYMMDD&gt;_&lt;NN&gt;.lean</code>（一个 <code>def … : Prop</code>）和对应的 <code>.json</code>。CI 会编译它，拒绝 <code>sorry</code>、<code>native_decide</code> 和非标准公理，用 lean4checker 独立复查，然后重新生成本站。详见 README。</p>'
+    body += f'<div class="actions"><a class="btn" href="{edit_link("", type="statement")}">＋ 登记一条表述（含新猜想）</a></div>'
+    body += ('<h2>谁都可以编辑</h2><p>和维基百科一样，不需要注册，也不需要 GitHub 账号。每个页面上都有编辑按钮。'
+             '提交后机器会自动检查：Lean 代码要能编译，不能有 <code>sorry</code>、<code>native_decide</code> 或非标准公理，并经 lean4checker 独立复核。'
+             '检查通过就直接写入，网站几分钟后更新；每一次编辑都留有记录，可以回退。'
+             '是否等价于原猜想不在检查范围内，留给数学家讨论。</p>'
+             '<p><a href="about/privacy.html">隐私与编辑规则</a> · 熟悉 GitHub 的人也可以直接提交 Pull Request，见 README。</p>')
     return page("Lean 表述登记库", [("首页", None)], body, 0)
+
+SITE_SRC = ROOT / "site"
+
+def write_edit_pages(index_rows):
+    """编辑表单需要的数据，以及编辑、状态、隐私三个页面。"""
+    data = {"statements": {}, "conjectures": {}}
+    for conj, _ in index_rows:
+        cdir = CONJ / conj["_dir"]
+        data["conjectures"][conj["slug"]] = {k: conj.get(k) or ([] if k == "references" else "") for k in ("name", "name_zh", "informal", "references")}
+        for mj in sorted(cdir.glob("S*.json")):
+            m = read_json(mj)
+            data["statements"][m["id"]] = {
+                "conjecture": conj["slug"], "conjecture_name": conj.get("name_zh") or conj["name"],
+                "source_note": (m.get("source") or {}).get("note") or "", "source_url": (m.get("source") or {}).get("url") or "",
+                "restatement": (m.get("informal_restatement") or {}).get("text") or "", "external_links": m.get("external_links") or []}
+    (OUT / "data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    (OUT / "edit").mkdir(exist_ok=True); (OUT / "about").mkdir(exist_ok=True)
+    (OUT / "edit" / "edit.js").write_text((SITE_SRC / "edit.js").read_text(encoding="utf-8"), encoding="utf-8")
+    js = '<script src="edit.js" defer></script>'
+    (OUT / "edit" / "index.html").write_text(page("编辑", [("编辑", None)],
+        '<h1 id="edit-title">编辑</h1><div id="edit-root"><p class="muted">正在加载……</p></div><noscript><p class="note bad">编辑需要启用 JavaScript。</p></noscript>' + js, 1), encoding="utf-8")
+    (OUT / "edit" / "status.html").write_text(page("编辑状态", [("编辑状态", None)],
+        '<h1>编辑状态</h1><div id="status-root"><p class="muted">正在查询……</p></div>' + js, 1), encoding="utf-8")
+    (OUT / "about" / "privacy.html").write_text(page("隐私与编辑规则", [("隐私与编辑规则", None)],
+        md_to_html((SITE_SRC / "privacy.md").read_text(encoding="utf-8")), 1), encoding="utf-8")
 
 def main():
     tc, deps = pinned_versions()
@@ -261,6 +335,7 @@ def main():
         (OUT / conj["slug"] / "index.html").write_text(render_conjecture(conj, entries, archived), encoding="utf-8")
         index_rows.append((conj, len(entries)))
     (OUT / "index.html").write_text(render_index(index_rows, tc, deps, all_ok), encoding="utf-8")
+    write_edit_pages(index_rows)
     (OUT / ".nojekyll").write_text("")
     print(f"wrote {OUT} ({sum(n for _,n in index_rows)} statements, {len(index_rows)} conjectures)")
 
