@@ -37,7 +37,7 @@
       [data, cfg] = await Promise.all([fetch("../data.json", { cache: "no-store" }).then(r => r.json()),
                                        fetch("/api/config").then(r => r.ok ? r.json() : {})]);
     } catch (e) { return fail("无法加载页面数据，请检查网络后刷新。"); }
-    document.title = TITLES[type] + " · Lean 表述登记库";
+    document.title = TITLES[type] + " · Formalia";
     $("#edit-title").textContent = TITLES[type];
 
     const form = el("form", { class: "edit", novalidate: true });

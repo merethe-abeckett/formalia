@@ -245,7 +245,7 @@ def apply_statement(sub, editor, created_at):
         if kind != "original": raise EditError("改编或照录的表述必须选择许可，并与原作许可一致或兼容")
         lic = licenses.DEFAULT
     if lic not in licenses.ALLOWED: raise EditError("许可只能是：" + "、".join(licenses.ALLOWED))
-    lines = ["/-", f"Lean 表述登记库 · 条目 #{sid}", f"猜想：{title}", f"内容许可：{lic}",
+    lines = ["/-", f"Formalia · 条目 #{sid}", f"猜想：{title}", f"内容许可：{lic}",
              f"经网站提交：{comment_safe(editor)}", "", "本文件只登记一条形式化表述，不对它是否等价于原猜想作任何判断。", "-/",
              "module", ""] + [f"public import {i}" for i in imports] + ["", "@[expose] public section", "", f"namespace {ns}", ""]
     if helpers:
