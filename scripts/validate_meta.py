@@ -3,6 +3,8 @@
 each .json points at a declaration that really exists in its .lean file."""
 import json, re, sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import lean_policy
 
 ROOT = Path(__file__).resolve().parent.parent / "Conjectures"
 ID_RE = re.compile(r"^(\d{8})-(\d{2})$")
@@ -43,11 +45,16 @@ for cdir in sorted(p for p in ROOT.iterdir() if p.is_dir()):
         code = re.sub(r"--[^\n]*", "", code)
         if not re.search(rf"^\s*def\s+{re.escape(decl)}\s*:\s*Prop\s*:=", code, re.M):
             err(lf, f"expected `def {decl} : Prop :=`")
+        for e in lean_policy.check_statement_file(src): err(lf, "Lean 规范：" + e)
         if re.search(r"\bsorry\b", code): err(lf, "contains `sorry`")
         if re.search(r"^\s*(axiom|opaque|constant)\b", code, re.M): err(lf, "declares an axiom/opaque/constant")
         for cp in meta.get("claimed_proofs") or []:
             for k in ("claimant", "date", "url"):
                 if not cp.get(k): err(mj, f"claimed proof missing {k}")
+        urls = [(meta.get("source") or {}).get("url")] + [c.get("url") for c in meta.get("claimed_proofs") or []] \
+             + [l.get("url") for l in meta.get("external_links") or []]
+        for u in urls:
+            if u and not re.match(r"^https?://[^\s<>\"'`]+$", u): err(mj, f"非法链接：{u!r}")
 
 if errors:
     print("\n".join(errors)); sys.exit(1)

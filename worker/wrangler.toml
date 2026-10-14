@@ -1,0 +1,20 @@
+# 用 wrangler 部署时的配置；也可以直接在 Cloudflare 后台粘贴 src/index.js，见 docs/WEB_EDIT.md
+name = "formalia-edit"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+routes = [
+  { pattern = "formalnaturalist.co.nz/api/*", zone_name = "formalnaturalist.co.nz" },
+  { pattern = "www.formalnaturalist.co.nz/api/*", zone_name = "formalnaturalist.co.nz" },
+]
+
+[vars]
+REPO = "merethe-abeckett/formalia"
+ALLOWED_ORIGINS = "https://formalnaturalist.co.nz,https://www.formalnaturalist.co.nz"
+RATE_LIMIT_PER_HOUR = "6"
+TURNSTILE_SITEKEY = ""   # 在后台填写
+
+[[kv_namespaces]]
+binding = "FORMALIA_KV"
+id = ""                  # 在后台创建 KV 命名空间后填写
+
+# 密钥用 `wrangler secret put` 设置：GITHUB_TOKEN、TURNSTILE_SECRET、ANON_SECRET
