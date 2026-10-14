@@ -9,6 +9,7 @@
  *   GET  /api/config            站点需要的公开配置（Turnstile site key）
  *   POST /api/submit            提交一条编辑
  *   GET  /api/status?issue=N    查询某条编辑的处理结果（不必打开 GitHub）
+ *   GET  /api/chat              灌水区聊天室（WebSocket，由 Durable Object ChatRoom 承载）
  *
  * 绑定（在 Cloudflare 后台配置，见 docs/WEB_EDIT.md）：
  *   KV        FORMALIA_KV        限流计数、封禁名单、私有编辑日志
@@ -19,6 +20,8 @@
  *   Variable  TURNSTILE_SITEKEY  Turnstile 站点密钥（公开）
  *   Variable  ALLOWED_ORIGINS    逗号分隔，如 https://formalnaturalist.co.nz,https://www.formalnaturalist.co.nz
  *   Variable  RATE_LIMIT_PER_HOUR  每个匿名编号每小时可提交次数，默认 6
+ *   Durable Object  CHAT         ChatRoom 类（灌水区）
+ *   Secret    CHAT_ADMIN_TOKEN   聊天室管理员口令（删消息、封禁）
  *
  * 隐私：完整 IP 只写进 KV 的私有日志（log:<议题号>），保存 90 天后自动删除，
  * 只有仓库维护者能在 Cloudflare 后台看到。公开显示的只有由 IP 派生的匿名编号。
@@ -54,6 +57,7 @@ export default {
         return await submit(request, env, reply);
       }
       if (url.pathname === "/api/status" && request.method === "GET") return await status(url, env, reply);
+      if (url.pathname === "/api/chat") return await chat(request, env, reply, allowed, origin);
       return reply(404, { ok: false, error: "没有这个接口" });
     } catch (e) {
       return reply(500, { ok: false, error: "服务器内部错误，请稍后再试" });
@@ -207,4 +211,117 @@ async function status(url, env, reply) {
     message: bot ? String(bot.body).replace(BOT_MARKER, "").trim() : "",
     issue_url: i.data.html_url,
   }, { "Cache-Control": "public, max-age=15" });
+}
+
+// ---------- 灌水区 ----------
+const CHAT_KEEP_MS = 7 * 24 * 3600 * 1000;   // 消息（连同发言 IP）保存 7 天
+const CHAT_HISTORY = 150;                     // 新连接收到的历史条数
+const CHAT_MAX_LEN = 500;
+const CHAT_MIN_GAP_MS = 2000;                 // 同一编号两条消息至少间隔 2 秒
+const CHAT_PER_MIN = 30;
+const CHAT_CONN_PER_ANON = 3;
+const CHAT_CONN_TOTAL = 300;
+
+async function chat(request, env, reply, allowed, origin) {
+  if (request.headers.get("Upgrade") !== "websocket") return reply(426, { ok: false, error: "需要 WebSocket" });
+  if (allowed.length && !allowed.includes(origin)) return reply(403, { ok: false, error: "来源不被允许" });
+  const ip = clientIp(request);
+  for (const k of banKeys(ip)) if (await env.FORMALIA_KV.get(k)) return reply(403, { ok: false, error: "该网络地址已被暂停发言" });
+  const anon = await anonId(env.ANON_SECRET || "", ip);
+  const headers = new Headers(request.headers);
+  headers.set("X-Formalia-Anon", anon);
+  headers.set("X-Formalia-IP", ip);
+  const stub = env.CHAT.get(env.CHAT.idFromName("lobby"));
+  return stub.fetch(new Request("https://chat/connect", { headers }));
+}
+
+export function cleanChatText(s, max) {
+  return String(s ?? "").replace(/[\u0000-\u001f\u007f\u2028\u2029]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+export class ChatRoom {
+  constructor(ctx, env) {
+    this.ctx = ctx; this.env = env;
+    ctx.blockConcurrencyWhile(async () => {
+      ctx.storage.sql.exec(`CREATE TABLE IF NOT EXISTS msg (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, anon TEXT NOT NULL,
+        nick TEXT NOT NULL, text TEXT NOT NULL, me INTEGER NOT NULL, ip TEXT NOT NULL)`);
+    });
+  }
+
+  online() { return this.ctx.getWebSockets().length; }
+  send(ws, obj) { try { ws.send(JSON.stringify(obj)); } catch { /* 连接已断 */ } }
+  broadcast(obj) { const m = JSON.stringify(obj); for (const ws of this.ctx.getWebSockets()) { try { ws.send(m); } catch { } } }
+  purge() { this.ctx.storage.sql.exec("DELETE FROM msg WHERE ts < ?", Date.now() - CHAT_KEEP_MS); }
+  history() {
+    return this.ctx.storage.sql.exec("SELECT id, ts, anon, nick, text, me FROM msg ORDER BY id DESC LIMIT ?", CHAT_HISTORY)
+      .toArray().reverse().map(r => ({ id: r.id, ts: r.ts, anon: r.anon, nick: r.nick, text: r.text, me: !!r.me }));
+  }
+
+  async fetch(request) {
+    const anon = request.headers.get("X-Formalia-Anon") || "";
+    const ip = request.headers.get("X-Formalia-IP") || "";
+    if (!anon) return new Response("bad", { status: 400 });
+    if (this.online() >= CHAT_CONN_TOTAL) return new Response("聊天室人数已满，请稍后再来", { status: 503 });
+    if (this.ctx.getWebSockets(anon).length >= CHAT_CONN_PER_ANON) return new Response("同一网络连接数过多", { status: 429 });
+    const [client, server] = Object.values(new WebSocketPair());
+    this.ctx.acceptWebSocket(server, [anon]);
+    server.serializeAttachment({ anon, ip, nick: "", admin: false, times: [] });
+    this.purge();
+    this.send(server, { t: "hello", anon, online: this.online(), history: this.history(), keep_days: 7 });
+    this.broadcast({ t: "online", n: this.online() });
+    return new Response(null, { status: 101, webSocket: client });
+  }
+
+  async webSocketMessage(ws, raw) {
+    let m; try { m = JSON.parse(typeof raw === "string" ? raw : new TextDecoder().decode(raw)); } catch { return; }
+    if (!m || typeof m !== "object") return;
+    const a = ws.deserializeAttachment() || {};
+    if (m.t === "ping") return this.send(ws, { t: "pong" });
+    if (m.t === "nick") {
+      a.nick = cleanChatText(m.nick, 20).replace(/[<>@#]/g, "");
+      ws.serializeAttachment(a);
+      return this.send(ws, { t: "sys", text: a.nick ? `昵称已改为 ${a.nick}` : "已清除昵称" });
+    }
+    if (m.t === "auth") {
+      const tok = String(this.env.CHAT_ADMIN_TOKEN || "");
+      a.admin = tok.length >= 16 && String(m.token || "") === tok;
+      ws.serializeAttachment(a);
+      return this.send(ws, { t: "sys", text: a.admin ? "管理员模式已开启" : "口令不对", admin: a.admin });
+    }
+    if ((m.t === "del" || m.t === "ban") && a.admin) {
+      const id = parseInt(m.id, 10);
+      const row = this.ctx.storage.sql.exec("SELECT anon, ip FROM msg WHERE id = ?", id).toArray()[0];
+      if (!row) return this.send(ws, { t: "sys", text: "找不到这条消息" });
+      if (m.t === "del") {
+        this.ctx.storage.sql.exec("DELETE FROM msg WHERE id = ?", id);
+        return this.broadcast({ t: "del", ids: [id] });
+      }
+      // 封禁：暂停该 IP 7 天，并删除他最近的全部消息
+      await this.env.FORMALIA_KV.put(`ban:${row.ip}`, `chat ${new Date().toISOString()}`, { expirationTtl: 7 * 24 * 3600 });
+      const ids = this.ctx.storage.sql.exec("SELECT id FROM msg WHERE anon = ?", row.anon).toArray().map(r => r.id);
+      this.ctx.storage.sql.exec("DELETE FROM msg WHERE anon = ?", row.anon);
+      this.broadcast({ t: "del", ids });
+      for (const s of this.ctx.getWebSockets(row.anon)) { this.send(s, { t: "sys", text: "你已被暂停发言 7 天" }); try { s.close(4003, "banned"); } catch { } }
+      return this.send(ws, { t: "sys", text: `已封禁 ${row.anon} 7 天，删除 ${ids.length} 条消息` });
+    }
+    if (m.t !== "msg") return;
+    let text = cleanChatText(m.text, CHAT_MAX_LEN);
+    if (!text) return;
+    let me = false;   // 先解析命令：不会发出消息的命令不占发言次数
+    if (text.startsWith("/me ")) { me = true; text = text.slice(4).trim(); if (!text) return; }
+    else if (text.startsWith("/")) return this.send(ws, { t: "sys", text: "可用命令：/nick 昵称、/me 动作" });
+    const now = Date.now();
+    a.times = (a.times || []).filter(t => now - t < 60000);
+    if (a.times.length && now - a.times[a.times.length - 1] < CHAT_MIN_GAP_MS) return this.send(ws, { t: "err", text: "说得太快了，歇两秒" });
+    if (a.times.length >= CHAT_PER_MIN) return this.send(ws, { t: "err", text: "一分钟内说太多了，休息一下" });
+    a.times.push(now); ws.serializeAttachment(a);
+    const cur = this.ctx.storage.sql.exec("INSERT INTO msg (ts, anon, nick, text, me, ip) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
+      now, a.anon, a.nick || "", text, me ? 1 : 0, a.ip || "");
+    const id = cur.one().id;
+    this.broadcast({ t: "msg", id, ts: now, anon: a.anon, nick: a.nick || "", text, me });
+  }
+
+  async webSocketClose(ws) { try { ws.close(); } catch { } this.broadcast({ t: "online", n: Math.max(0, this.online() - 1) }); }
+  async webSocketError(ws) { this.broadcast({ t: "online", n: Math.max(0, this.online() - 1) }); }
 }

@@ -1,4 +1,6 @@
-# Lean 表述登记库
+# Formalia
+
+数学猜想的 Lean 4 表述目录。网站：https://formalnaturalist.co.nz
 
 ## 阅读前说明（一些作者自己的话）
 

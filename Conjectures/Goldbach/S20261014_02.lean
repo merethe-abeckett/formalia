@@ -1,5 +1,5 @@
 /-
-Lean 表述登记库 · 条目 #20261014-02
+Formalia · 条目 #20261014-02
 猜想：哥德巴赫猜想
 内容许可：Apache-2.0（与原作相同）
 原作版权：Copyright 2025 The Formal Conjectures Authors，Apache License 2.0
