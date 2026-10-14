@@ -86,7 +86,17 @@ Lean 在编译期可以执行任意代码，所以匿名提交的 Lean 代码有
 
 5. **Settings** → **Domains & Routes** → **Add** → **Route**：Zone 选 `formalnaturalist.co.nz`，Route 填 `formalnaturalist.co.nz/api/*`。再加一条 `www.formalnaturalist.co.nz/api/*`。
 
-### 5. 验证
+### 5. 灌水区（聊天室）
+
+聊天室跑在同一个 Worker 里，用 Cloudflare 免费版的 Durable Objects（SQLite 存储）。
+
+1. Worker → **Settings** → **Bindings** → **Add binding** → **Durable Object**，Variable name 填 `CHAT`，Class 选 `ChatRoom`。
+2. **Variables and Secrets** 里加一个 Secret：`CHAT_ADMIN_TOKEN`，值是一串至少 16 位的随机字符。
+3. 管理员模式：浏览器打开 `https://formalnaturalist.co.nz/chat/#admin=你的口令` 一次，口令存在这台电脑上，地址栏里会自动抹掉。之后每条消息旁边会出现“删”“封”两个按钮。“封”会暂停该 IP 7 天并删除他的全部消息。
+
+用后台粘贴代码的方式部署时，如果添加 Durable Object 绑定的界面要求迁移（migration），以仓库里 `worker/wrangler.toml` 的 `[[migrations]]` 为准。
+
+### 6. 验证
 
 浏览器打开 https://formalnaturalist.co.nz/api/config ，应该看到 `{"sitekey":"0x…","repo":"merethe-abeckett/formalia"}`。然后在网站上随便找一条表述，点“声明证明了这条表述”，提交一条测试声明，几分钟内状态页应显示“已写入”。测试完可以用一条编辑把它删掉，或者在 GitHub 上回退那次提交。
 

@@ -17,4 +17,16 @@ TURNSTILE_SITEKEY = ""   # 在后台填写
 binding = "FORMALIA_KV"
 id = ""                  # 在后台创建 KV 命名空间后填写
 
-# 密钥用 `wrangler secret put` 设置：GITHUB_TOKEN、TURNSTILE_SECRET、ANON_SECRET
+[[durable_objects.bindings]]
+name = "CHAT"
+class_name = "ChatRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ChatRoom"]
+
+[placement]
+mode = "smart"   # 让 Worker 跑在离 Gemini 等后端近的机房，避开不受支持的地区
+
+# 密钥在 Cloudflare 后台设置一次即可，重新部署不会丢：
+# GITHUB_TOKEN、TURNSTILE_SECRET、ANON_SECRET、CHAT_ADMIN_TOKEN、GEMINI_API_KEY

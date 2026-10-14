@@ -140,6 +140,17 @@ form.edit button,.ask button{padding:8px 22px;border:0;border-radius:6px;backgro
 form.edit button:disabled,.ask button:disabled{opacity:.5;cursor:default}
 pre.msg{white-space:pre-wrap}
 .cf-turnstile{margin-top:12px}
+/* 灌水区 */
+.chat{font-family:var(--mono);font-size:14px;border:1px solid var(--line);border-radius:10px;background:var(--card);display:flex;flex-direction:column;height:min(70vh,640px)}
+.chat .bar{display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12.5px;font-family:var(--sans)}
+#chat-log{flex:1;overflow-y:auto;padding:8px 12px;line-height:1.55;word-break:break-word;--nick-l:38%}
+@media(prefers-color-scheme:dark){#chat-log{--nick-l:68%}}
+#chat-log .ts{color:var(--muted)}#chat-log .lt,#chat-log .star{color:var(--muted)}#chat-log .nick{font-weight:600}
+#chat-log .sys{color:var(--muted)}#chat-log .err{color:var(--bad)}#chat-log .mine{background:var(--box)}
+#chat-log .adm{font:inherit;font-size:11px;border:1px solid var(--line);background:none;color:var(--muted);border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
+#chat-form{display:flex;border-top:1px solid var(--line)}
+#chat-input{flex:1;border:0;padding:10px 12px;background:transparent;color:var(--fg);font:inherit;outline:none}
+#chat-form button{border:0;background:var(--accent);color:#fff;padding:0 18px;font-family:var(--sans);cursor:pointer;border-radius:0 0 10px 0}
 /* 交互式导读 */
 .ask{font-family:var(--sans);font-size:15px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card);margin-top:14px}
 .ask .log{display:flex;flex-direction:column;gap:10px;margin-bottom:8px}
@@ -163,7 +174,7 @@ def page(title, crumbs, body, depth, home=False):
 <meta name="description" content="Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。">
 <link rel="stylesheet" href="{rel}style.css"></head><body>
 <header class="top"><div class="in"><a class="brand" href="{rel}index.html">{SITE_NAME}</a>
-<nav><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a></nav></div></header>
+<nav><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a></nav></div></header>
 {crumb_html}<main>{body}</main>
 <footer>Formalia 只列出形式化表述及其事实，不判断某条表述是否等价于原猜想。<br>
 代码 Apache-2.0 · 条目内容按各自声明的许可，默认 CC-BY-4.0 · <a href="{rel}about/privacy.html">隐私与编辑规则</a> ·
@@ -417,6 +428,18 @@ def write_edit_pages(index_rows):
     about = (SITE_SRC / "about.md").read_text(encoding="utf-8").replace("{{PREFACE}}", "## 作者的话\n\n" + readme_preface())
     (OUT / "about" / "index.html").write_text(page("关于", [("关于", None)], "<h1>关于 Formalia</h1>" + md_to_html(about), 1), encoding="utf-8")
 
+def write_chat_page():
+    (OUT / "chat").mkdir(exist_ok=True)
+    (OUT / "chat" / "chat.js").write_text((SITE_SRC / "chat.js").read_text(encoding="utf-8"), encoding="utf-8")
+    body = ('<h1>灌水区</h1><p class="muted" style="font-family:var(--sans);font-size:14px">随便聊。不用注册，不用验证，进来就能说话。'
+            '消息保留 7 天；为防刷屏，每两秒最多一条。发言的 IP 只有维护者可见，随消息一起 7 天后删除。'
+            '<a href="../about/privacy.html">隐私与编辑规则</a></p>'
+            '<div class="chat"><div class="bar"><span>#formalia</span><span id="chat-status">连接中……</span></div>'
+            '<div id="chat-log" role="log" aria-live="polite"></div>'
+            '<form id="chat-form" autocomplete="off"><input id="chat-input" maxlength="500" placeholder="说点什么，回车发送"><button>发送</button></form></div>'
+            '<noscript><p class="note bad">聊天需要启用 JavaScript。</p></noscript><script src="chat.js" defer></script>')
+    (OUT / "chat" / "index.html").write_text(page("灌水区", [("灌水区", None)], body, 1), encoding="utf-8")
+
 def readme_preface():
     """README 里“阅读前说明”一节，网站与 README 共用一份原文。"""
     text = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -459,6 +482,7 @@ def main():
         index_rows.append((conj, len(entries)))
     (OUT / "index.html").write_text(render_index(index_rows, tc, deps, all_ok), encoding="utf-8")
     write_edit_pages(index_rows)
+    write_chat_page()
     (OUT / ".nojekyll").write_text("")
     print(f"wrote {OUT} ({sum(n for _,n in index_rows)} statements, {len(index_rows)} conjectures)")
 
