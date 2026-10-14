@@ -52,6 +52,8 @@ docs/ZENODO.md               用 Zenodo 为发布版本申请 DOI
 .github/workflows/pages.yml  构建并发布网站到 GitHub Pages
 .github/workflows/patrol.yml 每周巡查
 .github/workflows/guides.yml 生成或更新导读
+.github/workflows/claim.yml  把“声明证明”表单议题自动转成 PR
+scripts/claim_from_issue.py  上述工作流调用的脚本
 ```
 
 ### 编号
@@ -95,7 +97,7 @@ docs/ZENODO.md               用 Zenodo 为发布版本申请 DOI
 3. 本地运行：`lake exe cache get && scripts/run_checks.sh && scripts/lean4checker.sh && python3 scripts/validate_meta.py`。
 4. 提交 Pull Request。
 
-要为已有表述记录一条证明声明，在它的 `claimed_proofs` 里加一项并附证明链接。登记库不托管证明，只指向证明。
+要为已有表述记录一条证明声明，最简单的办法是在表述页面点“声明证明了这条表述”，填一个 GitHub 表单；机器人会自动生成 PR，CI 通过后由维护者合并。也可以直接在它的 `claimed_proofs` 里加一项并提 PR。登记库不托管证明，只指向证明。
 
 ## 提删、巡查、归档
 
