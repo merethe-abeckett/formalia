@@ -81,14 +81,19 @@
     const url = new URL(location.href); if (q) url.searchParams.set("q", q); else url.searchParams.delete("q");
     history.replaceState(null, "", url);
     out.replaceChildren();
-    if (!q) { info.textContent = `共 ${docs.filter(d => d.kind === "c").length} 个猜想、${docs.filter(d => d.kind === "s").length} 条表述。输入关键词开始搜索，例如“素数”“偶数”或编号。`; return; }
     const ts = terms(q);
-    const hits = docs.map(d => [score(d, ts), d]).filter(([s]) => s > 0).sort((x, y) => y[0] - x[0]).slice(0, 50);
-    info.textContent = hits.length ? `找到 ${hits.length} 条结果` : "没有找到。换个说法试试，或者登记一个新猜想。";
+    let hits;
+    if (!q) {   // 没输入时列出全部猜想，方便直接浏览
+      hits = docs.filter(d => d.kind === "c").map(d => [1, d]);
+      info.textContent = `共 ${hits.length} 个猜想、${docs.filter(d => d.kind === "s").length} 条表述。输入关键词开始搜索，中文、Lean 名称、编号都可以。`;
+    } else {
+      hits = docs.map(d => [score(d, ts), d]).filter(([s]) => s > 0).sort((x, y) => y[0] - x[0]).slice(0, 50);
+      info.textContent = hits.length ? `找到 ${hits.length} 条结果` : "没有找到。换个说法试试，或者登记一个新猜想。";
+    }
     for (const [, d] of hits) {
       const li = document.createElement("li");
       const a = document.createElement("a"); a.href = "../" + d.url;
-      const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = d.kind === "c" ? "猜想" : "表述";
+      const tag = document.createElement("span"); tag.className = "tag " + d.kind; tag.textContent = d.kind === "c" ? "猜想" : "表述";
       const t = document.createElement("span"); t.className = "t"; t.append(highlight(d.title, ts));
       a.append(tag, t);
       if (d.sub) { const s = document.createElement("span"); s.className = "e"; s.append(" · ", highlight(d.sub, ts)); a.append(s); }
@@ -96,7 +101,7 @@
       a.append(p); li.append(a); out.append(li);
     }
     if (!hits.length) {
-      const li = document.createElement("li"); const a = document.createElement("a");
+      const li = document.createElement("li"); li.className = "new"; const a = document.createElement("a");
       a.href = "../edit/index.html?type=statement"; a.textContent = "＋ 登记一条新表述（可以顺便登记新猜想）"; li.append(a); out.append(li);
     }
   }
@@ -108,4 +113,9 @@
   }).catch(() => { info.textContent = "搜索数据加载失败，请刷新页面。"; });
   let timer; input.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(render, 120); });
   $("#search-form").addEventListener("submit", (e) => { e.preventDefault(); render(); });
+  // 示例词：点一下直接搜，不刷新页面
+  $("#chips").addEventListener("click", (e) => {
+    const a = e.target.closest("a"); if (!a) return;
+    e.preventDefault(); input.value = new URL(a.href).searchParams.get("q") || ""; render(); input.focus();
+  });
 })();

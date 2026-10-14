@@ -11,7 +11,7 @@ Writes:
 The site states facts only. It carries no field for "is this equivalent to the
 informal conjecture"; that discussion happens offline among mathematicians.
 """
-import html, json, os, re, sys, subprocess, datetime
+import hashlib, html, json, os, re, sys, subprocess, datetime, urllib.parse
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import licenses
@@ -141,16 +141,25 @@ form.edit button:disabled,.ask button:disabled{opacity:.5;cursor:default}
 pre.msg{white-space:pre-wrap}
 .cf-turnstile{margin-top:12px}
 /* 搜索 */
-.search{display:flex;gap:8px;margin:16px 0 4px;max-width:640px}
-.search input{flex:1;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);font:16px var(--sans)}
-.search input:focus{outline:2px solid var(--accent);outline-offset:-1px}
-.search button{padding:0 18px;border:0;border-radius:8px;background:var(--accent);color:#fff;font:15px var(--sans);cursor:pointer}
-#search-info{font-family:var(--sans);font-size:13px;color:var(--muted);margin:6px 0 10px}
-#results{list-style:none;padding:0;margin:0;font-family:var(--sans)}
-#results li{border-bottom:1px solid var(--line)}#results a{display:block;padding:10px 4px;text-decoration:none;color:var(--fg)}
-#results a:hover{background:var(--box)}#results .t{font-weight:600}#results .e{color:var(--muted);font-size:14px}
-#results .tag{display:inline-block;font-size:11.5px;border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-right:8px;color:var(--muted);vertical-align:1px}
-#results .snip{font-size:13.5px;color:var(--muted);margin-top:3px;line-height:1.6}
+.search{display:flex;align-items:center;max-width:680px;margin:18px 0 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:4px 4px 4px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(31,95,139,.15)}
+.search svg{flex:none;width:18px;height:18px;color:var(--muted);margin-right:6px}
+.search input{flex:1;min-width:0;border:0;background:transparent;padding:9px 4px;font:16px var(--sans);color:var(--fg);outline:none}
+.search input::-webkit-search-cancel-button{cursor:pointer}
+.search button{flex:none;border:0;border-radius:999px;background:var(--accent);color:#fff;padding:9px 22px;font:15px var(--sans);cursor:pointer}
+@media(prefers-color-scheme:dark){.search button{color:#0d1b26}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 22px}
+.chips a{border:1px solid var(--line);border-radius:999px;padding:3px 12px;text-decoration:none;color:var(--fg);background:var(--card)}
+.chips a:hover{border-color:var(--muted)}
+#search-info{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 10px}
+#results{list-style:none;padding:0;margin:0;font-family:var(--sans);display:flex;flex-direction:column;gap:10px}
+#results li{background:var(--card);border:1px solid var(--line);border-radius:10px}#results li:hover{border-color:var(--muted)}
+#results a{display:block;padding:12px 16px;text-decoration:none;color:var(--fg)}
+#results .t{font-weight:600}#results .e{color:var(--muted);font-size:14px}
+#results .tag{display:inline-block;font-size:11.5px;border-radius:999px;padding:1px 8px;margin-right:8px;vertical-align:1px;background:var(--box);color:var(--muted)}
+#results .tag.c{background:var(--accent);color:var(--card)}
+#results .snip{font-size:13.5px;color:var(--muted);margin-top:4px;line-height:1.6}
+#results li.new{background:none;border-style:dashed}
 mark{background:#fde68a;color:inherit;border-radius:2px;padding:0 1px}
 @media(prefers-color-scheme:dark){mark{background:#6b5310}}
 /* 灌水区 */
@@ -176,6 +185,15 @@ mark{background:#fde68a;color:inherit;border-radius:2px;padding:0 1px}
 """
 
 SITE_NAME = "Formalia"
+SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>'
+
+def ver(text):
+    """静态文件的版本号：内容一变，链接就变，浏览器和 Cloudflare 不会用旧缓存。"""
+    return hashlib.sha256(text.encode()).hexdigest()[:10]
+
+def script(name):
+    return f'<script src="{name}?v={ver((SITE_SRC / name).read_text(encoding="utf-8"))}" defer></script>'
+
 REPO_URL = "https://github.com/merethe-abeckett/formalia"
 CONTACT = "merethe.abeckett@outlook.com"
 
@@ -187,7 +205,7 @@ def page(title, crumbs, body, depth, home=False):
     return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(full)}</title>
 <meta name="description" content="Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。">
-<link rel="stylesheet" href="{rel}style.css"></head><body>
+<link rel="stylesheet" href="{rel}style.css?v={ver(CSS)}"></head><body>
 <header class="top"><div class="in"><a class="brand" href="{rel}index.html">{SITE_NAME}</a>
 <nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
 {crumb_html}<main>{body}</main>
@@ -395,7 +413,7 @@ def render_index(conjs, tc, deps, check_ok):
 <p class="sub">数学猜想的 Lean 表述目录</p>
 <p>当有人说“AI 证明了某个猜想”，真正被证明的是一段 Lean 代码。这段代码写得是否忠实于原猜想，机器回答不了。
 Formalia 把每一种写法固定下来，给它一个永久编号，再记录谁声称证明了哪个编号。只列出，不判断。</p>
-<form class="search" action="search/index.html" method="get" role="search"><input name="q" placeholder="搜索猜想、表述、编号，例如“素数”" aria-label="搜索"><button>搜索</button></form>
+<form class="search" action="search/index.html" method="get" role="search">{SEARCH_ICON}<input type="search" name="q" placeholder="搜索猜想、编号或关键词" aria-label="搜索"><button>搜索</button></form>
 <div class="actions"><a class="btn primary" href="#conjectures">浏览猜想</a><a class="btn" href="about/guide.html">使用说明</a>
 <a class="btn" href="{edit_link("", type="statement")}">＋ 登记一条表述</a></div></section>
 <div class="steps">
@@ -432,7 +450,7 @@ def write_edit_pages(index_rows):
     (OUT / "data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     (OUT / "edit").mkdir(exist_ok=True); (OUT / "about").mkdir(exist_ok=True)
     (OUT / "edit" / "edit.js").write_text((SITE_SRC / "edit.js").read_text(encoding="utf-8"), encoding="utf-8")
-    js = '<script src="edit.js" defer></script>'
+    js = script("edit.js")
     (OUT / "edit" / "index.html").write_text(page("编辑", [("编辑", None)],
         '<h1 id="edit-title">编辑</h1><div id="edit-root"><p class="muted">正在加载……</p></div><noscript><p class="note bad">编辑需要启用 JavaScript。</p></noscript>' + js, 1), encoding="utf-8")
     (OUT / "edit" / "status.html").write_text(page("编辑状态", [("编辑状态", None)],
@@ -469,9 +487,14 @@ def write_search(index_rows):
     (OUT / "search.json").write_text(json.dumps({"docs": docs}, ensure_ascii=False), encoding="utf-8")
     (OUT / "search").mkdir(exist_ok=True)
     (OUT / "search" / "search.js").write_text((SITE_SRC / "search.js").read_text(encoding="utf-8"), encoding="utf-8")
-    body = ('<h1>搜索</h1><form class="search" id="search-form" role="search"><input id="q" placeholder="猜想名、关键词、编号，例如“素数”" aria-label="搜索" autocomplete="off">'
-            '<button>搜索</button></form><p id="search-info">正在加载……</p><ol id="results"></ol>'
-            '<noscript><p class="note bad">搜索需要启用 JavaScript。</p></noscript><script src="search.js" defer></script>')
+    examples = ["素数", "偶数"] + [c.get("name_zh") or c["name"] for c, _ in index_rows[:2]]
+    examples += [m["id"] for m in (read_json(mj) for c, _ in index_rows[:1] for mj in sorted((CONJ / c["_dir"]).glob("S*.json"))[:1])]
+    chips = "".join(f'<a href="?q={urllib.parse.quote(x)}">{esc(x)}</a>' for x in dict.fromkeys(examples))
+    body = (f'<h1>搜索</h1><form class="search" id="search-form" role="search">{SEARCH_ICON}'
+            '<input type="search" id="q" placeholder="搜索猜想、编号或关键词" aria-label="搜索" autocomplete="off">'
+            f'<button>搜索</button></form><div class="chips" id="chips"><span>试试</span>{chips}</div>'
+            '<p id="search-info">正在加载……</p><ol id="results"></ol>'
+            '<noscript><p class="note bad">搜索需要启用 JavaScript。</p></noscript>' + script("search.js"))
     (OUT / "search" / "index.html").write_text(page("搜索", [("搜索", None)], body, 1), encoding="utf-8")
 
 def write_chat_page():
@@ -483,7 +506,7 @@ def write_chat_page():
             '<div class="chat"><div class="bar"><span>#formalia</span><span id="chat-status">连接中……</span></div>'
             '<div id="chat-log" role="log" aria-live="polite"></div>'
             '<form id="chat-form" autocomplete="off"><input id="chat-input" maxlength="500" placeholder="说点什么，回车发送"><button>发送</button></form></div>'
-            '<noscript><p class="note bad">聊天需要启用 JavaScript。</p></noscript><script src="chat.js" defer></script>')
+            '<noscript><p class="note bad">聊天需要启用 JavaScript。</p></noscript>' + script("chat.js"))
     (OUT / "chat" / "index.html").write_text(page("灌水区", [("灌水区", None)], body, 1), encoding="utf-8")
 
 def readme_preface():
