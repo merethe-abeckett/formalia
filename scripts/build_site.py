@@ -31,7 +31,7 @@ def _inline(t):
     t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
     def link(m):
         label, url = m.group(1), m.group(2)
-        if not re.match(r"^(https?://|[a-zA-Z0-9_./#-]+$)", url) or url.lower().startswith("javascript"):
+        if not re.match(r"^(https?://|mailto:[^\s<>\"]+@[^\s<>\"]+$|[\w./#-]+$)", url) or url.lower().startswith("javascript"):
             return label
         return f'<a href="{url}">{label}</a>'
     return re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", link, t)
@@ -48,7 +48,7 @@ def md_to_html(md):
         if not line: close(); continue
         h = re.match(r"^(#{2,4})\s+(.*)$", line)
         if h:
-            close(); n = len(h.group(1)); out.append(f"<h{n}>{_inline(h.group(2))}</h{n}>"); continue
+            close(); n = len(h.group(1)); out.append(f'<h{n} id="{esc(h.group(2).strip())}">{_inline(h.group(2))}</h{n}>'); continue
         if line.startswith(("- ", "* ")):
             if mode != "ul": close(); out.append("<ul>"); mode = "ul"
             out.append(f"<li>{_inline(line[2:])}</li>"); continue
@@ -193,7 +193,7 @@ def page(title, crumbs, body, depth, home=False):
 {crumb_html}<main>{body}</main>
 <footer>Formalia 只列出形式化表述及其事实，不判断某条表述是否等价于原猜想。<br>
 代码 Apache-2.0 · 条目内容按各自声明的许可，默认 CC-BY-4.0 · <a href="{rel}about/privacy.html">隐私与编辑规则</a> ·
-<a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · 联系 <a href="mailto:{CONTACT}">{CONTACT}</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
+<a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · <a href="{rel}about/index.html#联系">联系我们</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
 </body></html>"""
 
 def status_cell(rep):
@@ -489,7 +489,7 @@ def readme_preface():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     m = re.search(r"^## 阅读前说明[^\n]*\n(.*?)^---", text, re.S | re.M)
     if not m: return ""
-    keep = [l for l in m.group(1).splitlines() if not re.search(r"域名|网址", l)]
+    keep = [l for l in m.group(1).splitlines() if not re.search(r"域名|网址", l) and "我觉得中国" not in l]
     return "\n".join(keep).strip()
 
 def main():
