@@ -1,0 +1,20 @@
+{
+  "id": "20261014-03",
+  "conjecture": "collatz-conjecture",
+  "module": "Conjectures.CollatzConjecture.S20261014_03",
+  "declaration": "Registry.CollatzConjecture.S20261014_03",
+  "submitted_by": "merethe-abeckett(经 Claude 代提交)",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/CollatzConjecture.lean",
+    "note": "命题取自 formal-conjectures 的 collatz_conjecture(Copyright 2025 The Formal Conjectures Authors,Apache License 2.0)。改动:Collatz 映射 collatzStep 内联展开;去掉 category 属性与 sorry。"
+  },
+  "informal_restatement": {
+    "author": "merethe-abeckett(经 Claude 代提交)",
+    "text": "对任意正整数 n,存在自然数 m,使得把映射 k ↦(k 为偶数时取 k/2,否则取 3k+1)对 n 迭代 m 次后恰为 1。"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}
