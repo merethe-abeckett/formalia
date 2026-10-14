@@ -1,0 +1,21 @@
+{
+  "slug": "legendre",
+  "name": "Legendre's conjecture",
+  "name_zh": "勒让德猜想",
+  "informal": "任意两个相邻的正整数平方数之间至少有一个素数。",
+  "references": [
+    {
+      "label": "维基百科（中文）",
+      "url": "https://zh.wikipedia.org/wiki/勒让德猜想"
+    },
+    {
+      "label": "Wikipedia (English)",
+      "url": "https://en.wikipedia.org/wiki/Legendre%27s_conjecture"
+    },
+    {
+      "label": "formal-conjectures（DeepMind）",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/LegendreConjecture.lean"
+    }
+  ],
+  "informal_en": "For every positive integer n there is a prime between n² and (n+1)²."
+}
