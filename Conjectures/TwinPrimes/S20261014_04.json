@@ -1,0 +1,20 @@
+{
+  "id": "20261014-04",
+  "conjecture": "twinprimes",
+  "module": "Conjectures.TwinPrimes.S20261014_04",
+  "declaration": "Registry.TwinPrimes.S20261014_04",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/TwinPrimes.lean",
+    "note": "命题取自 formal-conjectures 的 `TwinPrimes.lean`，去掉了 `answer(sorry)` 外壳与属性标注。"
+  },
+  "informal_restatement": {
+    "author": "提交者",
+    "text": "满足 p 与 p+2 同为素数（Nat.Prime）的自然数 p 构成的集合是无限集。"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

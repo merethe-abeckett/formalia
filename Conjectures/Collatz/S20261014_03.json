@@ -1,0 +1,20 @@
+{
+  "id": "20261014-03",
+  "conjecture": "collatz",
+  "module": "Conjectures.Collatz.S20261014_03",
+  "declaration": "Registry.Collatz.S20261014_03",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/CollatzConjecture.lean",
+    "note": "命题取自 formal-conjectures 的 `CollatzConjecture.lean`，去掉了 `answer(sorry)` 外壳与属性标注。"
+  },
+  "informal_restatement": {
+    "author": "提交者",
+    "text": "对任意正整数 n，存在自然数 m，使得把映射 k ↦（k 为偶数时取 k/2，否则取 3k+1）对 n 迭代 m 次后恰为 1。"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

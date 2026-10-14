@@ -1,0 +1,20 @@
+{
+  "id": "20261014-07",
+  "conjecture": "lemoine",
+  "module": "Conjectures.Lemoine.S20261014_07",
+  "declaration": "Registry.Lemoine.S20261014_07",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Lemoine.lean",
+    "note": "命题取自 formal-conjectures 的 `Lemoine.lean`，去掉了 `answer(sorry)` 外壳与属性标注。"
+  },
+  "informal_restatement": {
+    "author": "提交者",
+    "text": "对任意奇自然数 n > 6，存在素数 p、q（Nat.Prime）使得 n = p + 2q。"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}
