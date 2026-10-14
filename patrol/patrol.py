@@ -6,8 +6,9 @@ code itself (ill-formed statement, trivially true/false, hidden axiom or sorry,
 wrong declaration shape, broken under the pinned Mathlib). Whether a statement
 is equivalent to the informal conjecture is OUT of scope and is never asked.
 
-Two independent models review every statement. The combination rule, as decided
-for the registry:
+Two independent models review every statement. With only one provider configured
+the patrol still runs, but a flag can only open a "patrol finding" for the
+maintainer; deletion proposals always need two models. The combination rule:
   * both flag a problem AND CI evidence exists (checker report not ok)  -> "deletion proposal" issue, public notice period starts
   * both flag a problem, no CI evidence                                 -> "patrol finding" issue, for the maintainer to look at
   * exactly one flags                                                   -> "patrol disagreement" issue, maintainer decides
@@ -138,7 +139,10 @@ def issue_text(kind, e, verdicts):
         lines += [f"**Deletion proposal.** Both patrol models flag a Lean-level problem and the CI checker report is not clean. "
                   f"Public notice period: {NOTICE_DAYS} days from the opening of this issue. If the problem stands, the entry is **archived** (moved to `Archive/`, id kept, never reused), not deleted.", ""]
     elif kind == "patrol-finding":
-        lines += ["**Patrol finding.** Both patrol models flag a Lean-level problem, but CI reports the entry as clean. Maintainer to verify. No notice period starts until CI evidence exists.", ""]
+        if len(verdicts) == 1:
+            lines += ["**Patrol finding (single model).** Only one patrol model is configured and it flags a Lean-level problem. Maintainer to verify. A deletion proposal needs two independent models and CI evidence.", ""]
+        else:
+            lines += ["**Patrol finding.** Both patrol models flag a Lean-level problem, but CI reports the entry as clean. Maintainer to verify. No notice period starts until CI evidence exists.", ""]
     else:
         lines += ["**Patrol disagreement.** Exactly one patrol model flags a problem. The maintainer decides whether to proceed.", ""]
     lines += ["Scope reminder: equivalence to the informal conjecture is out of scope for the patrol and for this issue.", "", "| model | problem | category | reason |", "|---|---|---|---|"]
@@ -161,9 +165,12 @@ def main():
         providers = {}
         if os.environ.get("QWEN_API_KEY"): providers["qwen"] = ask_qwen
         if os.environ.get("GEMINI_API_KEY"): providers["gemini"] = ask_gemini
-        if len(providers) < 2:
-            print("patrol needs two providers (QWEN_API_KEY and GEMINI_API_KEY); got", list(providers), file=sys.stderr)
+        if not providers:
+            print("patrol needs at least one provider (QWEN_API_KEY and/or GEMINI_API_KEY)", file=sys.stderr)
             return 2
+        if len(providers) == 1:
+            print(f"single-provider mode ({list(providers)[0]}): a flag opens a patrol-finding only; "
+                  "deletion proposals need two independent models.")
     can_post = not args.dry_run and os.environ.get("GITHUB_TOKEN") and os.environ.get("GITHUB_REPOSITORY")
 
     summary = []
@@ -178,7 +185,9 @@ def main():
                 verdicts[name] = {"problem": False, "category": "error", "reason": f"provider error: {ex}", "raw": None}
             time.sleep(0.5)
         flags = [v["problem"] for v in verdicts.values()]
-        if all(flags):
+        if len(flags) == 1:
+            kind = "patrol-finding" if flags[0] else None
+        elif all(flags):
             kind = "deletion-proposal" if not e["ci_ok"] else "patrol-finding"
         elif any(flags):
             kind = "patrol-disagreement"
