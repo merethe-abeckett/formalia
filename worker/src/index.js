@@ -15,12 +15,13 @@
  * 绑定（在 Cloudflare 后台配置，见 docs/WEB_EDIT.md）：
  *   KV        FORMALIA_KV        限流计数、封禁名单、私有编辑日志
  *   Secret    GITHUB_TOKEN       细粒度令牌，只授予 formalia 的 Issues 读写
- *   Secret    TURNSTILE_SECRET   Turnstile 密钥
+ *   Secret    TURNSTILE_SECRET   Turnstile 密钥（可选：不设就不做人机验证，只靠限流）
  *   Secret    ANON_SECRET        生成匿名编号用的随机串
  *   Variable  REPO               merethe-abeckett/formalia
  *   Variable  TURNSTILE_SITEKEY  Turnstile 站点密钥（公开）
  *   Variable  ALLOWED_ORIGINS    逗号分隔，如 https://formalnaturalist.co.nz,https://www.formalnaturalist.co.nz
  *   Variable  RATE_LIMIT_PER_HOUR  每个匿名编号每小时可提交次数，默认 6
+ *   Variable  SUBMIT_PER_DAY     全站每天可提交次数，默认 200
  *   Durable Object  CHAT         ChatRoom 类（灌水区）
  *   Secret    CHAT_ADMIN_TOKEN   聊天室管理员口令（删消息、封禁）
  *   Durable Object  ASK          AskGate 类（交互式导读：限流 + 调用 Gemini）
@@ -57,7 +58,7 @@ export default {
     try {
       if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
       if (url.pathname === "/api/config" && request.method === "GET")
-        return reply(200, { sitekey: env.TURNSTILE_SITEKEY || "", repo: env.REPO || "" });
+        return reply(200, { edit: !!env.GITHUB_TOKEN, sitekey: env.TURNSTILE_SECRET ? (env.TURNSTILE_SITEKEY || "") : "", repo: env.REPO || "" });
       if (url.pathname === "/api/submit" && request.method === "POST") {
         if (allowed.length && !allowed.includes(origin)) return reply(403, { ok: false, error: "来源不被允许" });
         return await submit(request, env, reply);
@@ -135,6 +136,7 @@ async function gh(env, method, path, body) {
 }
 
 async function verifyTurnstile(env, token, ip) {
+  if (!env.TURNSTILE_SECRET) return true;   // 没配 Turnstile：不做人机验证，只靠限流
   if (!token) return false;
   const form = new FormData();
   form.append("secret", env.TURNSTILE_SECRET || "");
@@ -166,6 +168,7 @@ async function submit(request, env, reply) {
   for (const k of banKeys(ip)) {
     if (await kv.get(k)) return reply(403, { ok: false, error: "该网络地址已被暂停编辑。如有误会请写信说明。" });
   }
+  if (!env.GITHUB_TOKEN) return reply(503, { ok: false, error: "编辑服务暂未开通" });
   if (!(await verifyTurnstile(env, req.turnstile, ip))) return reply(400, { ok: false, error: "人机验证没有通过，请刷新页面重试" });
 
   const anon = await anonId(env.ANON_SECRET || "", ip);
@@ -173,7 +176,12 @@ async function submit(request, env, reply) {
   const rlKey = `rl:${anon}:${Math.floor(Date.now() / 3600000)}`;
   const used = parseInt((await kv.get(rlKey)) || "0", 10);
   if (used >= limit) return reply(429, { ok: false, error: `提交太频繁了，每小时最多 ${limit} 次，请稍后再试` });
+  const perDay = parseInt(env.SUBMIT_PER_DAY || "200", 10);
+  const dayKey = `rlday:${Math.floor(Date.now() / 86400000)}`;
+  const today = parseInt((await kv.get(dayKey)) || "0", 10);
+  if (today >= perDay) return reply(429, { ok: false, error: "今天全站的提交次数已满，请明天再试" });
   await kv.put(rlKey, String(used + 1), { expirationTtl: 7200 });
+  await kv.put(dayKey, String(today + 1), { expirationTtl: 2 * 86400 });
 
   const name = safeText(req.name, 40).replace(/[（）()]/g, "");
   const label = name ? `${name}（匿名者 ${anon}）` : `匿名者 ${anon}`;

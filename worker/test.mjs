@@ -35,7 +35,7 @@ const get = (path) => worker.fetch(new Request("https://formalnaturalist.co.nz" 
 let n = 0; const ok = (name) => { n++; console.log("  ✓", name); };
 
 // 配置
-let r = await get("/api/config"); assert.equal(r.status, 200); assert.equal((await r.json()).sitekey, "0xSITE");
+let r = await get("/api/config"); assert.equal(r.status, 200); let cj = await r.json(); assert.equal(cj.sitekey, "0xSITE"); assert.equal(cj.edit, true);
 assert.equal(r.headers.get("Access-Control-Allow-Origin"), ORIGIN); ok("config + CORS");
 
 // 正常提交（带恶意摘要和姓名）
@@ -83,6 +83,23 @@ j = await r.json(); assert.equal(r.status, 200, JSON.stringify(j)); assert.match
 r = await post({ type: "essay", target: "../x", turnstile: "tok", data: { title: "t" } }, "198.51.100.91"); assert.equal(r.status, 400);
 r = await post({ type: "essay", target: "J20261014-01", turnstile: "tok", data: { body: "改" } }, "198.51.100.92"); assert.equal(r.status, 200);
 ok("essay submissions");
+// 不配 Turnstile：不需要人机验证，直接提交
+const envNoTs = { ...env, TURNSTILE_SECRET: "", FORMALIA_KV: new KV(), SUBMIT_PER_DAY: "2" };
+const postNoTs = (body, ip) => worker.fetch(new Request("https://formalnaturalist.co.nz/api/submit", { method: "POST", body: JSON.stringify(body),
+  headers: { "Content-Type": "application/json", Origin: ORIGIN, "CF-Connecting-IP": ip } }), envNoTs, {});
+r = await worker.fetch(new Request("https://formalnaturalist.co.nz/api/config", { headers: { Origin: ORIGIN } }), envNoTs, {});
+assert.equal((await r.json()).sitekey, "", "no site key advertised without a secret");
+turnstileOk = false;   // 即使 Turnstile 会拒绝，也不该去问它
+r = await postNoTs({ ...claim, turnstile: "" }, "198.51.100.60"); assert.equal(r.status, 200, "submit without Turnstile");
+r = await postNoTs({ ...claim, turnstile: "" }, "198.51.100.61"); assert.equal(r.status, 200);
+r = await postNoTs({ ...claim, turnstile: "" }, "198.51.100.62"); assert.equal(r.status, 429); assert.match((await r.json()).error, /今天全站/);
+turnstileOk = true; ok("Turnstile optional; site-wide daily cap");
+// 没有 GitHub 令牌：编辑未开通
+r = await worker.fetch(new Request("https://formalnaturalist.co.nz/api/config", { headers: { Origin: ORIGIN } }), { ...env, GITHUB_TOKEN: "" }, {});
+assert.equal((await r.json()).edit, false);
+r = await worker.fetch(new Request("https://formalnaturalist.co.nz/api/submit", { method: "POST", body: JSON.stringify(claim),
+  headers: { "Content-Type": "application/json", Origin: ORIGIN, "CF-Connecting-IP": "198.51.100.63" } }), { ...env, GITHUB_TOKEN: "", FORMALIA_KV: new KV() }, {});
+assert.equal(r.status, 503); ok("no GitHub token → editing off");
 // 查询状态
 r = await get("/api/status?issue=41"); j = await r.json();
 assert.equal(j.state, "applied"); assert.equal(j.message, "已写入。"); ok("status");
