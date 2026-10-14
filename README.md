@@ -10,7 +10,7 @@
 
 本仓库强烈建议用户用中文普通话和各地中文方言完成对贡献的说明部分的补全，包括来源备注、非正式复述、PR 和议题里的说明。Lean 代码、JSON 字段名和 Mathlib 名称保持原样。
 
-本仓库已购买Cloudfare域名。目前网址为: www.formalnaturalist.co.nz。欢迎访问并参与贡献。
+本仓库已购买Cloudfare域名。目前网址为: www.formalnaturalist.co.nz
 
 ---
 
