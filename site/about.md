@@ -17,6 +17,6 @@ Formalia 是一个中立的目录，收录数学猜想的 Lean 4 形式化表述
 ## 联系
 
 - 仓库：[github.com/merethe-abeckett/formalia](https://github.com/merethe-abeckett/formalia)
-- 邮箱：[merethe.abeckett@outlook.com](mailto:merethe.abeckett@outlook.com)
+- 邮箱和作者的话：见[联系作者](contact.html)
 
 {{PREFACE}}
