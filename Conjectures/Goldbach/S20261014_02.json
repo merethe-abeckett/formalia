@@ -5,6 +5,7 @@
   "declaration": "Registry.Goldbach.S20261014_02",
   "submitted_by": "merethe-abeckett",
   "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
   "source": {
     "kind": "adapted",
     "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/GoldbachConjecture.lean",

@@ -5,6 +5,7 @@ import json, re, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lean_policy
+import licenses
 
 ROOT = Path(__file__).resolve().parent.parent / "Conjectures"
 ID_RE = re.compile(r"^(\d{8})-(\d{2})$")
@@ -51,6 +52,10 @@ for cdir in sorted(p for p in ROOT.iterdir() if p.is_dir()):
         for cp in meta.get("claimed_proofs") or []:
             for k in ("claimant", "date", "url"):
                 if not cp.get(k): err(mj, f"claimed proof missing {k}")
+        lic = meta.get("license")
+        if lic is not None and lic not in licenses.ALLOWED: err(mj, f"不支持的许可：{lic!r}")
+        if (meta.get("source") or {}).get("kind") in ("adapted", "verbatim") and not lic:
+            err(mj, "改编或照录的表述必须显式声明 license")
         urls = [(meta.get("source") or {}).get("url")] + [c.get("url") for c in meta.get("claimed_proofs") or []] \
              + [l.get("url") for l in meta.get("external_links") or []]
         for u in urls:

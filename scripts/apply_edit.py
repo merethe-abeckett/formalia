@@ -22,6 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lean_policy
+import licenses
 
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
@@ -236,7 +237,15 @@ def apply_statement(sub, editor, created_at):
     stem = "S" + sid.replace("-", "_")
     ns = f"Registry.{cdir.name}"
     title = comment_safe(conj.get("name_zh") or conj["name"])
-    lines = ["/-", f"Lean 表述登记库 · 条目 #{sid}", f"猜想：{title}", "内容许可：CC-BY-4.0（见 LICENSE-CONTENT）",
+    s = d.get("source") or {}
+    kind = s.get("kind") or "original"
+    if kind not in ("original", "adapted", "verbatim"): raise EditError("来源类型只能是原创、改编或照录")
+    lic = clean(d.get("license"), 40, "许可")
+    if not lic:
+        if kind != "original": raise EditError("改编或照录的表述必须选择许可，并与原作许可一致或兼容")
+        lic = licenses.DEFAULT
+    if lic not in licenses.ALLOWED: raise EditError("许可只能是：" + "、".join(licenses.ALLOWED))
+    lines = ["/-", f"Lean 表述登记库 · 条目 #{sid}", f"猜想：{title}", f"内容许可：{lic}",
              f"经网站提交：{comment_safe(editor)}", "", "本文件只登记一条形式化表述，不对它是否等价于原猜想作任何判断。", "-/",
              "module", ""] + [f"public import {i}" for i in imports] + ["", "@[expose] public section", "", f"namespace {ns}", ""]
     if helpers:
@@ -250,12 +259,9 @@ def apply_statement(sub, editor, created_at):
     lean_path = cdir / f"{stem}.lean"
     write_text(lean_path, src)
 
-    s = d.get("source") or {}
-    kind = s.get("kind") or "original"
-    if kind not in ("original", "adapted", "verbatim"): raise EditError("来源类型只能是原创、改编或照录")
     meta = {"id": sid, "conjecture": conj["slug"], "module": f"Conjectures.{cdir.name}.{stem}",
             "declaration": f"{ns}.{stem}", "submitted_by": editor,
-            "submitted_at": f"{date[:4]}-{date[4:6]}-{date[6:]}",
+            "submitted_at": f"{date[:4]}-{date[4:6]}-{date[6:]}", "license": lic,
             "source": {"kind": kind, "url": clean_url(s.get("url"), "来源链接"), "note": clean(s.get("note"), 2000, "来源备注", multiline=True)},
             "informal_restatement": {"author": editor, "text": clean(d.get("restatement"), 4000, "非正式复述", multiline=True)},
             "claimed_proofs": [], "external_links": []}

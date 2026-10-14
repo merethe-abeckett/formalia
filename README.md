@@ -82,6 +82,7 @@ tests/                       Lean 规范、编辑应用、Worker 的测试
 | `conjecture` | 所属 `conjecture.json` 的 slug |
 | `module`、`declaration` | Lean 模块名和 `def` 的完整限定名 |
 | `submitted_by`、`submitted_at` | 提交者与日期 |
+| `license` | 条目许可（SPDX 标识），可选：CC-BY-4.0（默认）、CC-BY-SA-4.0、CC0-1.0、Apache-2.0、MIT |
 | `source` | `kind`（`original` 原创、`adapted` 改编、`verbatim` 照录）、`url`、`note` |
 | `informal_restatement` | 提交者对 Lean 代码的自然语言复述，网站上标注为提交者自述 |
 | `claimed_proofs` | `{claimant, date, url, note}` 列表；只记录声明，不表示认可 |
@@ -130,4 +131,4 @@ tests/                       Lean 规范、编辑应用、Worker 的测试
 ## 许可
 
 - 代码（检查器、脚本、工作流）：Apache-2.0，见 `LICENSE`。
-- 条目内容（`Conjectures/**`）：CC-BY-4.0，见 `LICENSE-CONTENT`。改编自其他项目的表述在文件头和 `source` 中注明来源。
+- 条目内容（`Conjectures/**`）：复合许可。每条表述按其元数据中 `license` 字段声明的许可发布，未声明时默认 CC-BY-4.0（全文见 `LICENSE-CONTENT`）。改编或照录的表述必须声明许可，并与原作一致或兼容，文件头保留原作版权。详见 `docs/LICENSING.md`。
