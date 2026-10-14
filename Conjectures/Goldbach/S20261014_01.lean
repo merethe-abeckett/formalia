@@ -1,11 +1,10 @@
 /-
-Lean Statement Registry — entry #20261014-01
-Conjecture: Goldbach's conjecture
-Content licence: CC-BY-4.0 (see LICENSE-CONTENT)
+Lean 表述登记库 · 条目 #20261014-01
+猜想：哥德巴赫猜想
+内容许可：CC-BY-4.0（见 LICENSE-CONTENT）
 
-This file registers ONE formal statement. It makes no claim about whether the
-statement is equivalent to the informal conjecture. That question is left to
-mathematicians; the registry only lists.
+本文件只登记一条形式化表述。它不对“该表述是否等价于原猜想”作任何判断，
+这个问题留给数学家讨论；登记库只负责列出。
 -/
 module
 
@@ -16,10 +15,9 @@ public import Mathlib.Algebra.Group.Even
 
 namespace Registry.Goldbach
 
-/-- Statement #20261014-01.
+/-- 表述 #20261014-01。
 
-Every even natural number greater than 2 is the sum of two primes, where
-"prime" is `Nat.Prime` from Mathlib. -/
+每个大于 2 的偶自然数都是两个素数之和，其中“素数”取 Mathlib 的 `Nat.Prime`。 -/
 def S20261014_01 : Prop :=
   ∀ n : ℕ, 2 < n → Even n → ∃ p q : ℕ, Nat.Prime p ∧ Nat.Prime q ∧ n = p + q
 

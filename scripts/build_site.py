@@ -17,6 +17,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
 ARCH = ROOT / "Archive"
+GUIDES = ROOT / "Guides"
+
+def md_to_html(md):
+    """极简 Markdown：粗体、要点、段落。导读只用这几样。"""
+    out, in_list = [], False
+    for line in md.splitlines():
+        if line.startswith("<!--"): continue
+        t = esc(line.strip())
+        t = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", t)
+        t = re.sub(r"`([^`]+)`", r"<code>\1</code>", t)
+        if t.startswith("- ") or t.startswith("* "):
+            if not in_list: out.append("<ul>"); in_list = True
+            out.append(f"<li>{t[2:]}</li>")
+        else:
+            if in_list: out.append("</ul>"); in_list = False
+            if t: out.append(f"<p>{t}</p>")
+    if in_list: out.append("</ul>")
+    return "\n".join(out)
 CHECK = ROOT / "build" / "check"
 OUT = ROOT / "_site"
 
@@ -82,16 +100,21 @@ def find_decl(check, decl):
         if d["name"] == decl: return d
     return None
 
+KIND_ZH = {"original": "原创", "adapted": "改编", "verbatim": "照录"}
+
+def kind_zh(k): return KIND_ZH.get(k, k)
+
 def render_statement(conj, meta, lean_src, check, tc, deps):
     sid = meta["id"]; decl = find_decl(check, meta["declaration"])
+    cname = conj.get("name_zh") or conj["name"]
     first_commit = git("log", "--diff-filter=A", "--format=%H %cs", "--", f"Conjectures/{conj['_dir']}/{meta['_stem']}.lean")
     src = meta.get("source", {})
-    src_html = esc(src.get("kind", ""))
+    src_html = esc(kind_zh(src.get("kind", "")))
     if src.get("url"): src_html += f' · <a href="{esc(src["url"])}">{esc(src["url"])}</a>'
     if src.get("note"): src_html += f'<br><span class="muted">{esc(src["note"])}</span>'
     rows = [
         ("表述编号", f"#{esc(sid)}"),
-        ("所属猜想", f'<a href="../index.html">{esc(conj["name"])}</a>'),
+        ("所属猜想", f'<a href="../index.html">{esc(cname)}</a>'),
         ("Lean 声明", f"<code>{esc(meta['declaration'])}</code>，位于模块 <code>{esc(meta['module'])}</code>"),
         ("提交者", esc(meta.get("submitted_by",""))),
         ("提交日期", esc(meta.get("submitted_at",""))),
@@ -103,7 +126,7 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     ]
     table = "<table>" + "".join(f"<tr><th>{k}</th><td>{v}</td></tr>" for k,v in rows) + "</table>"
 
-    body = f"<h1>表述 #{esc(sid)} · {esc(conj['name'])}</h1>"
+    body = f"<h1>表述 #{esc(sid)} · {esc(cname)}</h1>"
     if meta.get("archived"):
         a = meta["archived"]
         body += f'<p class="note"><span class="bad">已于 {esc(a.get("at",""))} 归档。</span>{esc(a.get("reason",""))} 讨论：<a href="{esc(a.get("issue",""))}">{esc(a.get("issue",""))}</a>。仅供查阅，不再编译和检查。</p>'
@@ -134,6 +157,16 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
             body += f"<tr><td><code>{esc(d['name'])}</code></td><td><code>{esc(d['module'] or '（核心）')}</code></td></tr>"
         body += "</table>"
 
+    guide = GUIDES / conj["_dir"] / (meta["_stem"] + ".md")
+    body += "<h2>AI 导读</h2>"
+    if guide.exists():
+        gtext = guide.read_text(encoding="utf-8")
+        m = re.search(r"<!--\s*(.*?)\s*-->", gtext, re.S)
+        body += f'<p class="note">{esc(m.group(1)) if m else "AI 生成"}只解释定义和逐句翻译，不代表登记库判断，不涉及是否等价于原猜想。发现错误请提 PR 修改 <code>{esc(str(guide.relative_to(ROOT)))}</code>。</p>'
+        body += md_to_html(gtext)
+    else:
+        body += '<p class="muted">尚未生成</p>'
+
     ir = meta.get("informal_restatement") or {}
     body += "<h2>非正式复述</h2>"
     if ir.get("text"):
@@ -154,7 +187,7 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     body += "<h2>外部链接</h2>"
     els = meta.get("external_links") or []
     body += "<ul class='plain'>" + "".join(f'<li><a href="{esc(l["url"])}">{esc(l.get("label", l["url"]))}</a></li>' for l in els) + "</ul>" if els else '<p class="muted">暂无记录</p>'
-    return page(f"#{sid} · {conj['name']}", [(conj["name"], "../index.html"), (f"#{sid}", None)], body, 2)
+    return page(f"#{sid} · {cname}", [(cname, "../index.html"), (f"#{sid}", None)], body, 2)
 
 def render_conjecture(conj, entries, archived=()):
     body = f"<h1>{esc(conj.get('name_zh') or conj['name'])}</h1>"
@@ -163,7 +196,7 @@ def render_conjecture(conj, entries, archived=()):
     body += '<p class="note">这是一个消歧义页，列出登记在该猜想之下的全部形式化表述。登记库不判断其中哪一条（如果有）等价于自然语言表述。</p>'
     body += "<h2>已登记的表述</h2><table><tr><th>编号</th><th>Lean 声明</th><th>提交</th><th>来源</th><th>CI 检查</th><th>声称的证明</th></tr>"
     for meta, decl in entries:
-        body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(meta.get("submitted_at",""))} · {esc(meta.get("submitted_by",""))}</td><td>{esc(meta.get("source",{}).get("kind",""))}</td><td>{status_cell(decl)}</td><td>{len(meta.get("claimed_proofs") or [])}</td></tr>'
+        body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(meta.get("submitted_at",""))} · {esc(meta.get("submitted_by",""))}</td><td>{esc(kind_zh(meta.get("source",{}).get("kind","")))}</td><td>{status_cell(decl)}</td><td>{len(meta.get("claimed_proofs") or [])}</td></tr>'
     body += "</table>"
     if archived:
         body += "<h2>已归档的表述</h2><p class='note'>经提删公示后移出现行目录（见 docs/DELETION.md）。编号永不复用，各编号所指的原文保留于此。</p>"
@@ -175,7 +208,8 @@ def render_conjecture(conj, entries, archived=()):
     refs = conj.get("references") or []
     if refs:
         body += "<h2>参考资料</h2><ul class='plain'>" + "".join(f'<li><a href="{esc(r["url"])}">{esc(r.get("label", r["url"]))}</a></li>' for r in refs) + "</ul>"
-    return page(conj["name"], [(conj["name"], None)], body, 1)
+    cname = conj.get("name_zh") or conj["name"]
+    return page(cname, [(cname, None)], body, 1)
 
 def render_index(conjs, tc, deps, check_ok):
     body = "<h1>Lean 表述登记库</h1>"

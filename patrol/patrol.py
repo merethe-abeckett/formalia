@@ -55,8 +55,8 @@ File {path}:
 {code}
 ```
 
-Answer with ONLY a JSON object, no prose around it:
-{{"problem": true|false, "category": "<short label or empty>", "reason": "<one or two sentences, empty if no problem>"}}
+Answer with ONLY a JSON object, no prose around it. Write "category" and "reason" in Simplified Chinese:
+{{"problem": true|false, "category": "<短标签，无问题则留空>", "reason": "<一两句话，无问题则留空>"}}
 """
 
 def http_json(url, payload, headers, timeout=120):
@@ -134,22 +134,22 @@ def open_issue_once(marker, title, body, labels):
 def issue_text(kind, e, verdicts):
     sid = e["meta"]["id"]; conj = e["meta"]["conjecture"]
     marker = f"<!-- patrol:{kind}:{sid} -->"
-    lines = [marker, f"Statement `#{sid}` ({conj}), file `{e['path']}`.", ""]
+    lines = [marker, f"表述 `#{sid}`（{conj}），文件 `{e['path']}`。", ""]
     if kind == "deletion-proposal":
-        lines += [f"**Deletion proposal.** Both patrol models flag a Lean-level problem and the CI checker report is not clean. "
-                  f"Public notice period: {NOTICE_DAYS} days from the opening of this issue. If the problem stands, the entry is **archived** (moved to `Archive/`, id kept, never reused), not deleted.", ""]
+        lines += [f"**提删公示。** 两个巡查模型都标记了 Lean 层面的问题，且 CI 检查器报告未通过。"
+                  f"公示期：自本议题开启起 {NOTICE_DAYS} 天。若问题成立，该条目将被**归档**（移入 `Archive/`，编号保留、永不复用），而不是删除。", ""]
     elif kind == "patrol-finding":
         if len(verdicts) == 1:
-            lines += ["**Patrol finding (single model).** Only one patrol model is configured and it flags a Lean-level problem. Maintainer to verify. A deletion proposal needs two independent models and CI evidence.", ""]
+            lines += ["**巡查发现（单模型）。** 当前只配置了一个巡查模型，它标记了 Lean 层面的问题。请维护者核实。提删公示需要两个独立模型加 CI 证据。", ""]
         else:
-            lines += ["**Patrol finding.** Both patrol models flag a Lean-level problem, but CI reports the entry as clean. Maintainer to verify. No notice period starts until CI evidence exists.", ""]
+            lines += ["**巡查发现。** 两个巡查模型都标记了 Lean 层面的问题，但 CI 报告该条目干净。请维护者核实。没有 CI 证据前不进入公示。", ""]
     else:
-        lines += ["**Patrol disagreement.** Exactly one patrol model flags a problem. The maintainer decides whether to proceed.", ""]
-    lines += ["Scope reminder: equivalence to the informal conjecture is out of scope for the patrol and for this issue.", "", "| model | problem | category | reason |", "|---|---|---|---|"]
+        lines += ["**巡查意见不一。** 只有一个巡查模型标记了问题。由维护者裁决是否继续。", ""]
+    lines += ["范围提醒：该表述是否等价于原猜想，不在巡查和本议题的范围内。", "", "| 模型 | 有问题 | 类型 | 理由 |", "|---|---|---|---|"]
     for name, v in verdicts.items():
-        lines.append(f"| {name} | {'yes' if v['problem'] else 'no'} | {v['category']} | {v['reason'].replace('|','/')} |")
+        lines.append(f"| {name} | {'是' if v['problem'] else '否'} | {v['category']} | {v['reason'].replace('|','/')} |")
     rep = e["report"]
-    lines += ["", "CI checker report: " + ("not available" if rep is None else f"ok={rep['ok']}, is_prop={rep['is_prop']}, axioms={rep['axioms']}, sorry={rep['uses_sorry']}, native_decide={rep['uses_native_decide']}, non_standard={rep['non_standard_axioms']}")]
+    lines += ["", "CI 检查器报告：" + ("不可用" if rep is None else f"ok={rep['ok']}, is_prop={rep['is_prop']}, axioms={rep['axioms']}, sorry={rep['uses_sorry']}, native_decide={rep['uses_native_decide']}, non_standard={rep['non_standard_axioms']}")]
     return marker, lines
 
 def main():
@@ -198,7 +198,7 @@ def main():
         print(f"#{sid}: {kind or 'clean'}  " + "  ".join(f"{n}={'FLAG' if v['problem'] else 'ok'}" for n, v in verdicts.items()))
         if kind and can_post:
             marker, lines = issue_text(kind, e, verdicts)
-            url, created = open_issue_once(marker, f"[{kind}] statement #{sid}", "\n".join(lines), [kind])
+            url, created = open_issue_once(marker, f"[{kind}] 表述 #{sid}", "\n".join(lines), [kind])
             print("   ", "opened" if created else "already open", url)
         elif kind:
             marker, lines = issue_text(kind, e, verdicts)
