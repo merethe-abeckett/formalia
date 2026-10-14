@@ -19,7 +19,7 @@ issue for the same statement while the first is open.
 Providers are configured by environment variables and use only the standard
 library (no SDKs):
   QWEN_API_KEY, QWEN_BASE_URL (default DashScope OpenAI-compatible, intl), QWEN_MODEL (default qwen-plus)
-  GEMINI_API_KEY, GEMINI_MODEL (default gemini-2.5-flash)
+  GEMINI_API_KEY, GEMINI_MODEL (default gemini-3.8-flash)
   GITHUB_TOKEN, GITHUB_REPOSITORY  (for opening issues; omitted => dry run)
 Run with --dry-run to print verdicts without touching GitHub, and with
 --fake to use a built-in stub provider for testing the plumbing.

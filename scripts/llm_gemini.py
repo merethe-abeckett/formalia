@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gemini 调用的公用模块（只用标准库）。
 
-- 模型名来自 GEMINI_MODEL；未设置时默认 gemini-2.5-flash。
+- 模型名来自 GEMINI_MODEL；未设置时默认 gemini-3.8-flash。
 - 配置的模型返回 404 时，自动调用 ListModels，挑一个名字含 "flash"、支持
   generateContent 的最新模型，并把可用列表打到 stderr，方便更新 GEMINI_MODEL。
 - 其他 HTTP 错误原样抛出 GeminiError，调用方不得把它当成“无问题”。
@@ -10,7 +10,7 @@
 import json, os, sys, urllib.request, urllib.error
 
 BASE = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_MODEL = "gemini-2.5-flash"
+DEFAULT_MODEL = "gemini-3.8-flash"
 
 class GeminiError(Exception):
     pass
@@ -61,12 +61,34 @@ def resolve_model():
     print(f"[gemini] 改用 {_resolved!r}。建议把仓库变量 GEMINI_MODEL 设为这个值。", file=sys.stderr)
     return _resolved
 
+import re as _re
+
+def _suggested_model(err_text):
+    """从 404 报错里读出 Google 建议改用的模型名。"""
+    m = _re.search(r"use models/([A-Za-z0-9.\-]+)", err_text)
+    return m.group(1) if m else None
+
 def generate(prompt, temperature=0.2, json_mode=False):
+    global _resolved
     model = resolve_model()
     cfg = {"temperature": temperature}
     if json_mode: cfg["responseMimeType"] = "application/json"
-    out = _request(f"{BASE}/models/{model}:generateContent",
-                   {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": cfg})
+    payload = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": cfg}
+    try:
+        out = _request(f"{BASE}/models/{model}:generateContent", payload)
+    except GeminiError as e:
+        if "HTTP 404" not in str(e): raise
+        # 模型信息能查到但生成被拒（如“对新用户不再开放”）：按 Google 的建议换模型重试一次
+        alt = _suggested_model(str(e))
+        if not alt:
+            _resolved = None
+            models = list_models()
+            cands = sorted([m for m in models if "flash" in m and not any(x in m for x in ("lite","image","tts","live"))], reverse=True)
+            if not cands: raise
+            alt = cands[0]
+        print(f"[gemini] 模型 {model!r} 不可用，改用 {alt!r}。建议把仓库变量 GEMINI_MODEL 设为这个值。", file=sys.stderr)
+        _resolved = alt
+        out = _request(f"{BASE}/models/{alt}:generateContent", payload)
     try:
         return out["candidates"][0]["content"]["parts"][0]["text"].strip()
     except (KeyError, IndexError):

@@ -9,7 +9,7 @@
   scripts/gen_guides.py            为没有导读、或 Lean 文件比导读新的条目生成
   scripts/gen_guides.py --force    全部重新生成
   scripts/gen_guides.py --fake     不调用模型，用占位文本测试流程
-需要环境变量 GEMINI_API_KEY（可选 GEMINI_MODEL，默认 gemini-2.5-flash）。
+需要环境变量 GEMINI_API_KEY（可选 GEMINI_MODEL，默认 gemini-3.8-flash）。
 代码许可：Apache-2.0。
 """
 import argparse, json, os, re, sys, datetime
