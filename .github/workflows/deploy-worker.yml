@@ -2,8 +2,8 @@
 #
 # 一次性准备（全部在 GitHub 仓库 Settings → Secrets and variables → Actions 里填）：
 #   Secrets：CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID、ANON_SECRET、CHAT_ADMIN_TOKEN
-#            以后开通网页编辑再加：EDIT_GITHUB_TOKEN、TURNSTILE_SECRET
-#   Variables：开通网页编辑时加 TURNSTILE_SITEKEY（KV 编号已写在 worker/wrangler.toml 里）
+#            开通网页编辑再加：EDIT_GITHUB_TOKEN；人机验证可选：TURNSTILE_SECRET
+#   Variables：可选 TURNSTILE_SITEKEY（KV 编号已写在 worker/wrangler.toml 里）
 # 步骤见 docs/WEB_EDIT.md。
 name: Deploy Worker
 on:
