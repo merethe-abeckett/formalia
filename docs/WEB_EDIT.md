@@ -87,21 +87,23 @@ Cloudflare 左侧菜单点 **Workers & Pages**，页面右侧有 **Account ID**�
 
 管理员模式：打开 `https://formalnaturalist.co.nz/chat/#admin=你的CHAT_ADMIN_TOKEN` 一次。口令会存在这台电脑的浏览器里，地址栏会自动抹掉。之后每条消息旁边会出现“删”和“封”两个按钮。“封”会暂停这个人的网络地址 7 天，并删除他的全部消息。
 
-### 第二部分：开通网页编辑（以后再做也行）
+### 第二部分：开通网页编辑
 
-**1. GitHub 令牌**：打开 https://github.com/settings/personal-access-tokens/new 。Token name 填 `formalia-edit`，Expiration 选一年。Repository access 选 **Only select repositories** → `formalia`。Permissions → Repository permissions → **Issues** 选 **Read and write**，其余不动。生成后复制。
+只需要一个 GitHub 令牌。人机验证是可选的：不配就不验证，只靠限流（每个匿名编号每小时 6 次，全站每天 200 次，可在 `worker/wrangler.toml` 里调）。
 
-**2. 人机验证**：Cloudflare 左侧 **Turnstile** → **Add widget**。名字填 `formalia`，Hostname 加 `formalnaturalist.co.nz` 和 `www.formalnaturalist.co.nz`，模式选 **Managed**。创建后复制 **Site Key** 和 **Secret Key**。
+**1. 生成令牌**（只能你本人在 GitHub 上操作，别人代替不了，也不要把令牌发给任何人）：打开 https://github.com/settings/personal-access-tokens/new 。
 
-**3. 填进 GitHub**：
+- Token name：`formalia-edit`
+- Expiration：选一年
+- Repository access：选 **Only select repositories**，再选 `formalia`
+- Permissions → Repository permissions → **Issues**：选 **Read and write**，其余不动
+- 点 **Generate token**，复制以 `github_pat_` 开头的那串字符
 
-| 位置 | Name | 值 |
-| --- | --- | --- |
-| Secrets | `EDIT_GITHUB_TOKEN` | 第 1 步的令牌 |
-| Secrets | `TURNSTILE_SECRET` | Secret Key |
-| Variables | `TURNSTILE_SITEKEY` | Site Key |
+**2. 填进 GitHub**：仓库 Settings → Secrets and variables → Actions → **New repository secret**。Name 填 `EDIT_GITHUB_TOKEN`，Secret 粘贴刚才的令牌，点 Add secret。
 
-**4. 再运行一次 Deploy Worker。** 之后网站上的编辑表单就能用了。打开 https://formalnaturalist.co.nz/api/config 能看到你的 Site Key 就说明通了。
+**3. 运行一次 Deploy Worker**（Actions → Deploy Worker → Run workflow）。打开 https://formalnaturalist.co.nz/api/config ，看到 `"edit":true` 就开通了。
+
+**以后想加人机验证**：Cloudflare 左侧 **Turnstile** → **Add widget**，Hostname 加 `formalnaturalist.co.nz` 和 `www.formalnaturalist.co.nz`，模式选 **Managed**。把 Secret Key 填为 Secret `TURNSTILE_SECRET`，Site Key 填为 Variable `TURNSTILE_SITEKEY`，再运行一次 Deploy Worker。
 
 ### 以后
 

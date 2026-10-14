@@ -123,7 +123,8 @@
       };
     }
 
-    const ts = el("div", { class: "cf-turnstile", "data-sitekey": cfg.sitekey || "", "data-language": "zh-cn" });
+    // 人机验证是可选的：只有配置了 Turnstile 才显示
+    const ts = cfg.sitekey ? el("div", { class: "cf-turnstile", "data-sitekey": cfg.sitekey, "data-language": "zh-cn" }) : el("span");
     const btn = el("button", { type: "submit", text: "提交" });
     const out = el("p", { class: "note", hidden: true, role: "status" });
     form.append(
@@ -133,8 +134,8 @@
          el("a", { href: "../about/privacy.html", text: "隐私与编辑规则" })),
       ts, btn, out);
     root.replaceChildren(form);
-    if (!cfg.sitekey) { out.hidden = false; out.textContent = "编辑服务暂未开通（缺少人机验证配置）。"; btn.disabled = true; }
-    else { const s = el("script", { src: "https://challenges.cloudflare.com/turnstile/v0/api.js", async: true, defer: true }); document.head.append(s); }
+    if (!cfg.edit) { out.hidden = false; out.textContent = "编辑服务暂未开通。"; btn.disabled = true; }
+    else if (cfg.sitekey) { const s = el("script", { src: "https://challenges.cloudflare.com/turnstile/v0/api.js", async: true, defer: true }); document.head.append(s); }
 
     form.addEventListener("submit", async (ev) => {
       ev.preventDefault();
@@ -143,8 +144,8 @@
       for (const i of form.querySelectorAll("[required]")) if (!i.value.trim()) { out.textContent = "请填写所有带 * 的项目。"; i.focus(); return; }
       const { data: d } = collect(f);
       if ((type === "meta" || type === "conjecture") && !Object.keys(d).length) { out.textContent = "你还没有修改任何内容。"; return; }
-      const token = (f["cf-turnstile-response"] || {}).value;
-      if (!token) { out.textContent = "请先完成人机验证。"; return; }
+      const token = (f["cf-turnstile-response"] || {}).value || "";
+      if (cfg.sitekey && !token) { out.textContent = "请先完成人机验证。"; return; }
       btn.disabled = true; out.textContent = "正在提交……";
       try {
         const r = await fetch("/api/submit", { method: "POST", headers: { "Content-Type": "application/json" },
