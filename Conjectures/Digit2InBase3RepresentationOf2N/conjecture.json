@@ -1,0 +1,25 @@
+{
+  "slug": "digit-2-in-base-3-representation-of-2-n",
+  "name": "Digit $2$ in base $3$ representation of $2^n$",
+  "name_zh": "",
+  "informal": "For $n > 8$, $2^n$ is not the the sum of distinct powers of $3$. Expressed here in terms of the base $3$ digits of $n$.\n\nThis conjecture is equivalent to the halting of a $15$-state $2$-symbol Turing Machine.\n\nTODO(lezeau): Formalize the Turing Machine version of this problem.\n\nSource: *Hardness of Busy Beaver Value BB(15)*: https://link.springer.com/chapter/10.1007/978-3-031-72621-7_9\nThis is also https://arxiv.org/abs/2107.12475.",
+  "references": [
+    {
+      "label": "Some Unconventional Problems in Number Theory",
+      "url": "https://doi.org/10.2307/2689842"
+    },
+    {
+      "label": "arxiv/2107.12475",
+      "url": "https://arxiv.org/abs/2107.12475"
+    },
+    {
+      "label": "Hardness of Busy Beaver Value BB(15)",
+      "url": "https://doi.org/10.1007/978-3-031-72621-7_9"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Arxiv/2107.12475/CollatzLike.lean"
+    }
+  ],
+  "informal_en": "For $n > 8$, $2^n$ is not the the sum of distinct powers of $3$. Expressed here in terms of the base $3$ digits of $n$.\n\nThis conjecture is equivalent to the halting of a $15$-state $2$-symbol Turing Machine.\n\nTODO(lezeau): Formalize the Turing Machine version of this problem.\n\nSource: *Hardness of Busy Beaver Value BB(15)*: https://link.springer.com/chapter/10.1007/978-3-031-72621-7_9\nThis is also https://arxiv.org/abs/2107.12475."
+}

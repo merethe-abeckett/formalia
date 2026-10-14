@@ -1,0 +1,17 @@
+{
+  "slug": "graceful-tree-conjecture-ringelkotzig-conjecture",
+  "name": "Graceful Tree Conjecture (Ringel–Kotzig conjecture)",
+  "name_zh": "",
+  "informal": "Every tree admits a graceful labeling.\n\nA graceful labeling of a tree $T$ with $m$ edges is an injective map $f : V \\to \\{0, \\dots, m\\}$\nsuch that the multiset of absolute differences $|f(u) - f(v)|$ over edges $\\{u,v\\}$ of $T$\nequals $\\{1, \\dots, m\\}$.",
+  "references": [
+    {
+      "label": "Wikipedia/Graceful_labeling",
+      "url": "https://en.wikipedia.org/wiki/Graceful_labeling"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/GracefulLabeling.lean"
+    }
+  ],
+  "informal_en": "Every tree admits a graceful labeling.\n\nA graceful labeling of a tree $T$ with $m$ edges is an injective map $f : V \\to \\{0, \\dots, m\\}$\nsuch that the multiset of absolute differences $|f(u) - f(v)|$ over edges $\\{u,v\\}$ of $T$\nequals $\\{1, \\dots, m\\}$."
+}

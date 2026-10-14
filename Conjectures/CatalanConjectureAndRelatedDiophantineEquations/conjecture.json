@@ -1,0 +1,21 @@
+{
+  "slug": "catalan-conjecture-and-related-diophantine-equations",
+  "name": "Catalan's conjecture and related Diophantine equations",
+  "name_zh": "",
+  "informal": "For positive integers a, b, and c, there are only finitely many positive solutions (x, y, m, n) to the\nequation $ax^n - by^m = c$ where $(m, n) \\neq (2, 2)$ and $x, y > 1$.",
+  "references": [
+    {
+      "label": "Wikipedia - Catalan's conjecture",
+      "url": "https://en.wikipedia.org/wiki/Catalan%27s_conjecture"
+    },
+    {
+      "label": "arXiv:2507.12397",
+      "url": "https://arxiv.org/abs/2507.12397"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Catalan.lean"
+    }
+  ],
+  "informal_en": "For positive integers a, b, and c, there are only finitely many positive solutions (x, y, m, n) to the\nequation $ax^n - by^m = c$ where $(m, n) \\neq (2, 2)$ and $x, y > 1$."
+}

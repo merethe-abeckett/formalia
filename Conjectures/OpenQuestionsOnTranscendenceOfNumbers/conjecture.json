@@ -1,0 +1,17 @@
+{
+  "slug": "open-questions-on-transcendence-of-numbers",
+  "name": "Open questions on transcendence of numbers",
+  "name_zh": "",
+  "informal": "$\\log(\\log(2))$ is transcendental.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Transcendental_number"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Transcendental.lean"
+    }
+  ],
+  "informal_en": "$\\log(\\log(2))$ is transcendental."
+}

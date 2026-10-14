@@ -1,0 +1,21 @@
+{
+  "slug": "integer-values-of-tan-arctan-1-arctan-2-cdots-arctan-n",
+  "name": "Integer values of $\\tan(\\arctan 1 + \\arctan 2 + \\cdots + \\arctan n)$",
+  "name_zh": "",
+  "informal": "**Conjecture (Amdeberhan-Medina-Moll, 2008).** For every integer $n \\geq 5$, the value\n$$x_n = \\tan(\\arctan 1 + \\arctan 2 + \\cdots + \\arctan n)$$\nis not an integer.",
+  "references": [
+    {
+      "label": "arxiv/2607.05739",
+      "url": "https://arxiv.org/abs/2607.05739"
+    },
+    {
+      "label": "TanArctan",
+      "url": "https://github.com/AxiomMath/TanArctan"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Arxiv/2607.05739/TanArctanSum.lean"
+    }
+  ],
+  "informal_en": "**Conjecture (Amdeberhan-Medina-Moll, 2008).** For every integer $n \\geq 5$, the value\n$$x_n = \\tan(\\arctan 1 + \\arctan 2 + \\cdots + \\arctan n)$$\nis not an integer."
+}

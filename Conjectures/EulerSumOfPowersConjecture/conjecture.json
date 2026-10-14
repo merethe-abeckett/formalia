@@ -1,0 +1,17 @@
+{
+  "slug": "euler-sum-of-powers-conjecture",
+  "name": "Euler's sum of powers conjecture",
+  "name_zh": "",
+  "informal": "Euler's sum of powers conjecture states that for integers $n > 1$ and $k > 1$,\nif the sum of $n$ positive integers each raised to the $k$-th power equals another integer\nraised to the $k$-th power, then $n ≥ k$.\n\nThe conjecture is known to be false for $k = 4$ and $k = 5$,\nbut remains open for $k ≥ 6$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Euler's_sum_of_powers_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/EulerSumOfPowers.lean"
+    }
+  ],
+  "informal_en": "Euler's sum of powers conjecture states that for integers $n > 1$ and $k > 1$,\nif the sum of $n$ positive integers each raised to the $k$-th power equals another integer\nraised to the $k$-th power, then $n ≥ k$.\n\nThe conjecture is known to be false for $k = 4$ and $k = 5$,\nbut remains open for $k ≥ 6$."
+}

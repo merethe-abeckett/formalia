@@ -1,0 +1,25 @@
+{
+  "slug": "barker-sequences",
+  "name": "Barker sequences",
+  "name_zh": "",
+  "informal": "Every Barker sequence has length at most $13$.",
+  "references": [
+    {
+      "label": "A note on Barker sequences of even length",
+      "url": "https://arxiv.org/abs/2104.00502"
+    },
+    {
+      "label": "Barker code",
+      "url": "https://en.wikipedia.org/wiki/Barker_code"
+    },
+    {
+      "label": "OEIS A091704",
+      "url": "https://oeis.org/A091704"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Arxiv/2104.00502/BarkerSequence.lean"
+    }
+  ],
+  "informal_en": "Every Barker sequence has length at most $13$."
+}

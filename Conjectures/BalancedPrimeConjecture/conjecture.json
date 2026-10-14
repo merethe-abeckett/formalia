@@ -1,0 +1,21 @@
+{
+  "slug": "balanced-prime-conjecture",
+  "name": "Balanced prime conjecture",
+  "name_zh": "",
+  "informal": "Let $p_k$ be the $k$-th prime number.\nAre there infinitely many $n$ such that $(p_n + p_{n+2}) / 2$ is prime?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Balanced_prime"
+    },
+    {
+      "label": "OEIS A6562",
+      "url": "https://oeis.org/A6562"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/BalancedPrimes.lean"
+    }
+  ],
+  "informal_en": "Let $p_k$ be the $k$-th prime number.\nAre there infinitely many $n$ such that $(p_n + p_{n+2}) / 2$ is prime?"
+}

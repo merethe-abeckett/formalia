@@ -1,0 +1,17 @@
+{
+  "slug": "fibonacci-primes",
+  "name": "Fibonacci Primes",
+  "name_zh": "",
+  "informal": "There are infinitely many Fibonacci primes, i.e., Fibonacci numbers that are prime\nIt is also a barrier to defining a benchmark from this paper:\nhttps://arxiv.org/html/2505.13938v1 (see Figure 8).",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Fibonacci_prime"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/FibonacciPrimes.lean"
+    }
+  ],
+  "informal_en": "There are infinitely many Fibonacci primes, i.e., Fibonacci numbers that are prime\nIt is also a barrier to defining a benchmark from this paper:\nhttps://arxiv.org/html/2505.13938v1 (see Figure 8)."
+}

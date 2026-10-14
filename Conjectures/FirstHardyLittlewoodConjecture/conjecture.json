@@ -1,0 +1,17 @@
+{
+  "slug": "first-hardylittlewood-conjecture",
+  "name": "First Hardy–Littlewood conjecture",
+  "name_zh": "",
+  "informal": "For integers $x, y \\geq 2$,\n$$\n  \\pi(x + y) \\leq \\pi(x) + \\pi(y),\n$$\nwhere $\\pi(z)$ denotes the prime-counting function, giving the number of primes up to\nand including $z$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/First_Hardy%E2%80%93Littlewood_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/HardyLittlewood.lean"
+    }
+  ],
+  "informal_en": "For integers $x, y \\geq 2$,\n$$\n  \\pi(x + y) \\leq \\pi(x) + \\pi(y),\n$$\nwhere $\\pi(z)$ denotes the prime-counting function, giving the number of primes up to\nand including $z$."
+}

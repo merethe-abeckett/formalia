@@ -1,0 +1,29 @@
+{
+  "slug": "convergence-of-the-flint-hills-and-cookson-hills-series",
+  "name": "Convergence of the Flint Hills and Cookson Hills series",
+  "name_zh": "",
+  "informal": "The Flint Hills series summing $csc(n)^2 / n^3$ from $n=1$ to $\\infty$ converges.\n(Note that we 0-index the series below.)",
+  "references": [
+    {
+      "label": "Wikipedia: Examples of numerical series",
+      "url": "https://en.wikipedia.org/wiki/Series_(mathematics"
+    },
+    {
+      "label": "MathWorld: Flint Hills Series",
+      "url": "https://mathworld.wolfram.com/FlintHillsSeries.html"
+    },
+    {
+      "label": "Alekseyev, On the Flint Hills series",
+      "url": "https://doi.org/10.48550/arXiv.1104.5100"
+    },
+    {
+      "label": "MathWorld: Cookson Hills Series",
+      "url": "https://mathworld.wolfram.com/CooksonHillsSeries.html"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/FlintCooksonHills.lean"
+    }
+  ],
+  "informal_en": "The Flint Hills series summing $csc(n)^2 / n^3$ from $n=1$ to $\\infty$ converges.\n(Note that we 0-index the series below.)"
+}

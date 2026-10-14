@@ -1,0 +1,17 @@
+{
+  "slug": "prime-triplet-conjecture",
+  "name": "Prime Triplet Conjecture",
+  "name_zh": "",
+  "informal": "Are there infinitely many tuples of three consecutive primes $(p, q, r)$ such that $r - p = 6$?",
+  "references": [
+    {
+      "label": "Prime Triplet Wikipedia Page",
+      "url": "https://en.wikipedia.org/wiki/Prime_triplet#Conjecture_on_prime_triplets"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/PrimeTriplets.lean"
+    }
+  ],
+  "informal_en": "Are there infinitely many tuples of three consecutive primes $(p, q, r)$ such that $r - p = 6$?"
+}

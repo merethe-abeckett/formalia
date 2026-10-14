@@ -1,0 +1,21 @@
+{
+  "slug": "brocard-conjecture",
+  "name": "Brocard's Conjecture",
+  "name_zh": "",
+  "informal": "**Brocard's Conjecture**\nFor every `n ≥ 2`, between the squares of the `n`-th and `(n+1)`-th primes,\nthere are at least four prime numbers.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Brocard%27s_conjecture"
+    },
+    {
+      "label": "Luan Alberto Ferreira, *Real exponential sums over primes and prime gaps*",
+      "url": "https://arxiv.org/abs/2307.08725"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/BrocardConjecture.lean"
+    }
+  ],
+  "informal_en": "**Brocard's Conjecture**\nFor every `n ≥ 2`, between the squares of the `n`-th and `(n+1)`-th primes,\nthere are at least four prime numbers."
+}

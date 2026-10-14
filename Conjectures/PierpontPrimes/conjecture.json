@@ -1,0 +1,21 @@
+{
+  "slug": "pierpont-primes",
+  "name": "Pierpont primes",
+  "name_zh": "",
+  "informal": "There are infinitely many Pierpont primes.",
+  "references": [
+    {
+      "label": "Wikipedia, Pierpont prime",
+      "url": "https://en.wikipedia.org/wiki/Pierpont_prime"
+    },
+    {
+      "label": "OEIS A005109",
+      "url": "https://oeis.org/A005109"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/PierpontPrime.lean"
+    }
+  ],
+  "informal_en": "There are infinitely many Pierpont primes."
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "inverse-galois-problem",
+  "name": "Inverse Galois problem",
+  "name_zh": "",
+  "informal": "The **Inverse Galois Problem**: every finite group is\nisomorphic to the Galois group of a Galois extension of the\nrationals.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Inverse_Galois_problem"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/InverseGalois.lean"
+    }
+  ],
+  "informal_en": "The **Inverse Galois Problem**: every finite group is\nisomorphic to the Galois group of a Galois extension of the\nrationals."
+}

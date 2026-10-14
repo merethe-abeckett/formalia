@@ -1,0 +1,17 @@
+{
+  "slug": "elliotthalberstam-conjecture",
+  "name": "Elliott–Halberstam conjecture",
+  "name_zh": "",
+  "informal": "The Elliott–Halberstam conjecture: for every $\\theta < 1$ and $A > 0$ there exists a\nconstant $C > 0$ such that\n$$\\sum_{1 \\le q \\le x^{\\theta}} E(x; q) \\le \\frac{C x}{\\log^A x}$$\nfor all $x > 2$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Elliott%E2%80%93Halberstam_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/ElliottHalberstamConjecture.lean"
+    }
+  ],
+  "informal_en": "The Elliott–Halberstam conjecture: for every $\\theta < 1$ and $A > 0$ there exists a\nconstant $C > 0$ such that\n$$\\sum_{1 \\le q \\le x^{\\theta}} E(x; q) \\le \\frac{C x}{\\log^A x}$$\nfor all $x > 2$."
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "goodman-conjecture-on-coefficients-of-p-valent-functions",
+  "name": "Goodman's conjecture on coefficients of $p$-valent functions",
+  "name_zh": "",
+  "informal": "**Goodman's conjecture.** For every $p$-valent normalised function $f$ on the unit disk and every\n$n > p$, the $n$-th coefficient is bounded by the Goodman bound:\n$$|b_n| \\le \\sum_{k=1}^{p} \\frac{2k (n+p)!}{(p-k)!\\,(p+k)!\\,(n-p-1)!\\,(n^2-k^2)} |b_k|.$$",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Goodman%27s_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/GoodmanConjecture.lean"
+    }
+  ],
+  "informal_en": "**Goodman's conjecture.** For every $p$-valent normalised function $f$ on the unit disk and every\n$n > p$, the $n$-th coefficient is bounded by the Goodman bound:\n$$|b_n| \\le \\sum_{k=1}^{p} \\frac{2k (n+p)!}{(p-k)!\\,(p+k)!\\,(n-p-1)!\\,(n^2-k^2)} |b_k|.$$"
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "determinantal-conjecture",
+  "name": "Determinantal conjecture",
+  "name_zh": "",
+  "informal": "Does the determinant of the sum $A + B$ of two $n \\times n$ normal\ncomplex matrices $A$ and $B$ always lie in the convex hull\nof the $n!$ points $\\prod\\_i (\\lambda(A)\\_i + \\lambda(B)\\_{\\sigma(i)})$?\nHere the numbers $\\lambda(A)\\_i$ and $\\lambda(B)\\_i$ are\nthe eigenvalues of $A$ and $B$, and $\\sigma$ is an element of the symmetric\ngroup $S\\_n$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Determinantal_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/DeterminantalConjecture.lean"
+    }
+  ],
+  "informal_en": "Does the determinant of the sum $A + B$ of two $n \\times n$ normal\ncomplex matrices $A$ and $B$ always lie in the convex hull\nof the $n!$ points $\\prod\\_i (\\lambda(A)\\_i + \\lambda(B)\\_{\\sigma(i)})$?\nHere the numbers $\\lambda(A)\\_i$ and $\\lambda(B)\\_i$ are\nthe eigenvalues of $A$ and $B$, and $\\sigma$ is an element of the symmetric\ngroup $S\\_n$."
+}

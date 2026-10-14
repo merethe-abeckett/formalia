@@ -1,0 +1,17 @@
+{
+  "slug": "beal-conjecture",
+  "name": "Beal conjecture",
+  "name_zh": "",
+  "informal": "The **Beal Conjecture**: if we are given positive integers $A, B, C, x, y, z$ such that\n$x, y, z > 2$ and $A^x + B^y = C^z$ then $A, B, C$ have a common divisor.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Beal_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/BealConjecture.lean"
+    }
+  ],
+  "informal_en": "The **Beal Conjecture**: if we are given positive integers $A, B, C, x, y, z$ such that\n$x, y, z > 2$ and $A^x + B^y = C^z$ then $A, B, C$ have a common divisor."
+}

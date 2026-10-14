@@ -1,0 +1,21 @@
+{
+  "slug": "m-k-perfect-numbers",
+  "name": "(m,k)-perfect numbers",
+  "name_zh": "",
+  "informal": "There does not exist a $(2,5)$-perfect number",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Superperfect_number#Generalizations"
+    },
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/List_of_unsolved_problems_in_mathematics#General"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Superperfectnumbers.lean"
+    }
+  ],
+  "informal_en": "There does not exist a $(2,5)$-perfect number"
+}

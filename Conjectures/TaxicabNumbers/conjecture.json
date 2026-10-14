@@ -1,0 +1,33 @@
+{
+  "slug": "taxicab-numbers",
+  "name": "Taxicab numbers",
+  "name_zh": "",
+  "informal": "Taxicab number for $k=5$, $m=2$, and $n=2$ is not known.\nWhether such a number exists is also not known.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Taxicab_number"
+    },
+    {
+      "label": "Generalized taxicab number",
+      "url": "https://en.wikipedia.org/wiki/Generalized_taxicab_number"
+    },
+    {
+      "label": "OEIS taxicab cubes",
+      "url": "https://oeis.org/A001235"
+    },
+    {
+      "label": "OEIS taxicab 4th powers",
+      "url": "https://oeis.org/A018786"
+    },
+    {
+      "label": "OEIS taxicab conjecture",
+      "url": "https://oeis.org/A088703"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Taxicab.lean"
+    }
+  ],
+  "informal_en": "Taxicab number for $k=5$, $m=2$, and $n=2$ is not known.\nWhether such a number exists is also not known."
+}

@@ -1,0 +1,33 @@
+{
+  "slug": "bloch-and-landau-constants",
+  "name": "Bloch and Landau constants",
+  "name_zh": "",
+  "informal": "Ahlfors and Grunsky also conjectured in [AG37] that this upper bound is the precise value of the\nBloch constant.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Bloch%27s_theorem_(complex_analysis"
+    },
+    {
+      "label": "OptimizationConstants",
+      "url": "https://teorth.github.io/optimizationproblems/constants/57c.html"
+    },
+    {
+      "label": "MathWorld",
+      "url": "https://mathworld.wolfram.com/BlochConstant.html"
+    },
+    {
+      "label": "Bhowmik–Sen",
+      "url": "https://www.cambridge.org/core/journals/canadian-mathematical-bulletin/article/improved-bloch-and-landau-constants-for-meromorphic-functions/FD465D1F2CEF7E8C62AFF16C3E89B7B4"
+    },
+    {
+      "label": "\"Bloch's constant is computable.\"",
+      "url": "https://jucs.org/jucs_14_6/blochs_constant_is_computable/jucs_14_06_0896_0907_rettinger.pdf"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Bloch.lean"
+    }
+  ],
+  "informal_en": "Ahlfors and Grunsky also conjectured in [AG37] that this upper bound is the precise value of the\nBloch constant."
+}

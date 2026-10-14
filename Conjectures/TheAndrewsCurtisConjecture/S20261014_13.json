@@ -1,0 +1,20 @@
+{
+  "id": "20261014-13",
+  "conjecture": "the-andrews-curtis-conjecture",
+  "module": "Conjectures.TheAndrewsCurtisConjecture.S20261014_13",
+  "declaration": "Registry.TheAndrewsCurtisConjecture.S20261014_13",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/AndrewsCurtis.lean",
+    "note": "取自 formal-conjectures 的 `andrews_curtis_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "**The Andrews-Curtis conjecture.**\n\nEvery normally generating `n`-tuple in the free group of rank `n` is\nAndrews-Curtis equivalent to the standard tuple of free generators."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

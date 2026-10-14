@@ -1,0 +1,29 @@
+{
+  "slug": "mean-value-problem",
+  "name": "Mean value problem",
+  "name_zh": "",
+  "informal": "Given a complex polynomial $p$ of degree $d ≥ 2$ and a complex number $z$\nthere is a critical point $c$ of $p$, such that $|p(z)-p(c)|/|z-c| ≤ |p'(z)|$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mean_value_problem"
+    },
+    {
+      "label": "The fundamental theorem of algebra and complexity theory",
+      "url": "https://www.ams.org/journals/bull/1981-04-01/S0273-0979-1981-14858-8/"
+    },
+    {
+      "label": "The fundamental theorem of algebra and complexity theory",
+      "url": "https://www.ams.org/journals/bull/1981-04-01/S0273-0979-1981-14858-8/"
+    },
+    {
+      "label": "Critical points and values of complex polynomials",
+      "url": "https://doi.org/10.1016/0885-064X(89"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/MeanValueProblem.lean"
+    }
+  ],
+  "informal_en": "Given a complex polynomial $p$ of degree $d ≥ 2$ and a complex number $z$\nthere is a critical point $c$ of $p$, such that $|p(z)-p(c)|/|z-c| ≤ |p'(z)|$."
+}

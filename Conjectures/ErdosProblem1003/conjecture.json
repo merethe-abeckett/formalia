@@ -1,0 +1,17 @@
+{
+  "slug": "erdos-problem-1003",
+  "name": "Erdős Problem 1003",
+  "name_zh": "",
+  "informal": "Are there infinitely many solutions to $\\phi(n) = \\phi(n+1)$, where $\\phi$ is the Euler totient\nfunction?",
+  "references": [
+    {
+      "label": "erdosproblems.com/1003",
+      "url": "https://www.erdosproblems.com/1003"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/ErdosProblems/1003.lean"
+    }
+  ],
+  "informal_en": "Are there infinitely many solutions to $\\phi(n) = \\phi(n+1)$, where $\\phi$ is the Euler totient\nfunction?"
+}

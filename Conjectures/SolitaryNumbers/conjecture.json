@@ -1,0 +1,21 @@
+{
+  "slug": "solitary-numbers",
+  "name": "Solitary Numbers",
+  "name_zh": "",
+  "informal": "**Is 10 a solitary number?**  The smallest positive integer whose solitary status is\ncurrently unresolved is $10$, with abundancy index $\\sigma(10) / 10 = 9/5$.",
+  "references": [
+    {
+      "label": "Solitary number (Wikipedia)",
+      "url": "https://en.wikipedia.org/wiki/Solitary_number"
+    },
+    {
+      "label": "Solitary number large clubs (Wikipedia)",
+      "url": "https://en.wikipedia.org/wiki/Solitary_number#Large_clubs"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/SolitaryNumber.lean"
+    }
+  ],
+  "informal_en": "**Is 10 a solitary number?**  The smallest positive integer whose solitary status is\ncurrently unresolved is $10$, with abundancy index $\\sigma(10) / 10 = 9/5$."
+}

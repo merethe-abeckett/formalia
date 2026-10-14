@@ -1,0 +1,20 @@
+{
+  "id": "20261014-52",
+  "conjecture": "juggler-conjecture",
+  "module": "Conjectures.JugglerConjecture.S20261014_52",
+  "declaration": "Registry.JugglerConjecture.S20261014_52",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/JugglerConjecture.lean",
+    "note": "取自 formal-conjectures 的 `juggler_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "Now form a sequence beginning with any positive integer, where each subsequent term is obtained\nby applying the operation defined above to the previous term.\nThe **Juggler Conjecture** states that for any positive integer $n$, there exists a natural number\n$m$ such that the $m$-th term of the sequence is $1$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

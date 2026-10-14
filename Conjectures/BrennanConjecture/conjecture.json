@@ -1,0 +1,25 @@
+{
+  "slug": "brennan-conjecture",
+  "name": "Brennan's Conjecture",
+  "name_zh": "",
+  "informal": "Brennan's conjecture, part 2: $B_b(-2) = 1$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Brennan_conjecture"
+    },
+    {
+      "label": "arXiv:2409.15074",
+      "url": "https://arxiv.org/abs/2409.15074"
+    },
+    {
+      "label": "arXiv:2512.09330",
+      "url": "https://arxiv.org/abs/2512.09330"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Brennanconjecture.lean"
+    }
+  ],
+  "informal_en": "Brennan's conjecture, part 2: $B_b(-2) = 1$."
+}

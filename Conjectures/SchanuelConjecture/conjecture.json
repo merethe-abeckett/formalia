@@ -1,0 +1,17 @@
+{
+  "slug": "schanuel-conjecture",
+  "name": "Schanuel's Conjecture",
+  "name_zh": "",
+  "informal": "Given any set of $n$ complex numbers $\\{z_1, ..., z_n\\}$ that are linearly independent over\n$\\mathbb{Q}$, the field extension $\\mathbb{Q}(z_1, ..., z_n, e^{z_1}, ..., e^{z_n})$\nhas transcendence degree at least $n$ over $\\mathbb{Q}$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Schanuel%27s_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Schanuel.lean"
+    }
+  ],
+  "informal_en": "Given any set of $n$ complex numbers $\\{z_1, ..., z_n\\}$ that are linearly independent over\n$\\mathbb{Q}$, the field extension $\\mathbb{Q}(z_1, ..., z_n, e^{z_1}, ..., e^{z_n})$\nhas transcendence degree at least $n$ over $\\mathbb{Q}$."
+}

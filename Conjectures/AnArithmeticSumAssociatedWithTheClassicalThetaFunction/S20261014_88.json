@@ -1,0 +1,20 @@
+{
+  "id": "20261014-88",
+  "conjecture": "an-arithmetic-sum-associated-with-the-classical-theta-functi",
+  "module": "Conjectures.AnArithmeticSumAssociatedWithTheClassicalThetaFunction.S20261014_88",
+  "declaration": "Registry.AnArithmeticSumAssociatedWithTheClassicalThetaFunction.S20261014_88",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Arxiv/2501.03234/ArithmeticSumS.lean",
+    "note": "取自 formal-conjectures 的 `conjecture_1_1`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "**Conjecture 1.1**: For any odd prime $k$, the sum associated with the classical theta function $θ_3$,\n$S(k)$ is positive."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

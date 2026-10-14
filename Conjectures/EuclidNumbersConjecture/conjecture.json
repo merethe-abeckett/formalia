@@ -1,0 +1,17 @@
+{
+  "slug": "euclid-numbers-conjecture",
+  "name": "Euclid Numbers conjecture",
+  "name_zh": "",
+  "informal": "It is not known whether there is an infinite number of prime Euclid numbers.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Euclid_number"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Euclid.lean"
+    }
+  ],
+  "informal_en": "It is not known whether there is an infinite number of prime Euclid numbers."
+}

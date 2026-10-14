@@ -1,0 +1,17 @@
+{
+  "slug": "wolstenholme-prime",
+  "name": "Wolstenholme Prime",
+  "name_zh": "",
+  "informal": "It is conjectured that there are infinitely many Wolstenholme primes.\n\n*Reference:* [Wikipedia](https://en.wikipedia.org/wiki/Wolstenholme_prime#Expected_number_of_Wolstenholme_primes)",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Wolstenholme_prime"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/WolstenholmePrime.lean"
+    }
+  ],
+  "informal_en": "It is conjectured that there are infinitely many Wolstenholme primes.\n\n*Reference:* [Wikipedia](https://en.wikipedia.org/wiki/Wolstenholme_prime#Expected_number_of_Wolstenholme_primes)"
+}

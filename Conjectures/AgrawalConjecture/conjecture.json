@@ -1,0 +1,25 @@
+{
+  "slug": "agrawal-conjecture",
+  "name": "Agrawal's conjecture",
+  "name_zh": "",
+  "informal": "**Agrawal's Primality Conjecture.**\n\nDoes the congruence $(X-1)^n \\equiv X^n - 1 \\pmod{n, X^r-1}$ imply\n$n$ is prime (with a specific exception for $n^2 \\equiv 1 \\pmod{r}$)?\n\nWhile the \"if\" direction is a known theorem, the \"only if\" direction\nremains a conjecture.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Agrawal%27s_conjecture"
+    },
+    {
+      "label": "AIM Math",
+      "url": "https://aimath.org/WWN/primesinp/articles/html/50a/"
+    },
+    {
+      "label": "Paper",
+      "url": "https://eprint.iacr.org/2009/008.pdf"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Agrawal.lean"
+    }
+  ],
+  "informal_en": "**Agrawal's Primality Conjecture.**\n\nDoes the congruence $(X-1)^n \\equiv X^n - 1 \\pmod{n, X^r-1}$ imply\n$n$ is prime (with a specific exception for $n^2 \\equiv 1 \\pmod{r}$)?\n\nWhile the \"if\" direction is a known theorem, the \"only if\" direction\nremains a conjecture."
+}

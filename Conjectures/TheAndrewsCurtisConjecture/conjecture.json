@@ -1,0 +1,21 @@
+{
+  "slug": "the-andrews-curtis-conjecture",
+  "name": "The Andrews-Curtis conjecture",
+  "name_zh": "",
+  "informal": "**The Andrews-Curtis conjecture.**\n\nEvery normally generating `n`-tuple in the free group of rank `n` is\nAndrews-Curtis equivalent to the standard tuple of free generators.",
+  "references": [
+    {
+      "label": "Wikipedia, Andrews-Curtis conjecture",
+      "url": "https://en.wikipedia.org/wiki/Andrews%E2%80%93Curtis_conjecture"
+    },
+    {
+      "label": "A. D. Myasnikov, A. G. Myasnikov and V. Shpilrain,\n  *On the Andrews-Curtis equivalence*",
+      "url": "https://arxiv.org/abs/math/0302080"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/AndrewsCurtis.lean"
+    }
+  ],
+  "informal_en": "**The Andrews-Curtis conjecture.**\n\nEvery normally generating `n`-tuple in the free group of rank `n` is\nAndrews-Curtis equivalent to the standard tuple of free generators."
+}

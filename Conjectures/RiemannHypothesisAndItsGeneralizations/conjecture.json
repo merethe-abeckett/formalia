@@ -1,0 +1,29 @@
+{
+  "slug": "riemann-hypothesis-and-its-generalizations",
+  "name": "Riemann Hypothesis and its generalizations",
+  "name_zh": "",
+  "informal": "The **Riemann Hypothesis**: all non-trivial zeros of the Riemann zeta function have real\npart $\\frac{1}{2}$. That is, if $\\zeta(s) = 0$, $s \\neq 1$, and $s$ is not a trivial zero\n$-2(n+1)$ for some $n \\in \\mathbb{N}$, then $\\operatorname{Re}(s) = \\frac{1}{2}$.\n\nThis is the official Millennium Prize Problem as posed by the\n[Clay Mathematics Institute](https://www.claymath.org/wp-content/uploads/2022/05/riemann.pdf).\n\nThis uses the `RiemannHypothesis` type from Mathlib, which is defined as\n`∀ (s : ℂ), riemannZeta s = 0 → (¬∃ n : ℕ, s = -2 * (n + 1)) → s ≠ 1 → s.re = 1 / 2`.",
+  "references": [
+    {
+      "label": "The Clay Institute",
+      "url": "https://www.claymath.org/wp-content/uploads/2022/05/riemann.pdf"
+    },
+    {
+      "label": "Wikipedia: Riemann hypothesis",
+      "url": "https://en.wikipedia.org/wiki/Riemann_hypothesis"
+    },
+    {
+      "label": "Wikipedia: Generalized Riemann hypothesis",
+      "url": "https://en.wikipedia.org/wiki/Generalized_Riemann_hypothesis"
+    },
+    {
+      "label": "Wikipedia: Dedekind zeta function",
+      "url": "https://en.wikipedia.org/wiki/Dedekind_zeta_function"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Millennium/RiemannHypothesis.lean"
+    }
+  ],
+  "informal_en": "The **Riemann Hypothesis**: all non-trivial zeros of the Riemann zeta function have real\npart $\\frac{1}{2}$. That is, if $\\zeta(s) = 0$, $s \\neq 1$, and $s$ is not a trivial zero\n$-2(n+1)$ for some $n \\in \\mathbb{N}$, then $\\operatorname{Re}(s) = \\frac{1}{2}$.\n\nThis is the official Millennium Prize Problem as posed by the\n[Clay Mathematics Institute](https://www.claymath.org/wp-content/uploads/2022/05/riemann.pdf).\n\nThis uses the `RiemannHypothesis` type from Mathlib, which is defined as\n`∀ (s : ℂ), riemannZeta s = 0 → (¬∃ n : ℕ, s = -2 * (n + 1)) → s ≠ 1 → s.re = 1 / 2`."
+}

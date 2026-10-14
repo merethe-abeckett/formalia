@@ -1,0 +1,17 @@
+{
+  "slug": "an-arithmetic-sum-associated-with-the-classical-theta-functi",
+  "name": "An Arithmetic Sum Associated with the Classical Theta Function",
+  "name_zh": "",
+  "informal": "**Conjecture 1.1**: For any odd prime $k$, the sum associated with the classical theta function $θ_3$,\n$S(k)$ is positive.",
+  "references": [
+    {
+      "label": "arxiv/2501.03234",
+      "url": "https://arxiv.org/abs/2501.03234"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Arxiv/2501.03234/ArithmeticSumS.lean"
+    }
+  ],
+  "informal_en": "**Conjecture 1.1**: For any odd prime $k$, the sum associated with the classical theta function $θ_3$,\n$S(k)$ is positive."
+}

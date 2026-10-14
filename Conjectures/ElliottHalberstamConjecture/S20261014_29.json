@@ -1,0 +1,20 @@
+{
+  "id": "20261014-29",
+  "conjecture": "elliotthalberstam-conjecture",
+  "module": "Conjectures.ElliottHalberstamConjecture.S20261014_29",
+  "declaration": "Registry.ElliottHalberstamConjecture.S20261014_29",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/ElliottHalberstamConjecture.lean",
+    "note": "取自 formal-conjectures 的 `elliott_halberstam`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "The Elliott–Halberstam conjecture: for every $\\theta < 1$ and $A > 0$ there exists a\nconstant $C > 0$ such that\n$$\\sum_{1 \\le q \\le x^{\\theta}} E(x; q) \\le \\frac{C x}{\\log^A x}$$\nfor all $x > 2$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

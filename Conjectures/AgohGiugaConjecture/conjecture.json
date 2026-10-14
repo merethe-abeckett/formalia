@@ -1,0 +1,17 @@
+{
+  "slug": "agoh-giuga-conjecture",
+  "name": "Agoh-Giuga conjecture",
+  "name_zh": "",
+  "informal": "The **Agoh-Giuga Conjecture**, Agoh's formulation",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Agoh-Giuga_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/AgohGiuga.lean"
+    }
+  ],
+  "informal_en": "The **Agoh-Giuga Conjecture**, Agoh's formulation"
+}

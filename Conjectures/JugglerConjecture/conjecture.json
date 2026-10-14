@@ -1,0 +1,17 @@
+{
+  "slug": "juggler-conjecture",
+  "name": "Juggler conjecture",
+  "name_zh": "",
+  "informal": "Now form a sequence beginning with any positive integer, where each subsequent term is obtained\nby applying the operation defined above to the previous term.\nThe **Juggler Conjecture** states that for any positive integer $n$, there exists a natural number\n$m$ such that the $m$-th term of the sequence is $1$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Juggler_sequence"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/JugglerConjecture.lean"
+    }
+  ],
+  "informal_en": "Now form a sequence beginning with any positive integer, where each subsequent term is obtained\nby applying the operation defined above to the previous term.\nThe **Juggler Conjecture** states that for any positive integer $n$, there exists a natural number\n$m$ such that the $m$-th term of the sequence is $1$."
+}

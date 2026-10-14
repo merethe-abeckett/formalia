@@ -1,0 +1,17 @@
+{
+  "slug": "open-questions-on-irrationality-of-numbers",
+  "name": "Open questions on irrationality of numbers",
+  "name_zh": "",
+  "informal": "Is $\\pi ^ \\pi$ irrational?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Irrational_number#Open_questions"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Irrational.lean"
+    }
+  ],
+  "informal_en": "Is $\\pi ^ \\pi$ irrational?"
+}

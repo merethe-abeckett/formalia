@@ -1,0 +1,21 @@
+{
+  "slug": "open-questions-regarding-the-existence-of-euler-bricks",
+  "name": "Open questions regarding the existence of Euler bricks",
+  "name_zh": "",
+  "informal": "Is there a perfect Euler brick?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Euler_brick"
+    },
+    {
+      "label": "stackexchange",
+      "url": "https://math.stackexchange.com/questions/2264401/euler-bricks-and-the-4th-dimension"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/EulerBrick.lean"
+    }
+  ],
+  "informal_en": "Is there a perfect Euler brick?"
+}

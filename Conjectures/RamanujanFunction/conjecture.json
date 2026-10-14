@@ -1,0 +1,21 @@
+{
+  "slug": "ramanujan-function",
+  "name": "Ramanujan τ-function",
+  "name_zh": "",
+  "informal": "Lehmer's conjecture: $\\tau(n) \\ne 0$ for all $n > 0$.",
+  "references": [
+    {
+      "label": "Ramanujan-Petersson conjecture",
+      "url": "https://en.wikipedia.org/wiki/Ramanujan%E2%80%93Petersson_conjecture"
+    },
+    {
+      "label": "Lehmer's conjecture",
+      "url": "https://en.wikipedia.org/wiki/Ramanujan_tau_function#Conjectures_on_the_tau_function"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/RamanujanTau.lean"
+    }
+  ],
+  "informal_en": "Lehmer's conjecture: $\\tau(n) \\ne 0$ for all $n > 0$."
+}

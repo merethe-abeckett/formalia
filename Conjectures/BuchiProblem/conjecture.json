@@ -1,0 +1,17 @@
+{
+  "slug": "buchi-problem",
+  "name": "Büchi's problem",
+  "name_zh": "",
+  "informal": "**Büchi's problem**\nThere exists a positive integer $M$ such that, for all integers $x$ and $a$,\nif $(x+n)^2 + a$ is a square for $M$ consecutive values of $n$, then $a = 0$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/B%C3%BCchi%27s_problem"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Buchi.lean"
+    }
+  ],
+  "informal_en": "**Büchi's problem**\nThere exists a positive integer $M$ such that, for all integers $x$ and $a$,\nif $(x+n)^2 + a$ is a square for $M$ consecutive values of $n$, then $a = 0$."
+}

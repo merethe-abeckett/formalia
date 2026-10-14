@@ -1,0 +1,20 @@
+{
+  "id": "20261014-45",
+  "conjecture": "graceful-tree-conjecture-ringelkotzig-conjecture",
+  "module": "Conjectures.GracefulTreeConjectureRingelKotzigConjecture.S20261014_45",
+  "declaration": "Registry.GracefulTreeConjectureRingelKotzigConjecture.S20261014_45",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/GracefulLabeling.lean",
+    "note": "取自 formal-conjectures 的 `graceful_tree_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "Every tree admits a graceful labeling.\n\nA graceful labeling of a tree $T$ with $m$ edges is an injective map $f : V \\to \\{0, \\dots, m\\}$\nsuch that the multiset of absolute differences $|f(u) - f(v)|$ over edges $\\{u,v\\}$ of $T$\nequals $\\{1, \\dots, m\\}$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

@@ -1,0 +1,21 @@
+{
+  "slug": "the-erdosmoser-equation",
+  "name": "The Erdős–Moser equation",
+  "name_zh": "",
+  "informal": "The only positive solution of $S_k(m)=m^k$ is $(k,m)=(1,3)$.",
+  "references": [
+    {
+      "label": "Wikipedia: Erdős–Moser equation",
+      "url": "https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Moser_equation"
+    },
+    {
+      "label": "On stronger conjectures that imply the Erdős–Moser conjecture",
+      "url": "https://arxiv.org/abs/1003.1646"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/ErdosMoser.lean"
+    }
+  ],
+  "informal_en": "The only positive solution of $S_k(m)=m^k$ is $(k,m)=(1,3)$."
+}

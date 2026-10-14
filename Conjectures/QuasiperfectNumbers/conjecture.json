@@ -1,0 +1,17 @@
+{
+  "slug": "quasiperfect-numbers",
+  "name": "Quasiperfect Numbers",
+  "name_zh": "",
+  "informal": "**Quasiperfect Numbers Conjecture.**\nDo quasiperfect numbers exist?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Quasiperfect_number"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/QuasiperfectNumbers.lean"
+    }
+  ],
+  "informal_en": "**Quasiperfect Numbers Conjecture.**\nDo quasiperfect numbers exist?"
+}

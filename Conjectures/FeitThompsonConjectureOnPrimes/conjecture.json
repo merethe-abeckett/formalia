@@ -1,0 +1,17 @@
+{
+  "slug": "feit-thompson-conjecture-on-primes",
+  "name": "Feit-Thompson conjecture on primes",
+  "name_zh": "",
+  "informal": "There are no distinct primes $p$ and $q$ such that $\\frac{q^p - 1}{q - 1}$ divides $\\frac{p^q - 1}{p - 1}$",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Feit%E2%80%93Thompson_conjecture"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/FeitThompsonPrimeConjecture.lean"
+    }
+  ],
+  "informal_en": "There are no distinct primes $p$ and $q$ such that $\\frac{q^p - 1}{q - 1}$ divides $\\frac{p^q - 1}{p - 1}$"
+}

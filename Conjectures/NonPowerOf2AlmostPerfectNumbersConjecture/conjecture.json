@@ -1,0 +1,21 @@
+{
+  "slug": "non-power-of-2-almost-perfect-numbers-conjecture",
+  "name": "Non-Power-of-2 Almost Perfect Numbers Conjecture",
+  "name_zh": "",
+  "informal": "**Non-Power-of-2 Almost Perfect Numbers Conjecture.**\nDoes there exist an almost perfect number that is not a power of 2?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Almost_perfect_number"
+    },
+    {
+      "label": "mathworld",
+      "url": "https://mathworld.wolfram.com/AlmostPerfectNumber.html"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/AlmostPerfectNumbers.lean"
+    }
+  ],
+  "informal_en": "**Non-Power-of-2 Almost Perfect Numbers Conjecture.**\nDoes there exist an almost perfect number that is not a power of 2?"
+}

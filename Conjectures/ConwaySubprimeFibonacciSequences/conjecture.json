@@ -1,0 +1,21 @@
+{
+  "slug": "conway-subprime-fibonacci-sequences",
+  "name": "Conway's subprime Fibonacci sequences",
+  "name_zh": "",
+  "informal": "Every subprime Fibonacci sequence starting from two positive integers eventually enters a cycle.\nThis is the \"no infinite chains\" conjecture recorded in [A214897](https://oeis.org/A214897),\nassociated with [Guy–Khovanova–Salazar](https://arxiv.org/abs/1207.5099).",
+  "references": [
+    {
+      "label": "\"Conway's subprime Fibonacci sequences\"",
+      "url": "https://arxiv.org/abs/1207.5099"
+    },
+    {
+      "label": "A214897",
+      "url": "https://oeis.org/A214897"
+    },
+    {
+      "label": "formal-conjectures(DeepMind)",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Arxiv/1207.5099/SubprimeFibonacci.lean"
+    }
+  ],
+  "informal_en": "Every subprime Fibonacci sequence starting from two positive integers eventually enters a cycle.\nThis is the \"no infinite chains\" conjecture recorded in [A214897](https://oeis.org/A214897),\nassociated with [Guy–Khovanova–Salazar](https://arxiv.org/abs/1207.5099)."
+}
