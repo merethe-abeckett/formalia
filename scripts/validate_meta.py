@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent / "Conjectures"
 ID_RE = re.compile(r"^(\d{8})-(\d{2})$")
 REQUIRED = ["id", "conjecture", "module", "declaration", "submitted_by", "submitted_at", "source"]
 errors = []
+claim_ids = set()   # 声明编号全库唯一
 
 def err(p, msg): errors.append(f"{p}: {msg}")
 
@@ -50,8 +51,14 @@ for cdir in sorted(p for p in ROOT.iterdir() if p.is_dir()):
         if re.search(r"\bsorry\b", code): err(lf, "contains `sorry`")
         if re.search(r"^\s*(axiom|opaque|constant)\b", code, re.M): err(lf, "declares an axiom/opaque/constant")
         for cp in meta.get("claimed_proofs") or []:
-            for k in ("claimant", "date", "url"):
+            for k in ("id", "direction", "registered_at", "claimant", "date", "url"):
                 if not cp.get(k): err(mj, f"claimed proof missing {k}")
+            if not re.match(r"^P\d{8}-\d{2}$", cp.get("id") or ""): err(mj, f"声明编号应为 PYYYYMMDD-NN，实际为 {cp.get('id')!r}")
+            elif cp["id"] in claim_ids: err(mj, f"声明编号重复：{cp['id']}")
+            claim_ids.add(cp.get("id"))
+            if cp.get("direction") not in ("prove", "disprove"): err(mj, f"声明方向只能是 prove 或 disprove：{cp.get('direction')!r}")
+            for n in ((cp.get("verification") or {}).get("native_decide") or []):
+                if "._native.native_decide." not in n: err(mj, f"native_decide 记录格式不对：{n!r}")
         lic = meta.get("license")
         if lic is not None and lic not in licenses.ALLOWED: err(mj, f"不支持的许可：{lic!r}")
         if (meta.get("source") or {}).get("kind") in ("adapted", "verbatim") and not lic:

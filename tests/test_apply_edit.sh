@@ -23,7 +23,27 @@ expect 1 "claim branch"     '{"v":1,"type":"claim","target":"20261014-02",'"$ED"
 expect 1 "claim not github" '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","repo":"https://evil.org/a/b","commit":"0123456789abcdef0123456789abcdef01234567","module":"M.A","theorem":"M.t"}}' "github.com"
 expect 1 "claim reserved"   '{"v":1,"type":"claim","target":"20261014-02",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","repo":"https://github.com/a/b","commit":"0123456789abcdef0123456789abcdef01234567","module":"Mathlib.Evil","theorem":"M.t"}}' "不可用"
 expect 0 "claim pasted"     '{"v":1,"type":"claim","target":"20261014-01",'"$ED"',"data":{"claimant":"x","date":"2026-10-10","theorem":"Proof.ok","proof":"theorem Proof.ok : True := trivial"}}' "已通过"
-[ -f Proofs/S20261014_01_i1.lean ] && grep -q '"needs_proof": true' r.json && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: pasted proof not stored / needs_proof"; }
+[ -f Proofs/P20261015_02.lean ] && grep -q '"needs_proof": true' r.json && grep -q '"claim_id": "P20261015-02"' r.json && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: pasted proof not stored / needs_proof / claim id"; }
+python3 - <<'PY' && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: claim fields"; }
+import json
+c = json.load(open("Conjectures/Goldbach/S20261014_02.json"))["claimed_proofs"][0]
+assert c["id"] == "P20261015-01" and c["direction"] == "prove" and c["registered_at"] == "2026-10-15T03:00:00Z", c
+PY
+expect 0 "claim disprove"   '{"v":1,"type":"claim","target":"20261014-01",'"$ED"',"data":{"direction":"disprove","claimant":"x","date":"2026-10-10","theorem":"Proof.no","proof":"theorem Proof.no : True := trivial"}}' "P20261015-03（证否 #20261014-01）"
+grep -q '"direction": "disprove"' r.json && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: direction not passed to proof spec"; }
+expect 1 "claim bad direction" '{"v":1,"type":"claim","target":"20261014-01",'"$ED"',"data":{"direction":"maybe","claimant":"x","date":"2026-10-10","theorem":"Proof.no","proof":"x"}}' "方向"
+# GitHub 表单：方向下拉框
+FORM=$'### 方向\n\n证否（定理类型是它的否命题 ¬）\n\n### 表述编号\n\n20261014-04\n\n### 声称方\n\nx\n\n### 声称日期\n\n2026-10-10\n\n### 证明仓库\n\nhttps://github.com/a/d\n\n### 提交号\n\n0123456789abcdef0123456789abcdef01234567\n\n### 证明所在模块\n\nMyProof.Main\n\n### 定理名\n\nMyProof.no\n\n### 公告链接（可选）\n\n_No response_\n\n### 备注（可选，只写事实）\n\n_No response_'
+set +e; printf '%s' "$FORM" | python3 scripts/apply_edit.py --issue 3 --created-at 2026-10-15T05:00:00Z --result r.json --claim-form --author someone > /dev/null; set -e
+grep -q '"direction": "disprove"' r.json && grep -q '"ok": true' r.json && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: claim form direction"; cat r.json; }
+# 写入任务：GitHub 来源的证明会存档到 Proofs/<声明编号>/
+mkdir -p src/MyProof && echo "theorem MyProof.t : True := trivial" > src/MyProof/Main.lean && echo "x" > src/README.md && ln -s /etc/passwd src/MyProof/Evil.lean
+G2='"repo":"https://github.com/a/c","commit":"0123456789abcdef0123456789abcdef01234567","module":"MyProof.Main","theorem":"MyProof.t"'
+set +e; echo '{"v":1,"type":"claim","target":"20261014-03",'"$ED"',"data":{"claimant":"x","date":"2026-10-10",'"$G2"'}}' | issue \
+  | python3 scripts/apply_edit.py --issue 2 --created-at 2026-10-15T04:00:00Z --result r.json --verified '{"status":"passed"}' --archive-src src > /dev/null; set -e
+[ -f Proofs/P20261015_05/MyProof/Main.lean ] && [ ! -e Proofs/P20261015_05/MyProof/Evil.lean ] && [ ! -e Proofs/P20261015_05/README.md ] \
+  && grep -q '"archive": "Proofs/P20261015_05"' Conjectures/*/S20261014_03.json && grep -q 'Proofs/P20261015_05' r.json \
+  && pass=$((pass+1)) || { fail=$((fail+1)); echo "FAIL: github proof archive"; }
 expect 1 "meta conflict"    '{"v":1,"type":"meta","target":"20261014-01",'"$ED"',"data":{"restatement":"新"},"base":{"restatement":"旧"}}' "编辑冲突"
 expect 1 "meta forbidden"   '{"v":1,"type":"meta","target":"20261014-01",'"$ED"',"data":{"submitted_by":"me"}}' "不能编辑"
 expect 1 "meta no change"   '{"v":1,"type":"meta","target":"20261014-01",'"$ED"',"data":{"external_links":[]}}' "完全相同"

@@ -27,17 +27,19 @@ cat > Conjectures/ZzTest/S20000101_01.json <<'JSON'
  "declaration": "Registry.ZzTest.S20000101_01", "submitted_by": "test", "submitted_at": "2000-01-01",
  "source": {"kind": "original"}, "claimed_proofs": []}
 JSON
+sed -e 's/S20000101_01/S20000101_02/g' -e 's/1 + 1 = 2/1 + 1 = 3/' Conjectures/ZzTest/S20000101_01.lean > Conjectures/ZzTest/S20000101_02.lean
+sed -e 's/S20000101_01/S20000101_02/g' -e 's/20000101-01/20000101-02/' Conjectures/ZzTest/S20000101_01.json > Conjectures/ZzTest/S20000101_02.json
 echo '{"slug": "zztest", "name": "Test", "informal": "1 + 1 = 2"}' > Conjectures/ZzTest/conjecture.json
 cp lakefile.toml /tmp/lakefile.orig
 pass=0; fail=0
-run() {   # $1 期望(pass|fail)  $2 说明  $3 证明文件  $4 期望出现在消息里的文字
+run() {   # $1 期望(pass|fail)  $2 说明  $3 证明文件  $4 期望出现在消息里的文字  [$5 表述编号  $6 方向]
   rm -rf proof-out edit-out Submitted .lake/build/lib/lean/Proof .lake/build/lib/lean/Proof.*
   cp /tmp/lakefile.orig lakefile.toml
   mkdir -p edit-out
-  python3 - "$3" <<'PY' | python3 scripts/apply_edit.py --issue 7 --created-at 2026-10-15T00:00:00Z --result edit-out/result.json > /dev/null || true
+  python3 - "$3" "${5:-20000101-01}" "${6:-prove}" <<'PY' | python3 scripts/apply_edit.py --issue 7 --created-at 2026-10-15T00:00:00Z --result edit-out/result.json > /dev/null || true
 import json, sys
-sub = {"v": 1, "type": "claim", "target": "20000101-01", "editor": {"label": "测试"},
-       "data": {"claimant": "test", "date": "2026-10-14", "theorem": "Proof.ok", "proof": open(sys.argv[1]).read()}}
+sub = {"v": 1, "type": "claim", "target": sys.argv[2], "editor": {"label": "测试"},
+       "data": {"direction": sys.argv[3], "claimant": "test", "date": "2026-10-14", "theorem": "Proof.ok", "proof": open(sys.argv[1]).read()}}
 print("<!-- formalia-edit v1 -->\n```json\n" + json.dumps(sub, ensure_ascii=False) + "\n```")
 PY
   git checkout -q -- Conjectures/ 2>/dev/null || true   # apply_edit 写入的声明不影响后续测试
@@ -54,7 +56,10 @@ run pass "正确的证明"            tests/proofs/good.lean       "证明验证
 run fail "sorry"                 tests/proofs/sorry.lean      "sorry"
 run fail "类型不是表述本身"      tests/proofs/wrongtype.lean  "类型不是"
 run fail "自定义公理"            tests/proofs/axiom.lean      "非标准公理"
-run fail "native_decide"         tests/proofs/native.lean     "非标准公理"
+run pass "native_decide（内核重算后标出）" tests/proofs/native.lean "native_decide"
+run fail "伪造的 native_decide 公理" tests/proofs/fakenative.lean "内核没能" 20000101-02
+run pass "证否"                  tests/proofs/disprove.lean   "证否验证通过" 20000101-02 disprove
+run fail "证明当作证否提交"      tests/proofs/good.lean       "类型不是 ¬" 20000101-01 disprove
 run fail "自己重新定义表述"      tests/proofs/redefine.lean   "导入失败"
 run fail "导入登记库工具"        tests/proofs/badimport.lean  "不允许的导入"
 cp /tmp/lakefile.orig lakefile.toml

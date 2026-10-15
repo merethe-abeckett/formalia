@@ -64,7 +64,7 @@ Mathlib 一直在更新，名字和定义的细节偶尔会变。所以 Formalia
 - **公理**：不需要证明、直接承认的前提。Lean 的标准公理只有三条：`propext`、`Classical.choice`、`Quot.sound`，普通数学都建立在它们之上。用了别的公理，就是多加了假设。
 - **内核**：Lean 里最终负责检查证明的那一小段程序。
 
-所以 Formalia 的检查器会看：有没有 sorry、有没有 native_decide、用了哪些公理。三项都干净，才算可靠的证明。
+所以 Formalia 的检查器会看：有没有 sorry、用了哪些公理、有没有 native_decide。用了 native_decide 的证明，登记库不直接相信，而是让内核把那一步重新算一遍，算出来一致才登记，并在页面上标出感叹号。
 
 ## 机器能保证什么，不能保证什么
 

@@ -101,6 +101,7 @@ jobs:
     outputs:
       ok: ${{ steps.verify.outputs.ok }}
       axioms: ${{ steps.verify.outputs.axioms }}
+      native: ${{ steps.verify.outputs.native }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -150,6 +151,7 @@ jobs:
           EXPECT_TARGET: ${{ needs.check.outputs.target }}
           NEEDS_PROOF: ${{ needs.check.outputs.needs_proof }}
           AXIOMS: ${{ needs.proof-check.outputs.axioms }}
+          NATIVE: ${{ needs.proof-check.outputs.native }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           git config user.name "formalia-bot"
@@ -157,12 +159,26 @@ jobs:
           args=(--issue "$ISSUE" --created-at "$CREATED" --result /tmp/result.json)
           [ "$MODE" = "claim-form" ] && args+=(--claim-form --author "$AUTHOR")
           if [ "$NEEDS_PROOF" = "true" ]; then
+            # GitHub 来源的证明：拉取同一个固定提交，只读文本、不执行，存档到 Proofs/<声明编号>/。拉取失败不影响登记。
+            src=$(printf '%s' "$BODY" | python3 scripts/apply_edit.py "${args[@]}" > /dev/null 2>&1; python3 -c '
+          import json; p = json.load(open("/tmp/result.json")).get("proof") or {}
+          print(p.get("repo", "") + " " + p.get("commit", "") if p.get("kind") == "github" else "")')
+            if [ -n "$src" ]; then
+              read -r repo commit <<< "$src"
+              rm -rf /tmp/proof-src && git init -q /tmp/proof-src \
+                && GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1 timeout 600 git -C /tmp/proof-src fetch -q --depth 1 "$repo" "$commit" \
+                && git -C /tmp/proof-src -c core.symlinks=false checkout -q FETCH_HEAD \
+                && args+=(--archive-src /tmp/proof-src) || echo "存档拉取失败，跳过存档"
+            fi
+            git checkout -q -- . && git clean -qfd -- Proofs Conjectures Essays
             verified=$(python3 - <<'PY'
           import datetime, json, os, re
           ax = [a for a in os.environ.get("AXIOMS", "").split(",") if a]
           assert all(a in ("propext", "Classical.choice", "Quot.sound") for a in ax), ax
+          native = [a for a in os.environ.get("NATIVE", "").split(",") if a]
+          assert all(re.fullmatch(r"[A-Za-z0-9_.'«»]+\._native\.native_decide\.[A-Za-z0-9_]+", a) for a in native), native
           tc = open("lean-toolchain").read().strip().split(":")[-1]
-          print(json.dumps({"status": "passed", "lean": tc, "mathlib": "v4.29.0", "axioms": ax,
+          print(json.dumps({"status": "passed", "lean": tc, "mathlib": "v4.29.0", "axioms": ax, "native_decide": native,
                             "checked_at": datetime.date.today().isoformat(), "run": os.environ["RUN_URL"]}, ensure_ascii=False))
           PY
             )
@@ -181,7 +197,7 @@ jobs:
           open("/tmp/commit_msg.txt", "w").write(r["commit_message"])
           open("/tmp/changed.txt", "w").write("\n".join(r["changed"]) + "\n")
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write(f"kind={r['kind']}\ntarget={r['target']}\n")
+              f.write(f"kind={r['kind']}\ntarget={r['target']}\nclaim={r.get('claim_id') or ''}\n")
           PY
             xargs -d '\n' git add -- < /tmp/changed.txt
             git commit -q -F /tmp/commit_msg.txt
@@ -194,9 +210,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           ISSUE: ${{ github.event.issue.number }}
           TARGET: ${{ steps.apply.outputs.target }}
+          CLAIM: ${{ steps.apply.outputs.claim }}
         run: |
           sha=$(git rev-parse --short HEAD)
           case "$TARGET" in [0-9]*) label="表述 #${TARGET}";; J*) label="解读 ${TARGET}";; *) label="猜想 ${TARGET}";; esac
+          [ -n "$CLAIM" ] && label="声明 ${CLAIM}（${label}）"
           { echo "<!-- formalia-bot -->"
             echo "### 已写入"
             echo

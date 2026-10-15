@@ -267,6 +267,11 @@ def page(title, crumbs, body, depth, home=False):
 <a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · <a href="{rel}about/contact.html">联系作者</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
 </body></html>"""
 
+def claim_counts(meta, rel):
+    cps = meta.get("claimed_proofs") or []
+    n = lambda d: sum(1 for c in cps if (c.get("direction") or "prove") == d)
+    return f'<a href="{rel}#prove">{n("prove")} 条证明</a> · <a href="{rel}#disprove">{n("disprove")} 条证否</a>'
+
 def status_cell(rep):
     if rep is None:
         return '<span class="warn">未运行</span>'
@@ -331,6 +336,45 @@ def edit_link(rel, **q):
 
 def kind_zh(k): return KIND_ZH.get(k, k)
 
+NATIVE_NOTE = ("！表示证明用了 native_decide：它让电脑直接运行编译后的程序算出结果，正常情况下要额外信任编译器。"
+               "登记库不信这一步，而是让 Lean 内核把同样的计算重新算了一遍，结果一致才登记。")
+
+def claims_table(cps):
+    """一组证明或证否声明：编号、自称的声称方、登记时间、证明在哪、验证结果。"""
+    out = ("<table><tr><th>编号</th><th>声称方（自称）</th><th>登记时间</th><th>证明</th><th>验证</th><th>备注</th></tr>")
+    native = False
+    for c in cps:
+        note = esc(c.get('note',''))
+        if c.get('issue'): note += f' <a href="{esc(c["issue"])}">议题</a>'
+        if c.get('announcement'): note += f' <a href="{esc(c["announcement"])}" rel="nofollow ugc">公告</a>'
+        else: note += ' <span class="muted">未附公告</span>'
+        note += f'<br><span class="muted">自填日期 {esc(c.get("date",""))} · 登记者 {esc(c.get("recorded_by",""))}</span>'
+        pr = c.get("proof") or {}
+        if pr.get("source") == "github":
+            where = (f'<a href="{esc(c["url"])}" rel="nofollow ugc">{esc(pr["repo"].removeprefix("https://github.com/"))}</a>'
+                     f'<br><code>{esc(pr["commit"][:12])}</code> · <code>{esc(pr["theorem"])}</code>')
+            if pr.get("archive"): where += f'<br><a href="{REPO_URL}/tree/main/{esc(pr["archive"])}">登记库存档</a>'
+        elif pr.get("source") == "pasted":
+            where = f'<a href="../../{esc(pr["file"].replace("Proofs/", "proofs/").replace(".lean", ".txt"))}">粘贴的文件</a><br><code>{esc(pr["theorem"])}</code>'
+        else:
+            where = f'<a href="{esc(c.get("url",""))}" rel="nofollow ugc">{esc(c.get("url",""))}</a>'
+        v = c.get("verification") or {}
+        if v.get("status") == "passed":
+            nd = v.get("native_decide") or []
+            native = native or bool(nd)
+            ver = ('<span class="ok">通过</span>' + (' <span class="warn" title="用了 native_decide，已由内核重新计算">！native_decide</span>' if nd else "")
+                   + f'<br><span class="muted">Lean {esc(v.get("lean",""))} · Mathlib {esc(v.get("mathlib",""))} · {esc(v.get("checked_at",""))}</span>'
+                   + (f' <a href="{esc(v["run"])}">记录</a>' if v.get("run") else ""))
+        else:
+            ver = '<span class="warn">未验证</span>'
+        reg = (c.get("registered_at") or "").replace("T", " ").replace("Z", " UTC")
+        cid = c.get("id") or ""
+        out += (f'<tr id="{esc(cid)}"><td><code>{esc(cid) or "—"}</code></td><td>{esc(c.get("claimant",""))}</td><td>{esc(reg) or "—"}</td>'
+                f'<td>{where}</td><td>{ver}</td><td>{note}</td></tr>')
+    out += "</table>"
+    if native: out += f'<p class="note">{NATIVE_NOTE}</p>'
+    return out
+
 def render_statement(conj, meta, lean_src, check, tc, deps):
     sid = meta["id"]; decl = find_decl(check, meta["declaration"])
     cname = conj.get("name_zh") or conj["name"]
@@ -351,6 +395,7 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
         ("Lean 工具链", f"<code>{esc(tc)}</code>"),
         ("依赖（钉死版本）", "<br>".join(f"<code>{esc(n)}</code> @ <code>{esc(r)}</code>" + (f" ({esc(i)})" if i else "") for n,r,i in deps) or "—"),
         ("CI 检查", status_cell(decl)),
+        ("证明 / 证否", claim_counts(meta, "")),
         ("解读", essays_line(sid, "../../")),
     ]
     table = "<table>" + "".join(f"<tr><th>{k}</th><td>{v}</td></tr>" for k,v in rows) + "</table>"
@@ -368,6 +413,9 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     body += (f'<div class="actions"><a class="btn" href="{esc(live_url(lean_src, meta["declaration"]))}" target="_blank" rel="noopener">在 Lean 4 Web 中试编译 ↗</a></div>'
              '<p class="note">在浏览器里直接编译这段代码，不用安装任何东西。Lean 4 Web 使用最新版 Mathlib，和本站钉死的版本可能不同：'
              '那边报错不一定说明代码有问题，权威结果以下面的检查器报告为准。</p>')
+    body += (f'<h3>否命题 ¬#{esc(sid)}</h3><pre><code>¬ {esc(meta["declaration"])}</code></pre>'
+             '<p class="note">每条表述都自带它的否命题，登记在同一个编号下。证明命题，就是证明这条表述；证明否命题，就是证否它。'
+             '两种声明都列在下面的“证明与证否”里。</p>')
 
     body += "<h2>检查器报告</h2>"
     if decl is None:
@@ -416,34 +464,17 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     else:
         body += '<p class="muted">未提供</p>'
 
-    body += "<h2>声称的证明</h2>"
-    body += ('<p class="note">每条证明在登记前都经过机器验证：用钉死版本的 Lean 和 Mathlib 编译，定理的类型正好是这条 Lean 表述，'
-             '没有 sorry，只用标准公理，并经 Lean 内核重放。验证的是“证明了这段 Lean 代码”，不是“证明了原猜想”。'
-             '有问题可以提出质疑，按提删流程处理。</p>')
-    if not meta.get("archived"):
-        body += f'<p><a class="btn" href="{edit_link("../../", type="claim", target=sid)}">＋ 声明证明了这条表述</a></p>'
-    cps = meta.get("claimed_proofs") or []
-    if cps:
-        body += "<table><tr><th>声称方</th><th>日期</th><th>证明</th><th>验证</th><th>备注</th><th>登记者</th></tr>"
-        for c in cps:
-            note = esc(c.get('note',''))
-            if c.get('issue'): note += f' <a href="{esc(c["issue"])}">议题</a>'
-            if c.get('announcement'): note += f' <a href="{esc(c["announcement"])}" rel="nofollow ugc">公告</a>'
-            pr = c.get("proof") or {}
-            if pr.get("source") == "github":
-                where = (f'<a href="{esc(c["url"])}" rel="nofollow ugc">{esc(pr["repo"].removeprefix("https://github.com/"))}</a>'
-                         f'<br><code>{esc(pr["commit"][:12])}</code> · <code>{esc(pr["theorem"])}</code>')
-            elif pr.get("source") == "pasted":
-                where = f'<a href="../../{esc(pr["file"].replace("Proofs/", "proofs/").replace(".lean", ".txt"))}">粘贴的文件</a><br><code>{esc(pr["theorem"])}</code>'
-            else:
-                where = f'<a href="{esc(c.get("url",""))}" rel="nofollow ugc">{esc(c.get("url",""))}</a>'
-            v = c.get("verification") or {}
-            ver = (f'<span class="ok">通过</span><br><span class="muted">Lean {esc(v.get("lean",""))} · Mathlib {esc(v.get("mathlib",""))} · {esc(v.get("checked_at",""))}</span>'
-                   + (f' <a href="{esc(v["run"])}">记录</a>' if v.get("run") else "")) if v.get("status") == "passed" else '<span class="warn">未验证</span>'
-            body += f"<tr><td>{esc(c.get('claimant',''))}</td><td>{esc(c.get('date',''))}</td><td>{where}</td><td>{ver}</td><td>{note}</td><td>{esc(c.get('recorded_by',''))}</td></tr>"
-        body += "</table>"
-    else:
-        body += '<p class="muted">暂无记录</p>'
+    body += "<h2>证明与证否</h2>"
+    body += ('<p class="note">每条声明在登记前都经过机器验证：用钉死版本的 Lean 和 Mathlib 编译，定理的类型正好是命题（证否时正好是否命题），'
+             '没有 sorry，只用标准公理，并经 Lean 内核重放。验证的是“证明了这段 Lean 代码”，不是“证明了原猜想”；验证通过也不代表登记库背书。'
+             '声称方是提交者自己填的，登记库不核实身份。谁先谁后以登记时间为准。有问题可以提出质疑，按提删流程处理。</p>')
+    cps = sorted(meta.get("claimed_proofs") or [], key=lambda c: c.get("id") or "")
+    for direction, title, neg in (("prove", "证明：命题成立", ""), ("disprove", "证否：否命题成立", "¬ ")):
+        mine = [c for c in cps if (c.get("direction") or "prove") == direction]
+        body += f'<h3 id="{direction}">{title} <span class="muted" style="font-weight:400">· <code>{neg}{esc(meta["declaration"])}</code></span></h3>'
+        if not meta.get("archived"):
+            body += f'<p><a class="btn" href="{edit_link("../../", type="claim", target=sid, **({"dir": "disprove"} if neg else {}))}">＋ 声明{"证否" if neg else "证明"}了这条表述</a></p>'
+        body += claims_table(mine) if mine else '<p class="muted">暂无记录</p>'
 
     body += "<h2>外部链接</h2>"
     els = meta.get("external_links") or []
@@ -461,9 +492,9 @@ def render_conjecture(conj, entries, archived=()):
     body += '<p class="note">这是一个消歧义页，列出登记在该猜想之下的全部形式化表述。登记库不判断其中哪一条（如果有）等价于自然语言表述。</p>'
     body += (f'<div class="actions"><a class="btn" href="{edit_link("../", type="statement", conjecture=conj["slug"])}">＋ 新增一条表述</a>'
              f'<a class="btn" href="{edit_link("../", type="conjecture", target=conj["slug"])}">编辑猜想信息</a></div>')
-    body += "<h2>已登记的表述</h2><table><tr><th>编号</th><th>Lean 声明</th><th>提交</th><th>来源</th><th>CI 检查</th><th>声称的证明</th></tr>"
+    body += "<h2>已登记的表述</h2><table><tr><th>编号</th><th>Lean 声明</th><th>提交</th><th>来源</th><th>CI 检查</th><th>证明 / 证否</th></tr>"
     for meta, decl in entries:
-        body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(meta.get("submitted_at",""))} · {esc(meta.get("submitted_by",""))}</td><td>{esc(kind_zh(meta.get("source",{}).get("kind","")))}</td><td>{status_cell(decl)}</td><td>{len(meta.get("claimed_proofs") or [])}</td></tr>'
+        body += f'<tr><td><a href="{esc(meta["id"])}/index.html">#{esc(meta["id"])}</a></td><td><code>{esc(meta["declaration"])}</code></td><td>{esc(meta.get("submitted_at",""))} · {esc(meta.get("submitted_by",""))}</td><td>{esc(kind_zh(meta.get("source",{}).get("kind","")))}</td><td>{status_cell(decl)}</td><td>{claim_counts(meta, esc(meta["id"]) + "/index.html")}</td></tr>'
     body += "</table>"
     if archived:
         body += "<h2>已归档的表述</h2><p class='note'>经提删公示后移出现行目录（见 docs/DELETION.md）。编号永不复用，各编号所指的原文保留于此。</p>"
@@ -494,9 +525,9 @@ Formalia 把每一种写法固定下来，给它一个永久编号，再记录�
 <div class="steps">
 <div class="step"><span class="k">猜想</span><b>自然语言的命题</b><p>例如哥德巴赫猜想。每个猜想一个页面，列出它的各种 Lean 写法。</p></div>
 <div class="step"><span class="k">#20261014-01</span><b>表述</b><p>一段 Lean 代码，一个永久编号。编号指向的代码永远不变。</p></div>
-<div class="step"><span class="k">声称的证明</span><b>谁证明了哪个编号</b><p>只记录声明和链接，不托管证明，也不认证。</p></div>
+<div class="step"><span class="k">P20261015-01</span><b>证明与证否</b><p>谁证明或证否了哪个编号。每条声明都有编号、经机器验证并存档；验证通过不代表登记库背书。</p></div>
 </div>
-<div class="stats"><div><b>{len(conjs)}</b>个猜想</div><div><b>{n_stmt}</b>条表述</div><div><b>{n_claim}</b>条证明声明</div>
+<div class="stats"><div><b>{len(conjs)}</b>个猜想</div><div><b>{n_stmt}</b>条表述</div><div><b>{n_claim}</b>条证明 / 证否</div>
 <div><b>{"全部通过" if check_ok else "见各条目"}</b>自动检查</div><div><b style="font-size:15px;line-height:2"><code>{esc(tc.split(":")[-1])}</code> · Mathlib <code>{esc(mathlib)}</code></b>工具链</div></div>
 <h2 id="conjectures">猜想</h2><ul class="cards">'''
     for c, n in conjs:
@@ -633,7 +664,7 @@ def write_search(index_rows, essays=()):
             guide = GUIDES / conj["_dir"] / (mj.stem + ".md")
             gtext = re.sub(r"<!--.*?-->", "", guide.read_text(encoding="utf-8"), flags=re.S) if guide.exists() else ""
             doc = " ".join(x for x in [(m.get("informal_restatement") or {}).get("text"), (m.get("source") or {}).get("note"),
-                                       " ".join(c.get("claimant", "") for c in m.get("claimed_proofs") or []),
+                                       " ".join(f'{c.get("id", "")} {c.get("claimant", "")}' for c in m.get("claimed_proofs") or []),
                                        re.sub(r"[*`#]", "", gtext)] if x)
             docs.append({"kind": "s", "url": f'{conj["slug"]}/{m["id"]}/index.html', "title": f'#{m["id"]}',
                          "sub": cname, "text": re.sub(r"\s+", " ", doc).strip(), "code": f'{m["declaration"]} {code}'})

@@ -7,7 +7,8 @@
 输入：议题正文从 stdin 读入。
   - 网站提交：正文里有一个 ```json 代码块，紧跟标记 <!-- formalia-edit v1 -->
   - GitHub 声明表单：用 --claim-form --author <login> 解析 claim.yml 表单
-输出：--result 指定的 JSON 文件 {ok, message, kind, target, changed, needs_lean, commit_message}
+输出：--result 指定的 JSON 文件 {ok, message, kind, target, claim_id, changed, needs_lean, commit_message}
+声明证明写入时（--verified）可以再给 --archive-src：已拉取的证明仓库目录，把证明文件存档到 Proofs/<声明编号>/。
 退出码：0 成功，1 提交内容有问题（message 写给提交者看），2 用法错误。
 
 提交格式（v1）：
@@ -31,9 +32,10 @@ ESSAYS = ROOT / "Essays"
 MARKER = "<!-- formalia-edit v1 -->"
 ID_RE = re.compile(r"^(\d{8})-(\d{2})$")
 ESSAY_ID_RE = re.compile(r"^J(\d{8})-(\d{2})$")
+CLAIM_ID_RE = re.compile(r"^P(\d{8})-(\d{2})$")
 ESSAY_MAX = 20000   # 议题正文上限 65536 字符，留足余量
 URL_RE = re.compile(r"^https?://[^\s<>\"'`]+$")
-TYPE_ZH = {"claim": "声明证明", "meta": "编辑表述信息", "conjecture": "编辑猜想信息", "statement": "新增表述", "essay": "解读"}
+TYPE_ZH = {"claim": "声明证明或证否", "meta": "编辑表述信息", "conjecture": "编辑猜想信息", "statement": "新增表述", "essay": "解读"}
 
 class EditError(Exception):
     pass
@@ -103,6 +105,7 @@ def check_base(base, field, current):
 
 PENDING = {}   # 路径 -> 内容；全部检查通过后才一次性写盘
 PROOF_SPEC = {}  # 声明证明时：交给验证任务的证明说明
+CLAIM_ID = []    # 声明证明时：新声明的编号
 
 def write_json(p, obj):
     PENDING[p] = json.dumps(obj, ensure_ascii=False, indent=2) + "\n"
@@ -124,13 +127,41 @@ RESERVED_ROOTS = {"Conjectures", "RegistryTools", "Mathlib", "Batteries", "Lean"
                   "Plausible", "ProofWidgets", "LeanSearchClient", "ImportGraph", "Cli", "Main", "Submitted", "Archive", "Essays", "Proofs"}
 PROOF_MAX = 40000   # 粘贴的证明：议题正文上限 65536 字符，JSON 转义后要放得下
 
-def clean_proof(d, sid, issue):
+def utc_date(created_at):
+    return datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00")).astimezone(datetime.timezone.utc).strftime("%Y%m%d")
+
+def next_claim_id(date):
+    """声明编号 PYYYYMMDD-NN：按登记日期（UTC）排，全库统一编号，归档的也算，永不复用。"""
+    nns = [int(m.group(2)) for base in (CONJ, ARCH) if base.exists() for f in base.glob("*/S*.json")
+           for c in json.loads(f.read_text(encoding="utf-8")).get("claimed_proofs") or []
+           for m in [CLAIM_ID_RE.match(c.get("id") or "")] if m and m.group(1) == date]
+    nn = max(nns, default=0) + 1
+    if nn > 99: raise EditError("今天登记的证明声明已达 99 条上限，请明天再试")
+    return f"P{date}-{nn:02d}"
+
+ARCHIVE_MAX_FILES, ARCHIVE_MAX_BYTES = 500, 5 * 1024 * 1024
+
+def archive_files(src, root):
+    """从已拉取的证明仓库里挑出要存档的文件：<root>.lean 和 <root>/ 下的 .lean，规则和编译时一样。超出上限返回 None。"""
+    src = Path(src).resolve()
+    files = ([Path(f"{root}.lean")] if (src / f"{root}.lean").is_file() else []) + \
+            ([q.relative_to(src) for q in sorted((src / root).rglob("*.lean"))] if (src / root).is_dir() else [])
+    out, total = [], 0
+    for rel in files:
+        q = src / rel
+        if q.is_symlink() or not q.resolve().is_relative_to(src): continue
+        total += q.stat().st_size
+        if len(out) >= ARCHIVE_MAX_FILES or total > ARCHIVE_MAX_BYTES: return None
+        out.append((rel, q.read_text(encoding="utf-8", errors="replace")))
+    return out
+
+def clean_proof(d, cid):
     """证明的来源：GitHub 仓库的固定提交，或者直接粘贴的单个文件。返回写进登记的字段和交给验证任务的说明。"""
     theorem = clean(d.get("theorem"), 200, "定理名", required=True)
     if not LEAN_NAME_RE.match(theorem): raise EditError("定理名格式不对，应为 Lean 名字，例如 MyProof.goldbach")
     if d.get("proof"):
         text = clean(d.get("proof"), PROOF_MAX, "证明代码", multiline=True, required=True)
-        path = f"Proofs/S{sid.replace('-', '_')}_i{issue}.lean"
+        path = f"Proofs/{cid.replace('-', '_')}.lean"
         return ({"source": "pasted", "file": path, "theorem": theorem},
                 {"kind": "pasted", "text": text, "root": "Proof", "module": "Proof", "theorem": theorem, "store": path})
     m = REPO_RE.match(clean(d.get("repo"), 300, "仓库链接", required=True))
@@ -146,12 +177,20 @@ def clean_proof(d, sid, issue):
     return ({"source": "github", "repo": repo, "commit": commit, "module": module, "theorem": theorem},
             {"kind": "github", "repo": repo, "commit": commit, "root": root, "module": module, "theorem": theorem})
 
-def apply_claim(sub, editor, issue=0, verified=None):
+DIRECTION_ZH = {"prove": "证明", "disprove": "证否"}
+
+def apply_claim(sub, editor, created_at, verified=None, archive_src=None):
     p = find_statement(sub.get("target"))
     d = sub.get("data") or {}
     meta = json.loads(p.read_text(encoding="utf-8"))
-    proof, spec = clean_proof(d, meta["id"], issue)
+    direction = d.get("direction") or "prove"
+    if direction not in DIRECTION_ZH: raise EditError("方向只能是证明（prove）或证否（disprove）")
+    cid = next_claim_id(utc_date(created_at))
+    proof, spec = clean_proof(d, cid)
     claim = {
+        "id": cid,
+        "direction": direction,
+        "registered_at": datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00")).astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "claimant": clean(d.get("claimant"), 120, "声称方", required=True),
         "date": clean_date(d.get("date"), "声称日期"),
         "url": (f"{proof['repo']}/tree/{proof['commit']}" if proof["source"] == "github"
@@ -167,6 +206,12 @@ def apply_claim(sub, editor, issue=0, verified=None):
         and (c.get("proof") or {}).get("theorem") == proof["theorem"]
     if proof["source"] == "github" and any(same(c) for c in claims):
         raise EditError(f"这个提交里的这个定理已经登记在 #{meta['id']} 下了")
+    if proof["source"] == "github" and verified and archive_src:
+        files = archive_files(archive_src, spec["root"])
+        if files:
+            proof["archive"] = f"Proofs/{cid.replace('-', '_')}"
+            for rel, text in files:
+                write_text(ROOT / proof["archive"] / rel, text)
     if len(claims) >= 200: raise EditError("该表述的声明条数已达上限")
     claims.append(claim)
     write_json(p, meta)
@@ -174,8 +219,10 @@ def apply_claim(sub, editor, issue=0, verified=None):
     if spec["kind"] == "pasted":
         sp = ROOT / spec["store"]
         write_text(sp, spec["text"] + "\n"); changed.append(sp)
-    spec.update(statement=meta["declaration"], statement_module=meta["module"])
+    if proof.get("archive"): changed.append(ROOT / proof["archive"])
+    spec.update(statement=meta["declaration"], statement_module=meta["module"], direction=direction)
     PROOF_SPEC.update(spec)
+    CLAIM_ID.append(cid)
     return meta["id"], changed, False
 
 META_FIELDS = {
@@ -279,7 +326,7 @@ def apply_statement(sub, editor, created_at):
     doc = clean(d.get("doc"), 2000, "说明", multiline=True)
     if errs: raise EditError("Lean 代码不符合登记库规范：\n- " + "\n- ".join(errs))
 
-    date = datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00")).astimezone(datetime.timezone.utc).strftime("%Y%m%d")
+    date = utc_date(created_at)
     sid = next_id(date)
     stem = "S" + sid.replace("-", "_")
     ns = f"Registry.{cdir.name}"
@@ -377,7 +424,7 @@ def apply_essay(sub, editor, created_at):
     body = clean(d.get("body"), ESSAY_MAX, "正文", multiline=True, required=True)
     lic = clean(d.get("license"), 40, "许可") or licenses.DEFAULT
     if lic not in licenses.ALLOWED: raise EditError("许可只能是：" + "、".join(licenses.ALLOWED))
-    date = datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00")).astimezone(datetime.timezone.utc).strftime("%Y%m%d")
+    date = utc_date(created_at)
     nns = [int(m.group(1)) for f in (ESSAYS.glob(f"J{date}_*.json") if ESSAYS.exists() else []) for m in [re.match(rf"J{date}_(\d\d)\.", f.name)] if m]
     nn = max(nns, default=0) + 1
     if nn > 99: raise EditError("今天的解读已达 99 篇上限，请明天再试")
@@ -405,9 +452,10 @@ def parse_claim_form(body, author):
         v = m.group(2).strip()
         f[m.group(1).strip()] = "" if v == "_No response_" else v
     return {"v": 1, "type": "claim", "target": f.get("表述编号", "").lstrip("#").strip(),
-            "summary": "经 GitHub 表单声明证明",
+            "summary": "经 GitHub 表单声明" + ("证否" if "证否" in f.get("方向", "") else "证明"),
             "editor": {"label": f"GitHub 用户 {author}", "anon": "", "name": author},
-            "data": {"claimant": f.get("声称方"), "date": f.get("声称日期"), "repo": f.get("证明仓库"),
+            "data": {"direction": "disprove" if "证否" in f.get("方向", "") else "prove",
+                     "claimant": f.get("声称方"), "date": f.get("声称日期"), "repo": f.get("证明仓库"),
                      "commit": f.get("提交号"), "module": f.get("证明所在模块"), "theorem": f.get("定理名"),
                      "url": f.get("公告链接（可选）"), "note": f.get("备注（可选，只写事实）")}}
 
@@ -419,9 +467,10 @@ def main():
     ap.add_argument("--claim-form", action="store_true")
     ap.add_argument("--author", default="")
     ap.add_argument("--verified", default="", help="证明验证通过后由写入任务传入：验证记录 JSON")
+    ap.add_argument("--archive-src", default="", help="写入任务传入：已拉取的证明仓库目录，用来存档 GitHub 来源的证明")
     a = ap.parse_args()
     body = sys.stdin.read()
-    res = {"ok": False, "message": "", "kind": None, "target": None, "changed": [], "needs_lean": False, "needs_proof": False, "proof": None, "commit_message": ""}
+    res = {"ok": False, "message": "", "kind": None, "target": None, "claim_id": None, "changed": [], "needs_lean": False, "needs_proof": False, "proof": None, "commit_message": ""}
     try:
         sub = parse_claim_form(body, a.author) if a.claim_form else parse_web(body)
         kind = sub.get("type")
@@ -429,14 +478,15 @@ def main():
         ed = sub.get("editor") or {}
         editor = clean(ed.get("label"), 80, "编辑者", required=True)
         summary = clean(sub.get("summary"), 200, "编辑摘要") or TYPE_ZH[kind]
-        if kind == "claim": target, changed, lean = apply_claim(sub, editor, a.issue, json.loads(a.verified) if a.verified else None)
+        if kind == "claim": target, changed, lean = apply_claim(sub, editor, a.created_at, json.loads(a.verified) if a.verified else None, a.archive_src or None)
         elif kind == "meta": target, changed, lean = apply_meta(sub, editor)
         elif kind == "conjecture": target, changed, lean = apply_conjecture(sub, editor)
         elif kind == "essay": target, changed, lean = apply_essay(sub, editor, a.created_at)
         else: target, changed, lean = apply_statement(sub, editor, a.created_at)
         flush()
         label = f"#{target}" if ID_RE.match(target) else target
-        res.update(ok=True, kind=kind, target=target, needs_lean=lean, needs_proof=bool(PROOF_SPEC), proof=PROOF_SPEC or None,
+        if CLAIM_ID: label = f"{CLAIM_ID[0]}（{DIRECTION_ZH[PROOF_SPEC['direction']]} #{target}）"
+        res.update(ok=True, kind=kind, target=target, claim_id=(CLAIM_ID or [None])[0], needs_lean=lean, needs_proof=bool(PROOF_SPEC), proof=PROOF_SPEC or None,
                    changed=[str(p.relative_to(ROOT)) for p in changed],
                    message=f"{TYPE_ZH[kind]} {label} 已通过格式检查。",
                    commit_message=f"网页编辑：{TYPE_ZH[kind]} {label}：{summary}\n\n编辑者：{editor}\n议题：#{a.issue}\n")

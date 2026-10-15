@@ -16,7 +16,7 @@
   const type = params.get("type") || "";
   const target = params.get("target") || "";
   const root = $("#edit-root");
-  const TITLES = { claim: "声明证明了一条表述", meta: "编辑表述信息", conjecture: "编辑猜想信息", statement: "新增一条表述", essay: target ? "修改解读" : "写一篇解读" };
+  const TITLES = { claim: "声明证明或证否了一条表述", meta: "编辑表述信息", conjecture: "编辑猜想信息", statement: "新增一条表述", essay: target ? "修改解读" : "写一篇解读" };
   const sha256 = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s.trim())))].map(b => b.toString(16).padStart(2, "0")).join("");
   const splitAbout = (s) => s.split(/[\s,，、;；]+/).map(x => x.trim().replace(/^#/, "")).filter(Boolean);
 
@@ -51,31 +51,58 @@
       form.append(el("p", {}, "对象：", el("a", { href: `../${st.conjecture}/${target}/index.html`, text: `#${target}` }), `（${st.conjecture_name}）`));
       if (type === "claim") {
         const today = new Date().toISOString().slice(0, 10);
+        const dir = el("select", { name: "direction" },
+          el("option", { value: "prove", text: "证明：这条表述成立" }),
+          el("option", { value: "disprove", text: "证否：这条表述不成立（证明它的否命题）", selected: params.get("dir") === "disprove" }));
         const how = el("select", { name: "how" }, el("option", { value: "github", text: "GitHub 仓库的固定提交（多文件项目）" }),
           el("option", { value: "pasted", text: "直接粘贴（单个文件）" }));
         const gh = el("fieldset", {}, el("legend", { text: "GitHub 仓库" }),
           field("仓库 *", text("repo", "", { maxlength: 300, placeholder: "https://github.com/用户名/仓库名" })),
-          field("提交号 *", text("commit", "", { maxlength: 40, pattern: "[0-9a-f]{40}", spellcheck: "false", class: "mono" }), "完整的 40 位 commit，不能是分支名。登记的是这个固定版本。"),
+          field("提交号 *", text("commit", "", { maxlength: 40, pattern: "[0-9a-f]{40}", spellcheck: "false", class: "mono" }), "完整的 40 位 commit，不能是分支名。登记的是这个固定版本，验证通过后登记库会存一份副本。"),
           field("证明所在模块 *", text("module", "", { maxlength: 200, placeholder: "MyProof.Main", spellcheck: "false" }),
             "定理所在文件的模块名。只会拉取顶层名对应的 MyProof.lean 和 MyProof/ 目录下的 .lean 文件，不用你的 lakefile。"));
+        const proofArea = area("proof", "", 14, { maxlength: 40000, spellcheck: "false", class: "mono" });
+        const tryOut = el("span", { class: "fh" });
+        const tryBtn = el("button", { type: "button", class: "btn", text: "在 Lean 4 Web 中试编译 ↗" });
         const ps = el("fieldset", {}, el("legend", { text: "粘贴证明" }),
-          field("证明代码 *", area("proof", "", 14, { maxlength: 40000, spellcheck: "false", class: "mono",
-            placeholder: `import ${st.module}\n\ntheorem Proof.ok : ${st.declaration} := by\n  sorry` }), "整个 .lean 文件，最多 4 万字符。"));
-        const toggle = () => { gh.hidden = how.value !== "github"; ps.hidden = how.value !== "pasted"; };
-        how.addEventListener("change", toggle);
-        form.append(
-          el("p", { class: "note" }, "提交后会自动编译检查：用 Lean 4.29.0 和 Mathlib v4.29.0 编译，定理的类型必须正好是 ",
-            el("code", { text: st.declaration }), "，没有 sorry，只用标准公理，并经 Lean 内核重放。不通过就不登记。证明里用 ",
-            el("code", { text: `import ${st.module}` }), " 导入这条表述。"),
-          field("声称方 *", text("claimant", "", { required: true, maxlength: 120, placeholder: "人名、机构名或模型名" })),
-          field("声称日期 *", text("date", today, { required: true, pattern: "\\d{4}-\\d{2}-\\d{2}" }), "格式 YYYY-MM-DD"),
+          field("证明代码 *", proofArea, "整个 .lean 文件，最多 4 万字符。"),
+          el("div", { class: "actions" }, tryBtn), tryOut);
+        const want = el("code"), note = el("p", { class: "note" });
+        const sync = () => {
+          const neg = dir.value === "disprove" ? "¬ " : "";
+          want.textContent = neg + st.declaration;
+          proofArea.placeholder = `import ${st.module}\n\ntheorem Proof.${neg ? "no" : "ok"} : ${neg}${st.declaration} := by\n  sorry`;
+          gh.hidden = how.value !== "github"; ps.hidden = how.value !== "pasted";
+        };
+        note.append("提交后会自动编译检查：用 Lean 4.29.0 和 Mathlib v4.29.0 编译，定理的类型必须正好是 ", want,
+          "，没有 sorry，只用标准公理，并经 Lean 内核重放。不通过就不登记。证明里用 ", el("code", { text: `import ${st.module}` }),
+          " 导入这条表述。可以用 native_decide：登记库会让内核把那一步重新算一遍，通过后在页面上标出感叹号。");
+        dir.addEventListener("change", sync); how.addEventListener("change", sync);
+        // 提交前先在浏览器里试编译：把表述的代码贴在前面，换成 import Mathlib。Lean 4 Web 用的是最新版 Mathlib，结果只作参考。
+        tryBtn.addEventListener("click", async () => {
+          tryOut.textContent = "";
+          let lean;
+          try { lean = (await fetch(`../ask/${target}.json`).then(r => r.json())).lean; } catch { tryOut.textContent = "没能加载这条表述的代码。"; return; }
+          const stmt = lean.replace(/^module[ \t]*\n/m, "").replace(/^public import [^\n]*\n/gm, "").replace("@[expose] public section\n", "")
+            .trimEnd().replace(/\nend[ \t]*$/, "").replace(/\/-[\s\S]*?-\/\s*/, "").trim();
+          const proof = proofArea.value.replace(/^\s*(public\s+)?import\s+[^\n]*\n?/gm, "").trim();
+          if (!proof) { tryOut.textContent = "先在上面粘贴证明代码。"; return; }
+          const code = `import Mathlib\n\n${stmt}\n\n${proof}\n`;
+          window.open("https://live.lean-lang.org/#code=" + encodeURIComponent(code), "_blank", "noopener");
+          tryOut.textContent = "已在新标签页打开。Lean 4 Web 用的是最新版 Mathlib，和登记库钉死的 v4.29.0 可能不同：那边通过不代表这边一定通过，以提交后的正式验证为准。";
+        });
+        form.append(note,
+          field("方向 *", dir, "证否就是证明这条表述的否命题。两者都登记在同一个表述页上。"),
+          field("声称方 *", text("claimant", "", { required: true, maxlength: 120, placeholder: "人名、机构名或模型名" }),
+            "页面上会标为“自称”，登记库不核实身份。以机构或模型的名义声称时，请在下面附上公告链接。"),
+          field("声称日期 *", text("date", today, { required: true, pattern: "\\d{4}-\\d{2}-\\d{2}" }), "格式 YYYY-MM-DD。这是你自己填的日期，只作参考；谁先谁后以登记库收到的时间为准。"),
           field("证明从哪里来", how), gh, ps,
           field("定理名 *", text("theorem", "", { required: true, maxlength: 200, placeholder: "MyProof.goldbach", spellcheck: "false" }), "完整的定理名。"),
-          field("公告链接", text("url", "", { maxlength: 500, placeholder: "https://" }), "可选：论文、博客或新闻稿。"),
+          field("公告链接", text("url", "", { maxlength: 500, placeholder: "https://" }), "论文、博客或新闻稿。以机构或模型名义声称时请务必填写。"),
           field("备注", area("note", "", 3, { maxlength: 2000 }), "只写事实。"));
-        toggle();
+        sync();
         collect = (f) => {
-          const d = { claimant: f.claimant.value, date: f.date.value, theorem: f.theorem.value.trim(), url: f.url.value.trim(), note: f.note.value };
+          const d = { direction: f.direction.value, claimant: f.claimant.value, date: f.date.value, theorem: f.theorem.value.trim(), url: f.url.value.trim(), note: f.note.value };
           if (f.how.value === "pasted") d.proof = f.proof.value;
           else Object.assign(d, { repo: f.repo.value.trim(), commit: f.commit.value.trim().toLowerCase(), module: f.module.value.trim() });
           return { data: d };

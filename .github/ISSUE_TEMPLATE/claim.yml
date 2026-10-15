@@ -1,13 +1,22 @@
-name: 声明证明了某条表述
-description: 登记“某人/某模型证明了 #编号”。证明会被自动编译检查，通不过不登记。
+name: 声明证明或证否了某条表述
+description: 登记“某人/某模型证明（或证否）了 #编号”。证明会被自动编译检查，通不过不登记。
 title: "[claim] 表述 #"
 labels: ["claim"]
 body:
   - type: markdown
     attributes:
       value: |
-        填好后提交，机器人会拉下你的证明，用 Lean 4.29.0 和 Mathlib v4.29.0 编译，检查定理的类型正好是这条表述、没有 sorry、只用标准公理。全部通过才会登记，结果会回复在议题里。没有 GitHub 账号也可以在网站上提交，还可以直接粘贴单个文件。
-        证明要求：只依赖 Mathlib v4.29.0 和本登记库；用 `import Conjectures.<猜想>.S<编号>` 导入表述；写成 `theorem 定理名 : Registry.<猜想>.S<编号> := …`。详见网站“使用说明”。
+        填好后提交，机器人会拉下你的证明，用 Lean 4.29.0 和 Mathlib v4.29.0 编译，检查定理的类型正好是这条表述（证否时正好是它的否命题）、没有 sorry、只用标准公理。全部通过才会登记，结果会回复在议题里。没有 GitHub 账号也可以在网站上提交，还可以直接粘贴单个文件。
+        证明要求：只依赖 Mathlib v4.29.0 和本登记库；用 `import Conjectures.<猜想>.S<编号>` 导入表述；证明写成 `theorem 定理名 : Registry.<猜想>.S<编号> := …`，证否写成 `theorem 定理名 : ¬ Registry.<猜想>.S<编号> := …`。可以用 native_decide，登记库会让内核重新计算，页面上会标出感叹号。详见网站“使用说明”。
+  - type: dropdown
+    id: direction
+    attributes:
+      label: 方向
+      options:
+        - 证明（定理类型是这条表述）
+        - 证否（定理类型是它的否命题 ¬）
+    validations:
+      required: true
   - type: input
     id: statement
     attributes:
@@ -20,7 +29,7 @@ body:
     id: claimant
     attributes:
       label: 声称方
-      description: 人名、机构名或模型名
+      description: 人名、机构名或模型名。页面上会标为“自称”；以机构或模型名义声称时，请附上公告链接。
       placeholder: "例如：OpenAI / 张三 / DeepSeek-Prover"
     validations:
       required: true
@@ -28,6 +37,7 @@ body:
     id: date
     attributes:
       label: 声称日期
+      description: 你自己填的日期，只作参考。先后以登记库收到的时间为准。
       placeholder: "YYYY-MM-DD"
     validations:
       required: true
