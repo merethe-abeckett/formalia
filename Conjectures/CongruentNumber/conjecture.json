@@ -1,0 +1,21 @@
+{
+  "slug": "congruent-number",
+  "name": "Congruent Number",
+  "name_zh": "",
+  "informal": "Tunnell's theorem (sufficient condition assuming BSD) for odd squarefree congruent numbers.",
+  "references": [
+    {
+      "label": "Wikipedia (Congruent number)",
+      "url": "https://en.wikipedia.org/wiki/Congruent_number"
+    },
+    {
+      "label": "Wikipedia (Tunnell's theorem)",
+      "url": "https://en.wikipedia.org/wiki/Tunnell%27s_theorem"
+    },
+    {
+      "label": "Keith Conrad's note",
+      "url": "https://kconrad.math.uconn.edu/blurbs/ugradnumthy/congnumber.pdf"
+    }
+  ],
+  "informal_en": "Tunnell's theorem (sufficient condition assuming BSD) for odd squarefree congruent numbers."
+}

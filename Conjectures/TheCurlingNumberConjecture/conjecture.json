@@ -1,0 +1,13 @@
+{
+  "slug": "the-curling-number-conjecture",
+  "name": "The Curling Number Conjecture",
+  "name_zh": "",
+  "informal": "Starting from any nonempty finite integer sequence, repeatedly appending its curling number\neventually gives a sequence with curling number $1$ [Chaffin and Sloane, Conjecture 1].",
+  "references": [
+    {
+      "label": "arxiv/0912.2382",
+      "url": "https://arxiv.org/abs/0912.2382"
+    }
+  ],
+  "informal_en": "Starting from any nonempty finite integer sequence, repeatedly appending its curling number\neventually gives a sequence with curling number $1$ [Chaffin and Sloane, Conjecture 1]."
+}

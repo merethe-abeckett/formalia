@@ -1,0 +1,13 @@
+{
+  "slug": "primes-and-perfect-squares",
+  "name": "Primes and perfect squares",
+  "name_zh": "",
+  "informal": "Are there infinitely many primes $p$ such that $p - 1$ is a perfect square? In other words: Are there infinitely many primes of the form $n^2 + 1$?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Landau%27s_problems#Near-square_primes"
+    }
+  ],
+  "informal_en": "Are there infinitely many primes $p$ such that $p - 1$ is a perfect square? In other words: Are there infinitely many primes of the form $n^2 + 1$?"
+}

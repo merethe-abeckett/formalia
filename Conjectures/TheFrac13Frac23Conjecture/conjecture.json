@@ -1,0 +1,13 @@
+{
+  "slug": "the-frac-1-3-frac-2-3-conjecture",
+  "name": "The $\\frac 1 3$–$\\frac 2 3$ conjecture",
+  "name_zh": "",
+  "informal": "Does every finite partially ordered set that is not totally ordered\ncontain two elements $x$ and $y$ such that the probability that\n$x$ appears before $y$ in a random linear extension is between $\\frac 1 3$ and $\\frac 2 3$?\n\nThe set of all total order extensions is represented as order preserving\nbijections $P$ of $1, ..., n$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/1/3%E2%80%932/3_conjecture"
+    }
+  ],
+  "informal_en": "Does every finite partially ordered set that is not totally ordered\ncontain two elements $x$ and $y$ such that the probability that\n$x$ appears before $y$ in a random linear extension is between $\\frac 1 3$ and $\\frac 2 3$?\n\nThe set of all total order extensions is represented as order preserving\nbijections $P$ of $1, ..., n$."
+}

@@ -1,0 +1,21 @@
+{
+  "slug": "wilson-primes",
+  "name": "Wilson primes",
+  "name_zh": "",
+  "informal": "There are infinitely many Wilson primes.",
+  "references": [
+    {
+      "label": "Wikipedia, Wilson prime",
+      "url": "https://en.wikipedia.org/wiki/Wilson_prime"
+    },
+    {
+      "label": "OEIS A007540",
+      "url": "https://oeis.org/A007540"
+    },
+    {
+      "label": "A search for Wilson primes",
+      "url": "https://arxiv.org/abs/1209.3436"
+    }
+  ],
+  "informal_en": "There are infinitely many Wilson primes."
+}

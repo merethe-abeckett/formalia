@@ -1,0 +1,20 @@
+{
+  "id": "20261014-27",
+  "conjecture": "babaiseress-conjectures-on-the-diameter-of-finite-groups",
+  "module": "Conjectures.BabaiSeressConjecturesOnTheDiameterOfFiniteGroups.S20261014_27",
+  "declaration": "Registry.BabaiSeressConjecturesOnTheDiameterOfFiniteGroups.S20261014_27",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/DiameterSimpleFiniteGroups.lean",
+    "note": "取自 formal-conjectures 的 `babai_seress_conjecture_alternating`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "**Babai–Seress Conjecture (Conjecture 1.5)**: There exists an absolute constant $C$ such\nthat the diameter of the alternating group $A_n$ satisfies\n$$\\operatorname{diam}(A_n) \\leq n^C.$$\n\n*Reference:* [L. Babai and Á. Seress, *On the diameter of permutation groups*,\nEuropean Journal of Combinatorics 13 (1992), Conjecture 1.5](https://doi.org/10.1016/S0195-6698(05)80029-0)"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

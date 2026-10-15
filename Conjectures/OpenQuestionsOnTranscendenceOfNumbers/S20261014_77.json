@@ -1,0 +1,20 @@
+{
+  "id": "20261014-77",
+  "conjecture": "open-questions-on-transcendence-of-numbers",
+  "module": "Conjectures.OpenQuestionsOnTranscendenceOfNumbers.S20261014_77",
+  "declaration": "Registry.OpenQuestionsOnTranscendenceOfNumbers.S20261014_77",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Transcendental.lean",
+    "note": "取自 formal-conjectures 的 `rlog_rlog_two_transcendental`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "$\\log(\\log(2))$ is transcendental."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

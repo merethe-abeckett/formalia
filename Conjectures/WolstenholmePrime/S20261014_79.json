@@ -1,0 +1,20 @@
+{
+  "id": "20261014-79",
+  "conjecture": "wolstenholme-prime",
+  "module": "Conjectures.WolstenholmePrime.S20261014_79",
+  "declaration": "Registry.WolstenholmePrime.S20261014_79",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/WolstenholmePrime.lean",
+    "note": "取自 formal-conjectures 的 `wolstenholme_prime_infinite`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "It is conjectured that there are infinitely many Wolstenholme primes.\n\n*Reference:* [Wikipedia](https://en.wikipedia.org/wiki/Wolstenholme_prime#Expected_number_of_Wolstenholme_primes)"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

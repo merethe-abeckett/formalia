@@ -1,0 +1,20 @@
+{
+  "id": "20261014-34",
+  "conjecture": "euler-sum-of-powers-conjecture",
+  "module": "Conjectures.EulerSumOfPowersConjecture.S20261014_34",
+  "declaration": "Registry.EulerSumOfPowersConjecture.S20261014_34",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/EulerSumOfPowers.lean",
+    "note": "取自 formal-conjectures 的 `eulers_sum_of_powers_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "Euler's sum of powers conjecture states that for integers $n > 1$ and $k > 1$,\nif the sum of $n$ positive integers each raised to the $k$-th power equals another integer\nraised to the $k$-th power, then $n ≥ k$.\n\nThe conjecture is known to be false for $k = 4$ and $k = 5$,\nbut remains open for $k ≥ 6$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

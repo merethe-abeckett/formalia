@@ -1,0 +1,13 @@
+{
+  "slug": "piercebirkhoff-conjecture",
+  "name": "Pierce–Birkhoff conjecture",
+  "name_zh": "",
+  "informal": "The Pierce-Birkhoff conjecture states that for every real piecewise-polynomial function\n`f : ℝⁿ → ℝ`, there exists a finite set of polynomials `gᵢⱼ ∈ ℝ[x₁, ..., xₙ]` such that\n`f = supᵢ infⱼ(gᵢⱼ)`.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Pierce%E2%80%93Birkhoff_conjecture"
+    }
+  ],
+  "informal_en": "The Pierce-Birkhoff conjecture states that for every real piecewise-polynomial function\n`f : ℝⁿ → ℝ`, there exists a finite set of polynomials `gᵢⱼ ∈ ℝ[x₁, ..., xₙ]` such that\n`f = supᵢ infⱼ(gᵢⱼ)`."
+}

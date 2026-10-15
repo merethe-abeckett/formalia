@@ -1,0 +1,13 @@
+{
+  "slug": "selfridge-conjectures",
+  "name": "Selfridge's conjectures",
+  "name_zh": "",
+  "informal": "**PSW conjecture** (Selfridge's test)\nLet $p$ be an odd number, with $p \\equiv \\pm 2 \\pmod{5}$, $2^{p-1} \\equiv 1 \\pmod{p}$\nand $F_{p+1} \\equiv 0 \\pmod{p}$, then $p$ is a prime number.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/John_Selfridge#Selfridge's_conjecture_about_primality_testing"
+    }
+  ],
+  "informal_en": "**PSW conjecture** (Selfridge's test)\nLet $p$ be an odd number, with $p \\equiv \\pm 2 \\pmod{5}$, $2^{p-1} \\equiv 1 \\pmod{p}$\nand $F_{p+1} \\equiv 0 \\pmod{p}$, then $p$ is a prime number."
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "lychrel-numbers-in-base-10",
+  "name": "Lychrel numbers in base 10",
+  "name_zh": "",
+  "informal": "**Lychrel conjecture (base 10):** conjecturally, there are no Lychrel numbers in base 10.\n\nEquivalently, every positive integer eventually becomes a palindrome under the Lychrel iteration.",
+  "references": [
+    {
+      "label": "Wikipedia: Lychrel number",
+      "url": "https://en.wikipedia.org/wiki/Lychrel_number"
+    },
+    {
+      "label": "MathWorld: Lychrel Number",
+      "url": "https://mathworld.wolfram.com/LychrelNumber.html"
+    },
+    {
+      "label": "OEIS A023108",
+      "url": "https://oeis.org/A023108"
+    },
+    {
+      "label": "OEIS A023109",
+      "url": "https://oeis.org/A023109"
+    }
+  ],
+  "informal_en": "**Lychrel conjecture (base 10):** conjecturally, there are no Lychrel numbers in base 10.\n\nEquivalently, every positive integer eventually becomes a palindrome under the Lychrel iteration."
+}

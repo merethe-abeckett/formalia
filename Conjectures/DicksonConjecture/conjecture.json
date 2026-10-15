@@ -1,0 +1,33 @@
+{
+  "slug": "dickson-conjecture",
+  "name": "Dickson's conjecture",
+  "name_zh": "",
+  "informal": "**The generalized twin-prime conjecture**\nFor any positive integer $k$ there are infinitely many primes $p$ such that $p + 2k$ is prime.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Dickson%27s_conjecture"
+    },
+    {
+      "label": "PrimePages glossary",
+      "url": "https://t5k.org/glossary/xpage/DicksonsConjecture.html"
+    },
+    {
+      "label": "OEIS Wiki",
+      "url": "https://oeis.org/wiki/Dickson%27s_conjecture"
+    },
+    {
+      "label": "MathWorld",
+      "url": "https://mathworld.wolfram.com/DicksonsConjecture.html"
+    },
+    {
+      "label": "Leonard Eugene Dickson, *History of the Theory of Numbers, Vol. I: Divisibility and Primality*",
+      "url": "https://archive.org/details/historyoftheoryo01dickuoft"
+    },
+    {
+      "label": "Arxiv",
+      "url": "https://arxiv.org/pdf/0906.3850"
+    }
+  ],
+  "informal_en": "**The generalized twin-prime conjecture**\nFor any positive integer $k$ there are infinitely many primes $p$ such that $p + 2k$ is prime."
+}

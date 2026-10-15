@@ -1,0 +1,20 @@
+{
+  "id": "20261014-20",
+  "conjecture": "brocard-conjecture",
+  "module": "Conjectures.BrocardConjecture.S20261014_20",
+  "declaration": "Registry.BrocardConjecture.S20261014_20",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/BrocardConjecture.lean",
+    "note": "取自 formal-conjectures 的 `brocard_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。（命题本体写在辅助定义 `statement` 中，因为它依赖原文件顶部的 `open`，登记库的规范不允许命题里出现 `open`。）"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "**Brocard's Conjecture**\nFor every `n ≥ 2`, between the squares of the `n`-th and `(n+1)`-th primes,\nthere are at least four prime numbers."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

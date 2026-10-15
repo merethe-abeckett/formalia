@@ -1,0 +1,13 @@
+{
+  "slug": "open-questions-on-irrationality-of-numbers",
+  "name": "Open questions on irrationality of numbers",
+  "name_zh": "",
+  "informal": "Is $\\pi ^ \\pi$ irrational?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Irrational_number#Open_questions"
+    }
+  ],
+  "informal_en": "Is $\\pi ^ \\pi$ irrational?"
+}

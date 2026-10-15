@@ -1,0 +1,13 @@
+{
+  "slug": "rudin-conjecture-on-squares-in-arithmetic-progressions",
+  "name": "Rudin's conjecture on squares in arithmetic progressions",
+  "name_zh": "",
+  "informal": "A stronger form of Rudin's conjecture: for every $N \\ge 6$, the arithmetic progression\n$24 n + 1$ attains the maximum $Q(N)$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Rudin%27s_conjecture"
+    }
+  ],
+  "informal_en": "A stronger form of Rudin's conjecture: for every $N \\ge 6$, the arithmetic progression\n$24 n + 1$ attains the maximum $Q(N)$."
+}

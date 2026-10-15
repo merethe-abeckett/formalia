@@ -1,0 +1,13 @@
+{
+  "slug": "lehmer-totient-problem",
+  "name": "Lehmer's totient problem",
+  "name_zh": "",
+  "informal": "Does there exist a composite number $n > 1$ such that Euler’s totient function\n$\\varphi(n)$ divides $n - 1$?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Lehmer%27s_totient_problem"
+    }
+  ],
+  "informal_en": "Does there exist a composite number $n > 1$ such that Euler’s totient function\n$\\varphi(n)$ divides $n - 1$?"
+}

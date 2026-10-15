@@ -1,0 +1,13 @@
+{
+  "slug": "unique-crystal-components",
+  "name": "Unique Crystal Components",
+  "name_zh": "",
+  "informal": "If $n = ab$ is a crystal, then there are no other pairs of\npositive integers $c, d > 1$, different from the couple $a, b$, such that $n = cd$ and\n$B(c, d) ∈ ℕ$, i.e., the components of the crystals are unique.",
+  "references": [
+    {
+      "label": "arxiv/1601.03081",
+      "url": "https://arxiv.org/abs/1601.03081"
+    }
+  ],
+  "informal_en": "If $n = ab$ is a crystal, then there are no other pairs of\npositive integers $c, d > 1$, different from the couple $a, b$, such that $n = cd$ and\n$B(c, d) ∈ ℕ$, i.e., the components of the crystals are unique."
+}

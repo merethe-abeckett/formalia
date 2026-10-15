@@ -1,0 +1,17 @@
+{
+  "slug": "idoneal-numbers-completeness-conjecture",
+  "name": "Idoneal numbers completeness conjecture",
+  "name_zh": "",
+  "informal": "Idoneal numbers completeness conjecture.",
+  "references": [
+    {
+      "label": "Wikipedia: Idoneal number",
+      "url": "https://en.wikipedia.org/wiki/Idoneal_number"
+    },
+    {
+      "label": "OEIS A000926",
+      "url": "https://oeis.org/A000926"
+    }
+  ],
+  "informal_en": "Idoneal numbers completeness conjecture."
+}

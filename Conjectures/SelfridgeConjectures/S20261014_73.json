@@ -1,0 +1,20 @@
+{
+  "id": "20261014-73",
+  "conjecture": "selfridge-conjectures",
+  "module": "Conjectures.SelfridgeConjectures.S20261014_73",
+  "declaration": "Registry.SelfridgeConjectures.S20261014_73",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Selfridge.lean",
+    "note": "取自 formal-conjectures 的 `selfridge_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "**PSW conjecture** (Selfridge's test)\nLet $p$ be an odd number, with $p \\equiv \\pm 2 \\pmod{5}$, $2^{p-1} \\equiv 1 \\pmod{p}$\nand $F_{p+1} \\equiv 0 \\pmod{p}$, then $p$ is a prime number."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

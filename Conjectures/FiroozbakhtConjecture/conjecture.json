@@ -1,0 +1,17 @@
+{
+  "slug": "firoozbakht-conjecture",
+  "name": "Firoozbakht's conjecture",
+  "name_zh": "",
+  "informal": "**Firoozbakht's conjecture**\nThe inequality $\\sqrt[n+1]{p_{n+1}} < \\sqrt[n]{p_n}$ holds for all prime numbers $p_n$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Firoozbakht%27s_conjecture"
+    },
+    {
+      "label": "primepuzzles",
+      "url": "https://www.primepuzzles.net/conjectures/conj_030.htm"
+    }
+  ],
+  "informal_en": "**Firoozbakht's conjecture**\nThe inequality $\\sqrt[n+1]{p_{n+1}} < \\sqrt[n]{p_n}$ holds for all prime numbers $p_n$."
+}

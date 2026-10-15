@@ -1,0 +1,13 @@
+{
+  "slug": "erdos-problem-1002",
+  "name": "Erdős Problem 1002",
+  "name_zh": "",
+  "informal": "For any $0<\\alpha<1$, let $f(\\alpha,n)=\\frac{1}{\\log n}\\sum_{1\\leq k\\leq n}(\\tfrac{1}{2}-\n\\{ \\alpha k\\})$. Does $f(\\alpha,n)$ have an asymptotic distribution function?\n\nIn other words, is there a non-decreasing function $g$ such that $g(-\\infty)=0$, $g(\\infty)=1$,\nand $\\lim_{n\\to \\infty}\\lvert \\{ \\alpha\\in (0,1): f(\\alpha,n)\\leq c\\}\\rvert=g(c)$?",
+  "references": [
+    {
+      "label": "erdosproblems.com/1002",
+      "url": "https://www.erdosproblems.com/1002"
+    }
+  ],
+  "informal_en": "For any $0<\\alpha<1$, let $f(\\alpha,n)=\\frac{1}{\\log n}\\sum_{1\\leq k\\leq n}(\\tfrac{1}{2}-\n\\{ \\alpha k\\})$. Does $f(\\alpha,n)$ have an asymptotic distribution function?\n\nIn other words, is there a non-decreasing function $g$ such that $g(-\\infty)=0$, $g(\\infty)=1$,\nand $\\lim_{n\\to \\infty}\\lvert \\{ \\alpha\\in (0,1): f(\\alpha,n)\\leq c\\}\\rvert=g(c)$?"
+}

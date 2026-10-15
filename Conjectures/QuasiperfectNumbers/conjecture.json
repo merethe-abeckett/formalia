@@ -1,0 +1,13 @@
+{
+  "slug": "quasiperfect-numbers",
+  "name": "Quasiperfect Numbers",
+  "name_zh": "",
+  "informal": "**Quasiperfect Numbers Conjecture.**\nDo quasiperfect numbers exist?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Quasiperfect_number"
+    }
+  ],
+  "informal_en": "**Quasiperfect Numbers Conjecture.**\nDo quasiperfect numbers exist?"
+}

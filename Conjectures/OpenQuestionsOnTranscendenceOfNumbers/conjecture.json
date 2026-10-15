@@ -1,0 +1,13 @@
+{
+  "slug": "open-questions-on-transcendence-of-numbers",
+  "name": "Open questions on transcendence of numbers",
+  "name_zh": "",
+  "informal": "$\\log(\\log(2))$ is transcendental.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Transcendental_number"
+    }
+  ],
+  "informal_en": "$\\log(\\log(2))$ is transcendental."
+}

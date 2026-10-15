@@ -1,0 +1,20 @@
+{
+  "id": "20261014-60",
+  "conjecture": "mean-value-problem",
+  "module": "Conjectures.MeanValueProblem.S20261014_60",
+  "declaration": "Registry.MeanValueProblem.S20261014_60",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/MeanValueProblem.lean",
+    "note": "取自 formal-conjectures 的 `mean_value_problem`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "formal-conjectures 文档注释（原文）",
+    "text": "Given a complex polynomial $p$ of degree $d ≥ 2$ and a complex number $z$\nthere is a critical point $c$ of $p$, such that $|p(z)-p(c)|/|z-c| ≤ |p'(z)|$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

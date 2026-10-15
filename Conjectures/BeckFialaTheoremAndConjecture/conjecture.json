@@ -1,0 +1,25 @@
+{
+  "slug": "beckfiala-theorem-and-conjecture",
+  "name": "Beck–Fiala theorem and conjecture",
+  "name_zh": "",
+  "informal": "**The Beck–Fiala conjecture**\n\nThere exists a universal constant $C > 0$ such that every set system\n$S_1, \\dots, S_m \\subseteq [n]$ of degree at most $t$ admits a colouring\n$\\chi \\colon [n] \\to \\{-1, +1\\}$ with\n$\\left|\\sum_{j \\in S_i} \\chi(j)\\right| \\le C \\sqrt{t}$ for every $i$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Beck%E2%80%93Fiala_theorem"
+    },
+    {
+      "label": "J. Beck and T. Fiala, *\"Integer-making\" theorems*,\n  Discrete Applied Mathematics **3** (1981), 1–8",
+      "url": "https://doi.org/10.1016/0166-218X(81"
+    },
+    {
+      "label": "B. Bukh, *An improvement of the Beck–Fiala theorem*,\n  Combinatorics, Probability and Computing **25** (2016), 380–398",
+      "url": "https://doi.org/10.1017/S0963548315000140"
+    },
+    {
+      "label": "W. Banaszczyk, *Balancing vectors and Gaussian measures of n-dimensional convex bodies*,\n  Random Structures & Algorithms **12** (1998), 351–360",
+      "url": "https://doi.org/10.1002/(SICI"
+    }
+  ],
+  "informal_en": "**The Beck–Fiala conjecture**\n\nThere exists a universal constant $C > 0$ such that every set system\n$S_1, \\dots, S_m \\subseteq [n]$ of degree at most $t$ admits a colouring\n$\\chi \\colon [n] \\to \\{-1, +1\\}$ with\n$\\left|\\sum_{j \\in S_i} \\chi(j)\\right| \\le C \\sqrt{t}$ for every $i$."
+}

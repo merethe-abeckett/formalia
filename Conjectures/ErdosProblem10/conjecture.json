@@ -1,0 +1,13 @@
+{
+  "slug": "erdos-problem-10",
+  "name": "Erdős Problem 10",
+  "name_zh": "",
+  "informal": "Granville and Soundararajan [GrSo98] have conjectured that at most $3$\npowers of $2$ suffice for all odd integers, and hence at most $4$ powers of $2$\nsuffice for all even integers.\n\nRef: Granville, A. and Soundararajan, K., _A Binary Additive Problem of Erdős and the Order of $2$ mod $p^2$_",
+  "references": [
+    {
+      "label": "erdosproblems.com/10",
+      "url": "https://www.erdosproblems.com/10"
+    }
+  ],
+  "informal_en": "Granville and Soundararajan [GrSo98] have conjectured that at most $3$\npowers of $2$ suffice for all odd integers, and hence at most $4$ powers of $2$\nsuffice for all even integers.\n\nRef: Granville, A. and Soundararajan, K., _A Binary Additive Problem of Erdős and the Order of $2$ mod $p^2$_"
+}

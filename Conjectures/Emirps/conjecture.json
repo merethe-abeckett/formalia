@@ -1,0 +1,17 @@
+{
+  "slug": "emirps",
+  "name": "Emirps",
+  "name_zh": "",
+  "informal": "[Wikipedia's article on emirps](https://en.wikipedia.org/wiki/Emirp) states: \"It is not known\nwhether there are infinitely many emirps.\"",
+  "references": [
+    {
+      "label": "Wikipedia, Emirp",
+      "url": "https://en.wikipedia.org/wiki/Emirp"
+    },
+    {
+      "label": "OEIS A006567",
+      "url": "https://oeis.org/A006567"
+    }
+  ],
+  "informal_en": "[Wikipedia's article on emirps](https://en.wikipedia.org/wiki/Emirp) states: \"It is not known\nwhether there are infinitely many emirps.\""
+}

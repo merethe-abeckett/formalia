@@ -1,0 +1,8 @@
+{
+  "slug": "lander-parkin-and-selfridge-conjecture",
+  "name": "Lander, Parkin, and Selfridge Conjecture",
+  "name_zh": "",
+  "informal": "The Lander–Parkin–Selfridge conjecture: if the sum of $n$ positive integer $k$-th powers\nequals the sum of $m$ positive integer $k$-th powers, with all values on the left distinct from\nall values on the right, then $n + m \\geq k$.\n\nFormally, for positive integers $k, n, m \\in \\mathbb{N}$ and sequences\n$x : \\{0, \\ldots, n-1\\} \\to \\mathbb{N}$ and $y : \\{0, \\ldots, m-1\\} \\to \\mathbb{N}$\nwith $x_i > 0$, $y_j > 0$, and $x_i \\neq y_j$ for all $i, j$, if\n$$\\sum_{i=0}^{n-1} x_i^k = \\sum_{j=0}^{m-1} y_j^k,$$\nthen $k \\leq n + m$.",
+  "references": [],
+  "informal_en": "The Lander–Parkin–Selfridge conjecture: if the sum of $n$ positive integer $k$-th powers\nequals the sum of $m$ positive integer $k$-th powers, with all values on the left distinct from\nall values on the right, then $n + m \\geq k$.\n\nFormally, for positive integers $k, n, m \\in \\mathbb{N}$ and sequences\n$x : \\{0, \\ldots, n-1\\} \\to \\mathbb{N}$ and $y : \\{0, \\ldots, m-1\\} \\to \\mathbb{N}$\nwith $x_i > 0$, $y_j > 0$, and $x_i \\neq y_j$ for all $i, j$, if\n$$\\sum_{i=0}^{n-1} x_i^k = \\sum_{j=0}^{m-1} y_j^k,$$\nthen $k \\leq n + m$."
+}

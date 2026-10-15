@@ -1,0 +1,13 @@
+{
+  "slug": "particular-values-of-the-riemann-zeta-function",
+  "name": "Particular values of the Riemann zeta function",
+  "name_zh": "",
+  "informal": "$\\zeta(7)$ is irrational.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Particular_values_of_the_Riemann_zeta_function"
+    }
+  ],
+  "informal_en": "$\\zeta(7)$ is irrational."
+}

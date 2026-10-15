@@ -1,0 +1,21 @@
+{
+  "slug": "pollock-tetrahedral-numbers-conjecture",
+  "name": "Pollock's (tetrahedral numbers) conjecture",
+  "name_zh": "",
+  "informal": "Pollock's (tetrahedral numbers) conjecture:\nevery integer is the sum of at most $5$ tetrahedral numbers.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Pollock%27s_conjectures"
+    },
+    {
+      "label": "A797",
+      "url": "https://oeis.org/A797"
+    },
+    {
+      "label": "MathWorld: Pollock's Conjecture",
+      "url": "https://mathworld.wolfram.com/PollocksConjecture.html"
+    }
+  ],
+  "informal_en": "Pollock's (tetrahedral numbers) conjecture:\nevery integer is the sum of at most $5$ tetrahedral numbers."
+}

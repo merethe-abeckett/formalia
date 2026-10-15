@@ -1,0 +1,13 @@
+{
+  "slug": "euclid-numbers-conjecture",
+  "name": "Euclid Numbers conjecture",
+  "name_zh": "",
+  "informal": "It is not known whether there is an infinite number of prime Euclid numbers.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Euclid_number"
+    }
+  ],
+  "informal_en": "It is not known whether there is an infinite number of prime Euclid numbers."
+}

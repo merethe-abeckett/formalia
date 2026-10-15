@@ -1,0 +1,21 @@
+{
+  "slug": "conjectures-about-the-mandelbrot-and-multibrot-sets",
+  "name": "Conjectures about the Mandelbrot and Multibrot sets",
+  "name_zh": "",
+  "informal": "The MLC conjecture, stating that the mandelbrot set is locally connected.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mandelbrot_set#Local_connectivity"
+    },
+    {
+      "label": "arxiv/math/9902155",
+      "url": "https://arxiv.org/abs/math/9902155"
+    },
+    {
+      "label": "mathoverflow/37229",
+      "url": "https://mathoverflow.net/questions/37229/"
+    }
+  ],
+  "informal_en": "The MLC conjecture, stating that the mandelbrot set is locally connected."
+}

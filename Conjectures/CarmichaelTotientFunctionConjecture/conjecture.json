@@ -1,0 +1,13 @@
+{
+  "slug": "carmichael-totient-function-conjecture",
+  "name": "Carmichael's totient function conjecture",
+  "name_zh": "",
+  "informal": "*Carmichael's totient function conjecture*: For every positive natural number $n$,\nthere exists a natural number $m$ with $m ≠ n$, such that $φ(n) = φ(m)$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Carmichael%27s_totient_function_conjecture"
+    }
+  ],
+  "informal_en": "*Carmichael's totient function conjecture*: For every positive natural number $n$,\nthere exists a natural number $m$ with $m ≠ n$, such that $φ(n) = φ(m)$."
+}

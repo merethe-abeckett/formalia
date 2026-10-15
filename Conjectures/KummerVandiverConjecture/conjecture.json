@@ -1,0 +1,13 @@
+{
+  "slug": "kummervandiver-conjecture",
+  "name": "Kummer–Vandiver conjecture",
+  "name_zh": "",
+  "informal": "Kummer–Vandiver conjecture states that for every prime $p$, the class number of the maximal\nreal subfield of $\\mathbb{Q}(\\zeta_p)$ is not divisible by $p$.\n-",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Kummer%E2%80%93Vandiver_conjecture"
+    }
+  ],
+  "informal_en": "Kummer–Vandiver conjecture states that for every prime $p$, the class number of the maximal\nreal subfield of $\\mathbb{Q}(\\zeta_p)$ is not divisible by $p$.\n-"
+}

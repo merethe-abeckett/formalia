@@ -1,0 +1,13 @@
+{
+  "slug": "hall-conjecture",
+  "name": "Hall's conjecture",
+  "name_zh": "",
+  "informal": "Original Hall's conjecture with exponent $1/2$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Hall%27s_conjecture"
+    }
+  ],
+  "informal_en": "Original Hall's conjecture with exponent $1/2$."
+}

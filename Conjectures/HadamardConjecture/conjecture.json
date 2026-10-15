@@ -1,0 +1,17 @@
+{
+  "slug": "hadamard-conjecture",
+  "name": "Hadamard's conjecture",
+  "name_zh": "",
+  "informal": "There exists a Hadamard matrix for all $n = 4k$.",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Hadamard_matrix#Hadamard_conjecture"
+    },
+    {
+      "label": "Résolution d'une question relative aux déterminants",
+      "url": "https://gallica.bnf.fr/ark:/12148/bpt6k486252g/f400.image.r"
+    }
+  ],
+  "informal_en": "There exists a Hadamard matrix for all $n = 4k$."
+}

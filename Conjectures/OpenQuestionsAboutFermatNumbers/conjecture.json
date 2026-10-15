@@ -1,0 +1,13 @@
+{
+  "slug": "open-questions-about-fermat-numbers",
+  "name": "Open questions about Fermat numbers",
+  "name_zh": "",
+  "informal": "Are Fermat numbers composite for all `n > 4`?",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Fermat_number"
+    }
+  ],
+  "informal_en": "Are Fermat numbers composite for all `n > 4`?"
+}

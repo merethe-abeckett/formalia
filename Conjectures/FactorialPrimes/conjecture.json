@@ -1,0 +1,17 @@
+{
+  "slug": "factorial-primes",
+  "name": "Factorial primes",
+  "name_zh": "",
+  "informal": "There are infinitely many factorial primes.",
+  "references": [
+    {
+      "label": "Wikipedia, Factorial prime",
+      "url": "https://en.wikipedia.org/wiki/Factorial_prime"
+    },
+    {
+      "label": "OEIS A088054",
+      "url": "https://oeis.org/A088054"
+    }
+  ],
+  "informal_en": "There are infinitely many factorial primes."
+}

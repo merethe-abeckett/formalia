@@ -1,0 +1,21 @@
+{
+  "slug": "babaiseress-conjectures-on-the-diameter-of-finite-groups",
+  "name": "Babai–Seress Conjectures on the Diameter of Finite Groups",
+  "name_zh": "",
+  "informal": "**Babai–Seress Conjecture (Conjecture 1.5)**: There exists an absolute constant $C$ such\nthat the diameter of the alternating group $A_n$ satisfies\n$$\\operatorname{diam}(A_n) \\leq n^C.$$\n\n*Reference:* [L. Babai and Á. Seress, *On the diameter of permutation groups*,\nEuropean Journal of Combinatorics 13 (1992), Conjecture 1.5](https://doi.org/10.1016/S0195-6698(05)80029-0)",
+  "references": [
+    {
+      "label": "Wikipedia, *Diameter (group theory)*",
+      "url": "https://en.wikipedia.org/wiki/Diameter_(group_theory"
+    },
+    {
+      "label": "H. A. Helfgott and Á. Seress, *On the diameter of permutation groups*",
+      "url": "https://arxiv.org/abs/1109.3550"
+    },
+    {
+      "label": "L. Babai and Á. Seress, *On the diameter of permutation groups*,\n  European Journal of Combinatorics 13 (1992), 231–243",
+      "url": "https://doi.org/10.1016/S0195-6698(05"
+    }
+  ],
+  "informal_en": "**Babai–Seress Conjecture (Conjecture 1.5)**: There exists an absolute constant $C$ such\nthat the diameter of the alternating group $A_n$ satisfies\n$$\\operatorname{diam}(A_n) \\leq n^C.$$\n\n*Reference:* [L. Babai and Á. Seress, *On the diameter of permutation groups*,\nEuropean Journal of Combinatorics 13 (1992), Conjecture 1.5](https://doi.org/10.1016/S0195-6698(05)80029-0)"
+}
