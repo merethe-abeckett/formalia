@@ -193,6 +193,48 @@ article.essay{max-width:760px;line-height:1.85;margin-top:18px}article.essay pre
 .ask .a.err{color:var(--bad)}.ask .row .st{font-size:13px}
 @media(max-width:700px){.steps{grid-template-columns:1fr}.hero h1{font-size:2.1em}}
 @media(max-width:600px){th{width:auto}td,th{display:block;width:100%}tr{display:block;border-bottom:1px solid var(--line)}}
+/* ===== Vector 2010 风格：放在最后，覆盖上面的样式 ===== */
+:root{--bg:#f6f6f6;--fg:#202122;--muted:#54595d;--line:#a2a9b1;--box:#f8f9fa;--card:#fff;--link:#0645ad;--accent:#36c;
+--ok:#14866d;--bad:#d33;--warn:#ac6600;--serif:"Linux Libertine",Georgia,Times,"Noto Serif SC","Songti SC",serif}
+body{background:var(--bg);font:14px/1.6 var(--sans)}
+/* 左侧栏：logo + 导航 */
+.top{position:absolute;top:0;left:0;width:176px;border:0}
+.top .in{display:block;max-width:none;padding:0}
+.top .brand{display:flex;align-items:center;justify-content:center;height:160px;font:normal 30px var(--serif);color:var(--fg)}
+.top nav{display:block;margin:0 0 0 12px;padding-right:8px}
+.top nav::before{content:"导航";display:block;font-size:12px;color:var(--muted);border-bottom:1px solid #c8ccd1;margin-bottom:6px;padding-bottom:2px}
+.top nav a{display:block;padding:2px 0;font-size:12.5px;color:var(--link)}
+.top nav a:hover{color:var(--link);text-decoration:underline}
+/* 右侧白色内容框，浅蓝边 */
+.crumbs{max-width:none;margin:40px 0 0 176px;padding:12px 24px 0;background:#fff;border:1px solid #a7d7f9;border-width:1px 0 0 1px;font-size:12.5px}
+main{max-width:none;margin:0 0 0 176px;padding:4px 24px 24px;background:#fff;border:1px solid #a7d7f9;border-width:0 0 1px 1px}
+header+main{margin-top:40px;border-top-width:1px;padding-top:16px}
+footer{max-width:none;margin:0 0 0 176px;padding:16px 24px;border:0;font-size:11.5px}
+/* 标题：衬线体、细下划线 */
+h1{font:normal 1.8em/1.3 var(--serif);border-bottom:1px solid var(--line);margin:8px 0 16px;padding-bottom:2px}
+h2{font:normal 1.5em/1.3 var(--serif);border-bottom:1px solid var(--line);margin:1.2em 0 .5em;padding-bottom:2px}
+h3{font:bold 1.15em/1.6 var(--sans)}
+.hero{padding:8px 0}.hero h1{font:normal 2.4em/1.3 var(--serif)}
+/* 表格像 wikitable */
+table{background:#f8f9fa;font-size:14px}
+td,th{border-color:#a2a9b1;padding:5px 8px}
+th{background:#eaecf0}
+pre{background:#f8f9fa;border-color:#eaecf0;border-radius:0}
+/* 按钮、卡片、搜索框：方一点 */
+.btn,.cards a,.step,.search,.search button,.chat,.ask{border-radius:2px;box-shadow:none}
+.btn{background:#f8f9fa;border-color:#a2a9b1}
+.btn.primary,.search button,#chat-form button{background:#36c;border-color:#36c;color:#fff}
+.cards a{background:#f8f9fa;border-color:#c8ccd1}
+mark{background:#fde68a}
+#chat-log{--nick-l:38%}
+/* 手机：侧栏收到顶部 */
+@media(max-width:720px){
+.top{position:static;width:auto}
+.top .brand{height:auto;padding:10px 16px;justify-content:flex-start;font-size:24px}
+.top nav{display:flex;flex-wrap:wrap;gap:2px 14px;margin:0;padding:0 16px 10px}
+.top nav::before{display:none}
+.crumbs,main,footer,header+main{margin-left:0;margin-top:0;border-left:0}
+}
 """
 
 SITE_NAME = "Formalia"
