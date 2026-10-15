@@ -260,7 +260,7 @@ def page(title, crumbs, body, depth, home=False):
 <meta name="description" content="Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。">
 <link rel="stylesheet" href="{rel}style.css?v={ver(CSS)}"></head><body>
 <header class="top"><div class="in"><a class="brand" href="{rel}index.html">{SITE_NAME}</a>
-<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}essays/index.html">解读</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
+<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}essays/index.html">解读</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/lean.html">什么是 Lean</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
 {crumb_html}<main>{body}</main>
 <footer>Formalia 只列出形式化表述及其事实，不判断某条表述是否等价于原猜想。<br>
 代码 Apache-2.0 · 条目内容按各自声明的许可，默认 CC-BY-4.0 · <a href="{rel}about/privacy.html">隐私与编辑规则</a> ·
@@ -594,6 +594,8 @@ def write_edit_pages(index_rows):
         "<h1>隐私与编辑规则</h1>" + md_to_html((SITE_SRC / "privacy.md").read_text(encoding="utf-8")), 1), encoding="utf-8")
     (OUT / "about" / "guide.html").write_text(page("使用说明", [("使用说明", None)],
         "<h1>使用说明</h1>" + md_to_html((SITE_SRC / "guide.md").read_text(encoding="utf-8")), 1), encoding="utf-8")
+    (OUT / "about" / "lean.html").write_text(page("什么是 Lean 4", [("什么是 Lean 4", None)],
+        "<h1>什么是 Lean 4？</h1>" + md_to_html((SITE_SRC / "lean.md").read_text(encoding="utf-8")), 1), encoding="utf-8")
     about = (SITE_SRC / "about.md").read_text(encoding="utf-8").replace("{{PREFACE}}", "## 作者的话\n\n" + readme_preface())
     (OUT / "about" / "index.html").write_text(page("关于", [("关于", None)], "<h1>关于 Formalia</h1>" + md_to_html(about), 1), encoding="utf-8")
     contact = (SITE_SRC / "contact.md").read_text(encoding="utf-8").replace("{{QUOTE}}", founder_quote()).replace("{{EMAIL}}", CONTACT)
