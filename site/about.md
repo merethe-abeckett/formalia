@@ -19,4 +19,8 @@ Formalia 是一个中立的目录，收录数学猜想的 Lean 4 形式化表述
 - 仓库：[github.com/merethe-abeckett/formalia](https://github.com/merethe-abeckett/formalia)
 - 邮箱和作者的话：见[联系作者](contact.html)
 
+## 致谢
+
+网站的大多数代码和样式由 Claude（Anthropic 的 AI 助手）编写和调试。感谢Claude!
+
 {{PREFACE}}
