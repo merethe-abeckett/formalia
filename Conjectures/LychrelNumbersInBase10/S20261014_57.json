@@ -1,0 +1,21 @@
+{
+  "id": "20261014-57",
+  "conjecture": "lychrel-numbers-in-base-10",
+  "module": "Conjectures.LychrelNumbersInBase10.S20261014_57",
+  "declaration": "Registry.LychrelNumbersInBase10.S20261014_57",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/LychrelNumbers.lean",
+    "note": "取自 formal-conjectures 的 `no_lychrel_numbers_base10`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "十进制中不存在利克瑞尔数：每个正整数反复“加上自己的倒序数”，最终都会得到回文数。",
+    "text_en": "**Lychrel conjecture (base 10):** conjecturally, there are no Lychrel numbers in base 10.\n\nEquivalently, every positive integer eventually becomes a palindrome under the Lychrel iteration."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

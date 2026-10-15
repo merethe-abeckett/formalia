@@ -1,0 +1,13 @@
+{
+  "slug": "unique-crystal-components",
+  "name": "Unique Crystal Components",
+  "name_zh": "晶体数的分量唯一性",
+  "informal": "若奇数 n = ab 是晶体数，则它的分量 {a, b} 是唯一的：不存在另一对大于 1 的 c、d 也使 n = cd 成为晶体数。",
+  "references": [
+    {
+      "label": "arxiv/1601.03081",
+      "url": "https://arxiv.org/abs/1601.03081"
+    }
+  ],
+  "informal_en": "If $n = ab$ is a crystal, then there are no other pairs of\npositive integers $c, d > 1$, different from the couple $a, b$, such that $n = cd$ and\n$B(c, d) ∈ ℕ$, i.e., the components of the crystals are unique."
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "mean-value-problem",
+  "name": "Mean value problem",
+  "name_zh": "斯梅尔平均值问题",
+  "informal": "对任意次数 d ≥ 2 的复多项式 p 和复数 z，存在 p 的临界点 c，使 |p(z) − p(c)| / |z − c| ≤ |p′(z)|。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Mean_value_problem"
+    },
+    {
+      "label": "The fundamental theorem of algebra and complexity theory",
+      "url": "https://www.ams.org/journals/bull/1981-04-01/S0273-0979-1981-14858-8/"
+    },
+    {
+      "label": "The fundamental theorem of algebra and complexity theory",
+      "url": "https://www.ams.org/journals/bull/1981-04-01/S0273-0979-1981-14858-8/"
+    },
+    {
+      "label": "Critical points and values of complex polynomials",
+      "url": "https://doi.org/10.1016/0885-064X(89"
+    }
+  ],
+  "informal_en": "Given a complex polynomial $p$ of degree $d ≥ 2$ and a complex number $z$\nthere is a critical point $c$ of $p$, such that $|p(z)-p(c)|/|z-c| ≤ |p'(z)|$."
+}

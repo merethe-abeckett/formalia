@@ -1,0 +1,21 @@
+{
+  "id": "20261014-10",
+  "conjecture": "agoh-giuga-conjecture",
+  "module": "Conjectures.AgohGiugaConjecture.S20261014_10",
+  "declaration": "Registry.AgohGiugaConjecture.S20261014_10",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/AgohGiuga.lean",
+    "note": "取自 formal-conjectures 的 `agoh_giuga`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "阿戈的表述：对任意整数 p ≥ 2，p 是素数，当且仅当由伯努利数 B_{p−1} 的分子和分母写成的一个整除条件成立（等价于 p·B_{p−1} ≡ −1（模 p））。",
+    "text_en": "The **Agoh-Giuga Conjecture**, Agoh's formulation"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

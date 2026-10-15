@@ -1,0 +1,17 @@
+{
+  "slug": "oppermann-conjecture",
+  "name": "Oppermann's Conjecture",
+  "name_zh": "奥珀曼猜想",
+  "informal": "对每个整数 x ≥ 2，x(x − 1) 与 x² 之间都有素数。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Oppermann%27s_conjecture"
+    },
+    {
+      "label": "Luan Alberto Ferreira, *Real exponential sums over primes and prime gaps*",
+      "url": "https://arxiv.org/abs/2307.08725"
+    }
+  ],
+  "informal_en": "For every integer $x \\ge 2$ there exists a prime between $x(x-1)$ and $x^2$."
+}

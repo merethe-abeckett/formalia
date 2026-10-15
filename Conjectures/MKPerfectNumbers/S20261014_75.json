@@ -1,0 +1,21 @@
+{
+  "id": "20261014-75",
+  "conjecture": "m-k-perfect-numbers",
+  "module": "Conjectures.MKPerfectNumbers.S20261014_75",
+  "declaration": "Registry.MKPerfectNumbers.S20261014_75",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Superperfectnumbers.lean",
+    "note": "取自 formal-conjectures 的 `twoFivePerfect`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "不存在 (2, 5) 完全数，即不存在正整数 n，使 σ(σ(n)) = 5n，其中 σ 是因数和函数。",
+    "text_en": "There does not exist a $(2,5)$-perfect number"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

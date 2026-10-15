@@ -1,0 +1,13 @@
+{
+  "slug": "wolstenholme-prime",
+  "name": "Wolstenholme Prime",
+  "name_zh": "沃斯滕霍姆素数",
+  "informal": "有无穷多个沃斯滕霍姆素数。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Wolstenholme_prime"
+    }
+  ],
+  "informal_en": "It is conjectured that there are infinitely many Wolstenholme primes.\n\n*Reference:* [Wikipedia](https://en.wikipedia.org/wiki/Wolstenholme_prime#Expected_number_of_Wolstenholme_primes)"
+}

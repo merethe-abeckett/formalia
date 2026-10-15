@@ -1,0 +1,13 @@
+{
+  "slug": "feit-thompson-conjecture-on-primes",
+  "name": "Feit-Thompson conjecture on primes",
+  "name_zh": "费特-汤普森素数猜想",
+  "informal": "不存在两个不同的素数 p、q，使 (q^p − 1)/(q − 1) 整除 (p^q − 1)/(p − 1)。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Feit%E2%80%93Thompson_conjecture"
+    }
+  ],
+  "informal_en": "There are no distinct primes $p$ and $q$ such that $\\frac{q^p - 1}{q - 1}$ divides $\\frac{p^q - 1}{p - 1}$"
+}

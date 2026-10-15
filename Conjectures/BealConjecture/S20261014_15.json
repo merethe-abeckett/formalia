@@ -1,0 +1,21 @@
+{
+  "id": "20261014-15",
+  "conjecture": "beal-conjecture",
+  "module": "Conjectures.BealConjecture.S20261014_15",
+  "declaration": "Registry.BealConjecture.S20261014_15",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/BealConjecture.lean",
+    "note": "取自 formal-conjectures 的 `beal_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "若正整数 A、B、C、x、y、z 满足 x、y、z > 2 且 A^x + B^y = C^z，则 A、B、C 有大于 1 的公因数。",
+    "text_en": "The **Beal Conjecture**: if we are given positive integers $A, B, C, x, y, z$ such that\n$x, y, z > 2$ and $A^x + B^y = C^z$ then $A, B, C$ have a common divisor."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

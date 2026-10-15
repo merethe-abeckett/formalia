@@ -1,0 +1,21 @@
+{
+  "id": "20261014-41",
+  "conjecture": "firoozbakht-conjecture",
+  "module": "Conjectures.FiroozbakhtConjecture.S20261014_41",
+  "declaration": "Registry.FiroozbakhtConjecture.S20261014_41",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Firoozbakht.lean",
+    "note": "取自 formal-conjectures 的 `firoozbakht_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "对所有 n，第 n + 1 个素数的 n + 1 次方根小于第 n 个素数的 n 次方根。",
+    "text_en": "**Firoozbakht's conjecture**\nThe inequality $\\sqrt[n+1]{p_{n+1}} < \\sqrt[n]{p_n}$ holds for all prime numbers $p_n$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "the-goormaghtigh-conjecture",
+  "name": "The Goormaghtigh conjecture",
+  "name_zh": "古尔马格蒂猜想",
+  "informal": "能用两种不同进制写成至少三位的“全 1 数”的正整数，只有 31 和 8191。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Goormaghtigh_conjecture"
+    },
+    {
+      "label": "No new Goormaghtigh primes up to $10^{700}$",
+      "url": "https://math.colgate.edu/~integers/y98/y98.pdf"
+    }
+  ],
+  "informal_en": "The only Goormaghtigh numbers are $31$ and $8191$."
+}

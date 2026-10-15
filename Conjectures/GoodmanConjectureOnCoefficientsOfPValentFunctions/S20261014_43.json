@@ -1,0 +1,21 @@
+{
+  "id": "20261014-43",
+  "conjecture": "goodman-conjecture-on-coefficients-of-p-valent-functions",
+  "module": "Conjectures.GoodmanConjectureOnCoefficientsOfPValentFunctions.S20261014_43",
+  "declaration": "Registry.GoodmanConjectureOnCoefficientsOfPValentFunctions.S20261014_43",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/GoodmanConjecture.lean",
+    "note": "取自 formal-conjectures 的 `goodman_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "对单位圆盘上每个规范化的 p 叶函数 f 和每个 n > p，其第 n 个系数 bₙ 不超过古德曼给出的、由前 p 个系数表示的上界。",
+    "text_en": "**Goodman's conjecture.** For every $p$-valent normalised function $f$ on the unit disk and every\n$n > p$, the $n$-th coefficient is bounded by the Goodman bound:\n$$|b_n| \\le \\sum_{k=1}^{p} \\frac{2k (n+p)!}{(p-k)!\\,(p+k)!\\,(n-p-1)!\\,(n^2-k^2)} |b_k|.$$"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

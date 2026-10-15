@@ -1,0 +1,21 @@
+{
+  "id": "20261014-93",
+  "conjecture": "erdos-problem-1003",
+  "module": "Conjectures.ErdosProblem1003.S20261014_93",
+  "declaration": "Registry.ErdosProblem1003.S20261014_93",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/ErdosProblems/1003.lean",
+    "note": "取自 formal-conjectures 的 `erdos_1003`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。（命题本体写在辅助定义 `statement` 中，因为它依赖原文件顶部的 `open`，登记库的规范不允许命题里出现 `open`。）"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "方程 φ(n) = φ(n + 1) 是否有无穷多个解？这里 φ 是欧拉函数。",
+    "text_en": "Are there infinitely many solutions to $\\phi(n) = \\phi(n+1)$, where $\\phi$ is the Euler totient\nfunction?"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

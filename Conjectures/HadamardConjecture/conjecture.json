@@ -1,0 +1,17 @@
+{
+  "slug": "hadamard-conjecture",
+  "name": "Hadamard's conjecture",
+  "name_zh": "阿达马猜想",
+  "informal": "对每个 n = 4k，都存在 n 阶阿达马矩阵。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Hadamard_matrix#Hadamard_conjecture"
+    },
+    {
+      "label": "Résolution d'une question relative aux déterminants",
+      "url": "https://gallica.bnf.fr/ark:/12148/bpt6k486252g/f400.image.r"
+    }
+  ],
+  "informal_en": "There exists a Hadamard matrix for all $n = 4k$."
+}

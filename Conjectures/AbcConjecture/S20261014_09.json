@@ -1,0 +1,21 @@
+{
+  "id": "20261014-09",
+  "conjecture": "abc-conjecture",
+  "module": "Conjectures.AbcConjecture.S20261014_09",
+  "declaration": "Registry.AbcConjecture.S20261014_09",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/ABC.lean",
+    "note": "取自 formal-conjectures 的 `abc`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "对任意正实数 ε，满足 a + b = c、且 c > rad(abc)^(1+ε) 的互素正整数三元组 (a, b, c) 只有有限多个。这里 rad(abc) 是 abc 的所有不同素因子之积。",
+    "text_en": "For every positive real number `ε`, there exist only finitely many triples `(a, b, c)` of coprime positive integers, with `a + b = c`, such that `c > rad(abc)^(1+ε)`"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

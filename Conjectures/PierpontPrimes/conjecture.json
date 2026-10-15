@@ -1,0 +1,17 @@
+{
+  "slug": "pierpont-primes",
+  "name": "Pierpont primes",
+  "name_zh": "皮尔庞特素数",
+  "informal": "有无穷多个皮尔庞特素数（形如 2^u·3^v + 1 的素数）。",
+  "references": [
+    {
+      "label": "Wikipedia, Pierpont prime",
+      "url": "https://en.wikipedia.org/wiki/Pierpont_prime"
+    },
+    {
+      "label": "OEIS A005109",
+      "url": "https://oeis.org/A005109"
+    }
+  ],
+  "informal_en": "There are infinitely many Pierpont primes."
+}

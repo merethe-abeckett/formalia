@@ -1,0 +1,21 @@
+{
+  "id": "20261014-33",
+  "conjecture": "open-questions-regarding-the-existence-of-euler-bricks",
+  "module": "Conjectures.OpenQuestionsRegardingTheExistenceOfEulerBricks.S20261014_33",
+  "declaration": "Registry.OpenQuestionsRegardingTheExistenceOfEulerBricks.S20261014_33",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/EulerBrick.lean",
+    "note": "取自 formal-conjectures 的 `perfect_euler_brick_existence`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "是否存在完美欧拉砖：三条棱、三条面对角线和体对角线都是整数的长方体？",
+    "text_en": "Is there a perfect Euler brick?"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

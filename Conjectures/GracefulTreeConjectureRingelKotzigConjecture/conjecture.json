@@ -1,0 +1,13 @@
+{
+  "slug": "graceful-tree-conjecture-ringelkotzig-conjecture",
+  "name": "Graceful Tree Conjecture (Ringel–Kotzig conjecture)",
+  "name_zh": "优美树猜想（林格尔-科齐格猜想）",
+  "informal": "每棵树都有优美标号：有 m 条边的树，可以给顶点标上 0 到 m 中互不相同的数，使各条边两端标号之差的绝对值恰好取遍 1 到 m。",
+  "references": [
+    {
+      "label": "Wikipedia/Graceful_labeling",
+      "url": "https://en.wikipedia.org/wiki/Graceful_labeling"
+    }
+  ],
+  "informal_en": "Every tree admits a graceful labeling.\n\nA graceful labeling of a tree $T$ with $m$ edges is an injective map $f : V \\to \\{0, \\dots, m\\}$\nsuch that the multiset of absolute differences $|f(u) - f(v)|$ over edges $\\{u,v\\}$ of $T$\nequals $\\{1, \\dots, m\\}$."
+}

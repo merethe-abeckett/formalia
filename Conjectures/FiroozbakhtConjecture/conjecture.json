@@ -1,0 +1,17 @@
+{
+  "slug": "firoozbakht-conjecture",
+  "name": "Firoozbakht's conjecture",
+  "name_zh": "菲鲁兹巴赫特猜想",
+  "informal": "对所有 n，第 n + 1 个素数的 n + 1 次方根小于第 n 个素数的 n 次方根。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Firoozbakht%27s_conjecture"
+    },
+    {
+      "label": "primepuzzles",
+      "url": "https://www.primepuzzles.net/conjectures/conj_030.htm"
+    }
+  ],
+  "informal_en": "**Firoozbakht's conjecture**\nThe inequality $\\sqrt[n+1]{p_{n+1}} < \\sqrt[n]{p_n}$ holds for all prime numbers $p_n$."
+}

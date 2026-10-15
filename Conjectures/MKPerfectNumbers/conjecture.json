@@ -1,0 +1,17 @@
+{
+  "slug": "m-k-perfect-numbers",
+  "name": "(m,k)-perfect numbers",
+  "name_zh": "(m, k) 完全数",
+  "informal": "不存在 (2, 5) 完全数，即不存在正整数 n，使 σ(σ(n)) = 5n，其中 σ 是因数和函数。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Superperfect_number#Generalizations"
+    },
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/List_of_unsolved_problems_in_mathematics#General"
+    }
+  ],
+  "informal_en": "There does not exist a $(2,5)$-perfect number"
+}

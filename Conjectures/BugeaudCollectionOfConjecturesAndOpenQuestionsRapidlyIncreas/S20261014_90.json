@@ -1,0 +1,21 @@
+{
+  "id": "20261014-90",
+  "conjecture": "bugeaud-collection-of-conjectures-and-open-questions-rapidly",
+  "module": "Conjectures.BugeaudCollectionOfConjecturesAndOpenQuestionsRapidlyIncreas.S20261014_90",
+  "declaration": "Registry.BugeaudCollectionOfConjecturesAndOpenQuestionsRapidlyIncreas.S20261014_90",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Books/BugeaudDistributionModuloOne/Problem10_6.lean",
+    "note": "取自 formal-conjectures 的 `problem_10_6_variant_1`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "比若问题集第 10.6 题：找一个增长很快（相邻项之比有一定下界）的正整数序列 (mₙ)，使对每个无理数 ξ，序列 ξ·mₙ 的小数部分在 [0, 1) 中稠密。",
+    "text_en": "Problem 10.6. Find a very rapidly increasing sequence $(m_n)_{n \\ge 1}$ of positive\nintegers such that $(\\{\\xi m_n\\})_{n \\ge 1}$ is dense modulo one for every irrational\nnumber $\\xi$. Note: Furstenberg's $2^m3^n$ is sublacunary but requires two parameters.\n\nThis is the reading of \"very rapidly increasing\" as a lower bound on the consecutive ratios,\nand it is the one that remains open. It is not answered by runs of consecutive integers, since\ninside a run $m_{n+1} - m_n = 1$; and by `not_isLacunary_of_dense` any answer is pinched\nbetween a decaying ratio floor and the failure of lacunarity. [Kat16, Cor. 4.9] gives a\nuniversally densifying sequence of the multiplicative shape $\\{2^n 3^e\\}$, for which the\nratio condition reduces to a Diophantine statement about the differences of the exponents\n$e$ times $\\log_2 3$ modulo one."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

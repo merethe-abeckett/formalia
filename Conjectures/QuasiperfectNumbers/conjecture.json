@@ -1,0 +1,13 @@
+{
+  "slug": "quasiperfect-numbers",
+  "name": "Quasiperfect Numbers",
+  "name_zh": "拟完全数",
+  "informal": "是否存在拟完全数（因数和等于 2n + 1 的正整数 n）？",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Quasiperfect_number"
+    }
+  ],
+  "informal_en": "**Quasiperfect Numbers Conjecture.**\nDo quasiperfect numbers exist?"
+}

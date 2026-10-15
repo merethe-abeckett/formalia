@@ -1,0 +1,17 @@
+{
+  "slug": "betrothed-numbers",
+  "name": "Betrothed numbers",
+  "name_zh": "订婚数（准亲和数）",
+  "informal": "是否存在奇偶性相同（同为偶数或同为奇数）的一对订婚数 (m, n)，m ≠ n？已知的订婚数对都是一奇一偶。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Betrothed_numbers"
+    },
+    {
+      "label": "OEIS A005276",
+      "url": "https://oeis.org/A005276"
+    }
+  ],
+  "informal_en": "**Same parity betrothed numbers conjecture.**\nDo there exist betrothed numbers $(m, n)$ where both have the same parity\n(both even or both odd)?\n\nAll known betrothed pairs consist of one even and one odd number.\n\nThe requirement $m \\neq n$ is part of the question: $\\mathrm{IsBetrothed}\\ n\\ n$ says\n$\\sigma(n) = 2n + 1$, i.e. that $n$ is quasiperfect, which is the separate open problem\n`QuasiperfectNumbers.exists_quasiperfect`."
+}

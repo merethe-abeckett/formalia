@@ -1,0 +1,13 @@
+{
+  "slug": "euclid-numbers-conjecture",
+  "name": "Euclid Numbers conjecture",
+  "name_zh": "欧几里得数猜想",
+  "informal": "有无穷多个是素数的欧几里得数（前若干个素数之积加 1）。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Euclid_number"
+    }
+  ],
+  "informal_en": "It is not known whether there is an infinite number of prime Euclid numbers."
+}

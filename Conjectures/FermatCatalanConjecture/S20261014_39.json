@@ -1,0 +1,21 @@
+{
+  "id": "20261014-39",
+  "conjecture": "fermat-catalan-conjecture",
+  "module": "Conjectures.FermatCatalanConjecture.S20261014_39",
+  "declaration": "Registry.FermatCatalanConjecture.S20261014_39",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/FermatCatalanConjecture.lean",
+    "note": "取自 formal-conjectures 的 `fermat_catalan`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "方程 a^m + b^n = c^k 在 a、b、c 为互素正整数、m、n、k 为正整数且 1/m + 1/n + 1/k < 1 时，只有有限多组不同的 (a^m, b^n, c^k)。",
+    "text_en": "The **Fermat–Catalan conjecture** states that the equation\n$a^m + b^n = c^k$ has only finitely many solutions $(a,b,c,m,n,k)$ with distinct triplets of values\n$(a^m, b^n, c^k)$ where $a, b, c$ are positive coprime integers and $m, n, k$ are positive integers satisfying\n$\\frac 1 m + \\frac 1 n + \\frac 1 k < 1$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

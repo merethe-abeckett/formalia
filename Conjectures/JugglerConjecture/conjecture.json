@@ -1,0 +1,13 @@
+{
+  "slug": "juggler-conjecture",
+  "name": "Juggler conjecture",
+  "name_zh": "杂耍序列猜想",
+  "informal": "从任意正整数出发，偶数取其平方根的整数部分，奇数取其 3/2 次方的整数部分，反复操作，最终一定会到达 1。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Juggler_sequence"
+    }
+  ],
+  "informal_en": "Now form a sequence beginning with any positive integer, where each subsequent term is obtained\nby applying the operation defined above to the previous term.\nThe **Juggler Conjecture** states that for any positive integer $n$, there exists a natural number\n$m$ such that the $m$-th term of the sequence is $1$."
+}

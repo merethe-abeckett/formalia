@@ -1,0 +1,21 @@
+{
+  "id": "20261014-23",
+  "conjecture": "catalan-conjecture-and-related-diophantine-equations",
+  "module": "Conjectures.CatalanConjectureAndRelatedDiophantineEquations.S20261014_23",
+  "declaration": "Registry.CatalanConjectureAndRelatedDiophantineEquations.S20261014_23",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Catalan.lean",
+    "note": "取自 formal-conjectures 的 `pillais_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "对正整数 a、b、c，方程 a·x^n − b·y^m = c 在 x、y > 1 且 (m, n) ≠ (2, 2) 时只有有限多组正整数解 (x, y, m, n)。",
+    "text_en": "For positive integers a, b, and c, there are only finitely many positive solutions (x, y, m, n) to the\nequation $ax^n - by^m = c$ where $(m, n) \\neq (2, 2)$ and $x, y > 1$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

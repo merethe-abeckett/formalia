@@ -1,0 +1,13 @@
+{
+  "slug": "determinantal-conjecture",
+  "name": "Determinantal conjecture",
+  "name_zh": "行列式猜想",
+  "informal": "两个 n×n 复正规矩阵 A、B 之和的行列式，是否总落在 n! 个点 ∏ᵢ (λᵢ(A) + λ_{σ(i)}(B)) 的凸包内？这里 λ 是特征值，σ 取遍对称群 Sₙ。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Determinantal_conjecture"
+    }
+  ],
+  "informal_en": "Does the determinant of the sum $A + B$ of two $n \\times n$ normal\ncomplex matrices $A$ and $B$ always lie in the convex hull\nof the $n!$ points $\\prod\\_i (\\lambda(A)\\_i + \\lambda(B)\\_{\\sigma(i)})$?\nHere the numbers $\\lambda(A)\\_i$ and $\\lambda(B)\\_i$ are\nthe eigenvalues of $A$ and $B$, and $\\sigma$ is an element of the symmetric\ngroup $S\\_n$."
+}

@@ -1,0 +1,21 @@
+{
+  "id": "20261014-87",
+  "conjecture": "digit-2-in-base-3-representation-of-2-n",
+  "module": "Conjectures.Digit2InBase3RepresentationOf2N.S20261014_87",
+  "declaration": "Registry.Digit2InBase3RepresentationOf2N.S20261014_87",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Arxiv/2107.12475/CollatzLike.lean",
+    "note": "取自 formal-conjectures 的 `CollatzLike`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "当 n > 8 时，2^n 的三进制表示中一定含有数字 2，即 2^n 不是若干个互不相同的 3 的幂之和。该猜想等价于某台 15 状态、2 符号的图灵机停机。",
+    "text_en": "For $n > 8$, $2^n$ is not the the sum of distinct powers of $3$. Expressed here in terms of the base $3$ digits of $n$.\n\nThis conjecture is equivalent to the halting of a $15$-state $2$-symbol Turing Machine.\n\nTODO(lezeau): Formalize the Turing Machine version of this problem.\n\nSource: *Hardness of Busy Beaver Value BB(15)*: https://link.springer.com/chapter/10.1007/978-3-031-72621-7_9\nThis is also https://arxiv.org/abs/2107.12475."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

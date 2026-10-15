@@ -1,0 +1,21 @@
+{
+  "id": "20261014-76",
+  "conjecture": "taxicab-numbers",
+  "module": "Conjectures.TaxicabNumbers.S20261014_76",
+  "declaration": "Registry.TaxicabNumbers.S20261014_76",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Taxicab.lean",
+    "note": "取自 formal-conjectures 的 `taxicab_for_5_2_2`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "是否存在能用两种方式写成两个正整数五次方之和的数？对应的出租车数 Ta(5, 2, 2) 目前未知，是否存在也未知。",
+    "text_en": "Taxicab number for $k=5$, $m=2$, and $n=2$ is not known.\nWhether such a number exists is also not known."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

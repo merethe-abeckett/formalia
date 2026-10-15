@@ -1,0 +1,13 @@
+{
+  "slug": "agoh-giuga-conjecture",
+  "name": "Agoh-Giuga conjecture",
+  "name_zh": "阿戈-朱加猜想",
+  "informal": "阿戈的表述：对任意整数 p ≥ 2，p 是素数，当且仅当由伯努利数 B_{p−1} 的分子和分母写成的一个整除条件成立（等价于 p·B_{p−1} ≡ −1（模 p））。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Agoh-Giuga_conjecture"
+    }
+  ],
+  "informal_en": "The **Agoh-Giuga Conjecture**, Agoh's formulation"
+}

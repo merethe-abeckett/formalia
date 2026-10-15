@@ -1,0 +1,13 @@
+{
+  "slug": "exponentials-conjectures-and-theorems",
+  "name": "Exponentials conjectures and theorems",
+  "name_zh": "指数猜想",
+  "informal": "四指数猜想的一个推论：对任意无理数 t，2^t 与 3^t 中至少有一个是超越数。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Four_exponentials_conjecture"
+    }
+  ],
+  "informal_en": "The four exponential conjecture would imply that for any irrational number $t$,\nat least one of the numbers $2^t$ and $3^t$ is transcendental."
+}

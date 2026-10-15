@@ -1,0 +1,8 @@
+{
+  "slug": "bugeaud-collection-of-conjectures-and-open-questions-rapidly",
+  "name": "Bugeaud Collection of Conjectures and Open Questions: Rapidly Increasing Sequences Dense Modulo One",
+  "name_zh": "比若问题集：模一稠密的快速增长序列",
+  "informal": "比若问题集第 10.6 题：找一个增长很快（相邻项之比有一定下界）的正整数序列 (mₙ)，使对每个无理数 ξ，序列 ξ·mₙ 的小数部分在 [0, 1) 中稠密。",
+  "references": [],
+  "informal_en": "Problem 10.6. Find a very rapidly increasing sequence $(m_n)_{n \\ge 1}$ of positive\nintegers such that $(\\{\\xi m_n\\})_{n \\ge 1}$ is dense modulo one for every irrational\nnumber $\\xi$. Note: Furstenberg's $2^m3^n$ is sublacunary but requires two parameters.\n\nThis is the reading of \"very rapidly increasing\" as a lower bound on the consecutive ratios,\nand it is the one that remains open. It is not answered by runs of consecutive integers, since\ninside a run $m_{n+1} - m_n = 1$; and by `not_isLacunary_of_dense` any answer is pinched\nbetween a decaying ratio floor and the failure of lacunarity. [Kat16, Cor. 4.9] gives a\nuniversally densifying sequence of the multiplicative shape $\\{2^n 3^e\\}$, for which the\nratio condition reduces to a Diophantine statement about the differences of the exponents\n$e$ times $\\log_2 3$ modulo one."
+}

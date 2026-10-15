@@ -1,0 +1,13 @@
+{
+  "slug": "goodman-conjecture-on-coefficients-of-p-valent-functions",
+  "name": "Goodman's conjecture on coefficients of $p$-valent functions",
+  "name_zh": "古德曼 p 叶函数系数猜想",
+  "informal": "对单位圆盘上每个规范化的 p 叶函数 f 和每个 n > p，其第 n 个系数 bₙ 不超过古德曼给出的、由前 p 个系数表示的上界。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Goodman%27s_conjecture"
+    }
+  ],
+  "informal_en": "**Goodman's conjecture.** For every $p$-valent normalised function $f$ on the unit disk and every\n$n > p$, the $n$-th coefficient is bounded by the Goodman bound:\n$$|b_n| \\le \\sum_{k=1}^{p} \\frac{2k (n+p)!}{(p-k)!\\,(p+k)!\\,(n-p-1)!\\,(n^2-k^2)} |b_k|.$$"
+}

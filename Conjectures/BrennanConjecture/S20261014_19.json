@@ -1,0 +1,21 @@
+{
+  "id": "20261014-19",
+  "conjecture": "brennan-conjecture",
+  "module": "Conjectures.BrennanConjecture.S20261014_19",
+  "declaration": "Registry.BrennanConjecture.S20261014_19",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Brennanconjecture.lean",
+    "note": "取自 formal-conjectures 的 `brennan_universalSpectrumBounded`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "布伦南猜想的第二种表述：单位圆盘上有界单叶函数的普适积分平均谱在 −2 处的值 B_b(−2) 等于 1。",
+    "text_en": "Brennan's conjecture, part 2: $B_b(-2) = 1$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

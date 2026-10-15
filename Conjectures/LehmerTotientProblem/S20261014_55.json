@@ -1,0 +1,21 @@
+{
+  "id": "20261014-55",
+  "conjecture": "lehmer-totient-problem",
+  "module": "Conjectures.LehmerTotientProblem.S20261014_55",
+  "declaration": "Registry.LehmerTotientProblem.S20261014_55",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/LehmerTotient.lean",
+    "note": "取自 formal-conjectures 的 `lehmer_totient`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "是否存在合数 n > 1，使欧拉函数 φ(n) 整除 n − 1？",
+    "text_en": "Does there exist a composite number $n > 1$ such that Euler’s totient function\n$\\varphi(n)$ divides $n - 1$?"
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

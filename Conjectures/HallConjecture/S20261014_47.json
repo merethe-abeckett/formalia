@@ -1,0 +1,21 @@
+{
+  "id": "20261014-47",
+  "conjecture": "hall-conjecture",
+  "module": "Conjectures.HallConjecture.S20261014_47",
+  "declaration": "Registry.HallConjecture.S20261014_47",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Hall.lean",
+    "note": "取自 formal-conjectures 的 `hall_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "霍尔猜想的原始形式（指数 1/2）：存在常数 C > 0，使对所有满足 y² ≠ x³ 的整数 x、y，都有 |y² − x³| > C·|x|^(1/2)。",
+    "text_en": "Original Hall's conjecture with exponent $1/2$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

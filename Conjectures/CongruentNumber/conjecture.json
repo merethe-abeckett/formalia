@@ -1,0 +1,21 @@
+{
+  "slug": "congruent-number",
+  "name": "Congruent Number",
+  "name_zh": "同余数问题",
+  "informal": "滕内尔定理给出的充分条件：对无平方因子的奇数 n，若满足 n = 2x² + y² + 32z² 的整数解个数的两倍等于 n = 2x² + y² + 8z² 的整数解个数，则 n 是同余数（某个有理直角三角形的面积）。这一方向在假定 BSD 猜想时成立，无条件证明尚未知。",
+  "references": [
+    {
+      "label": "Wikipedia (Congruent number)",
+      "url": "https://en.wikipedia.org/wiki/Congruent_number"
+    },
+    {
+      "label": "Wikipedia (Tunnell's theorem)",
+      "url": "https://en.wikipedia.org/wiki/Tunnell%27s_theorem"
+    },
+    {
+      "label": "Keith Conrad's note",
+      "url": "https://kconrad.math.uconn.edu/blurbs/ugradnumthy/congnumber.pdf"
+    }
+  ],
+  "informal_en": "Tunnell's theorem (sufficient condition assuming BSD) for odd squarefree congruent numbers."
+}

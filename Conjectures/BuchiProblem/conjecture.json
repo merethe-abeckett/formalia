@@ -1,0 +1,13 @@
+{
+  "slug": "buchi-problem",
+  "name": "Büchi's problem",
+  "name_zh": "比希问题",
+  "informal": "存在正整数 M，使得对所有整数 x 和 a，如果 (x + n)² + a 对连续 M 个 n 都是完全平方数，那么 a = 0。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/B%C3%BCchi%27s_problem"
+    }
+  ],
+  "informal_en": "**Büchi's problem**\nThere exists a positive integer $M$ such that, for all integers $x$ and $a$,\nif $(x+n)^2 + a$ is a square for $M$ consecutive values of $n$, then $a = 0$."
+}

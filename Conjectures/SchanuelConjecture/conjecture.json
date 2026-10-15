@@ -1,0 +1,13 @@
+{
+  "slug": "schanuel-conjecture",
+  "name": "Schanuel's Conjecture",
+  "name_zh": "沙努埃尔猜想",
+  "informal": "若复数 z₁, …, zₙ 在 ℚ 上线性无关，则域 ℚ(z₁, …, zₙ, e^{z₁}, …, e^{zₙ}) 在 ℚ 上的超越次数至少为 n。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Schanuel%27s_conjecture"
+    }
+  ],
+  "informal_en": "Given any set of $n$ complex numbers $\\{z_1, ..., z_n\\}$ that are linearly independent over\n$\\mathbb{Q}$, the field extension $\\mathbb{Q}(z_1, ..., z_n, e^{z_1}, ..., e^{z_n})$\nhas transcendence degree at least $n$ over $\\mathbb{Q}$."
+}

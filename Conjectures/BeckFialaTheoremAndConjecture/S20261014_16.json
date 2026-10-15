@@ -1,0 +1,21 @@
+{
+  "id": "20261014-16",
+  "conjecture": "beckfiala-theorem-and-conjecture",
+  "module": "Conjectures.BeckFialaTheoremAndConjecture.S20261014_16",
+  "declaration": "Registry.BeckFialaTheoremAndConjecture.S20261014_16",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/BeckFialaConjecture.lean",
+    "note": "取自 formal-conjectures 的 `beck_fiala_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "存在常数 C > 0，使任何度数不超过 t 的集合系 S₁, …, Sₘ ⊆ {1, …, n} 都有一种 ±1 染色 χ，使每个集合内染色之和的绝对值不超过 C·√t。",
+    "text_en": "**The Beck–Fiala conjecture**\n\nThere exists a universal constant $C > 0$ such that every set system\n$S_1, \\dots, S_m \\subseteq [n]$ of degree at most $t$ admits a colouring\n$\\chi \\colon [n] \\to \\{-1, +1\\}$ with\n$\\left|\\sum_{j \\in S_i} \\chi(j)\\right| \\le C \\sqrt{t}$ for every $i$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

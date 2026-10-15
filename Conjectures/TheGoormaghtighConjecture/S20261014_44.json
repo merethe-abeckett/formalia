@@ -1,0 +1,21 @@
+{
+  "id": "20261014-44",
+  "conjecture": "the-goormaghtigh-conjecture",
+  "module": "Conjectures.TheGoormaghtighConjecture.S20261014_44",
+  "declaration": "Registry.TheGoormaghtighConjecture.S20261014_44",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-14",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/Wikipedia/Goormaghtigh.lean",
+    "note": "取自 formal-conjectures 的 `goormaghtigh_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "能用两种不同进制写成至少三位的“全 1 数”的正整数，只有 31 和 8191。",
+    "text_en": "The only Goormaghtigh numbers are $31$ and $8191$."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

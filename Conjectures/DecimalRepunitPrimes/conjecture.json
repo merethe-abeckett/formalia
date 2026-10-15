@@ -1,0 +1,25 @@
+{
+  "slug": "decimal-repunit-primes",
+  "name": "Decimal Repunit Primes",
+  "name_zh": "十进制循环单位素数",
+  "informal": "有无穷多个十进制循环单位素数（形如 11…1 的素数）。",
+  "references": [
+    {
+      "label": "Wikipedia: Repunit",
+      "url": "https://en.wikipedia.org/wiki/Repunit#Decimal_repunit_primes"
+    },
+    {
+      "label": "OEIS A002275",
+      "url": "https://oeis.org/A002275"
+    },
+    {
+      "label": "OEIS A004022",
+      "url": "https://oeis.org/A004022"
+    },
+    {
+      "label": "OEIS A004023",
+      "url": "https://oeis.org/A004023"
+    }
+  ],
+  "informal_en": "[Wikipedia's repunit article](https://en.wikipedia.org/wiki/Repunit#Decimal_repunit_primes)\nstates: \"It has been conjectured that there are infinitely many repunit primes.\""
+}

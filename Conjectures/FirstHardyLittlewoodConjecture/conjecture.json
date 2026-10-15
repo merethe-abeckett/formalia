@@ -1,0 +1,13 @@
+{
+  "slug": "first-hardylittlewood-conjecture",
+  "name": "First Hardy–Littlewood conjecture",
+  "name_zh": "哈代-李特尔伍德猜想（素数计数的次可加性）",
+  "informal": "对整数 x、y ≥ 2，π(x + y) ≤ π(x) + π(y)，其中 π(z) 是不超过 z 的素数个数。",
+  "references": [
+    {
+      "label": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/First_Hardy%E2%80%93Littlewood_conjecture"
+    }
+  ],
+  "informal_en": "For integers $x, y \\geq 2$,\n$$\n  \\pi(x + y) \\leq \\pi(x) + \\pi(y),\n$$\nwhere $\\pi(z)$ denotes the prime-counting function, giving the number of primes up to\nand including $z$."
+}
