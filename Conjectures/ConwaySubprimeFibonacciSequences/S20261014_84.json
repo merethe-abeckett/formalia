@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "Every subprime Fibonacci sequence starting from two positive integers eventually enters a cycle.\nThis is the \"no infinite chains\" conjecture recorded in [A214897](https://oeis.org/A214897),\nassociated with [Guy–Khovanova–Salazar](https://arxiv.org/abs/1207.5099)."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "从任意两个正整数出发的次素数斐波那契序列最终都会进入循环。见 OEIS A214897。",
+    "text_en": "Every subprime Fibonacci sequence starting from two positive integers eventually enters a cycle.\nThis is the \"no infinite chains\" conjecture recorded in [A214897](https://oeis.org/A214897),\nassociated with [Guy–Khovanova–Salazar](https://arxiv.org/abs/1207.5099)."
   },
   "claimed_proofs": [],
   "external_links": []

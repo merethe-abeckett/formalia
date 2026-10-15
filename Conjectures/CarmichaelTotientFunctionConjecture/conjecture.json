@@ -1,8 +1,8 @@
 {
   "slug": "carmichael-totient-function-conjecture",
   "name": "Carmichael's totient function conjecture",
-  "name_zh": "",
-  "informal": "*Carmichael's totient function conjecture*: For every positive natural number $n$,\nthere exists a natural number $m$ with $m ≠ n$, such that $φ(n) = φ(m)$.",
+  "name_zh": "卡迈克尔欧拉函数猜想",
+  "informal": "对每个正整数 n，都存在另一个正整数 m ≠ n，使 φ(m) = φ(n)。这里 φ 是欧拉函数。",
   "references": [
     {
       "label": "Wikipedia",

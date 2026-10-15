@@ -1,8 +1,8 @@
 {
   "slug": "rudin-conjecture-on-squares-in-arithmetic-progressions",
   "name": "Rudin's conjecture on squares in arithmetic progressions",
-  "name_zh": "",
-  "informal": "A stronger form of Rudin's conjecture: for every $N \\ge 6$, the arithmetic progression\n$24 n + 1$ attains the maximum $Q(N)$.",
+  "name_zh": "鲁丁等差数列平方数猜想",
+  "informal": "鲁丁猜想的加强形式：对每个 N ≥ 6，在所有非平凡等差数列的前 N 项中，等差数列 24n + 1 所含的完全平方数最多。",
   "references": [
     {
       "label": "Wikipedia",

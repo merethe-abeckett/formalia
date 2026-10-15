@@ -1,8 +1,8 @@
 {
   "slug": "an-arithmetic-sum-associated-with-the-classical-theta-functi",
   "name": "An Arithmetic Sum Associated with the Classical Theta Function",
-  "name_zh": "",
-  "informal": "**Conjecture 1.1**: For any odd prime $k$, the sum associated with the classical theta function $θ_3$,\n$S(k)$ is positive.",
+  "name_zh": "与经典 θ 函数相关的一个算术和",
+  "informal": "对任意奇素数 k，与经典 θ₃ 函数相关的一个符号和 S(k) 是正数。",
   "references": [
     {
       "label": "arxiv/2501.03234",

@@ -1,8 +1,8 @@
 {
   "slug": "idoneal-numbers-completeness-conjecture",
   "name": "Idoneal numbers completeness conjecture",
-  "name_zh": "",
-  "informal": "Idoneal numbers completeness conjecture.",
+  "name_zh": "欧拉方便数的完备性猜想",
+  "informal": "已知的欧拉方便数就是全部：任何方便数都在已知列表中。这里方便数指不能写成 ab + bc + ca（0 < a < b < c）的正整数。",
   "references": [
     {
       "label": "Wikipedia: Idoneal number",

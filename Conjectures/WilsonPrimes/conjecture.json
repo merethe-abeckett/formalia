@@ -1,8 +1,8 @@
 {
   "slug": "wilson-primes",
   "name": "Wilson primes",
-  "name_zh": "",
-  "informal": "There are infinitely many Wilson primes.",
+  "name_zh": "威尔逊素数",
+  "informal": "有无穷多个威尔逊素数（满足 (p − 1)! ≡ −1（模 p²）的素数 p）。",
   "references": [
     {
       "label": "Wikipedia, Wilson prime",

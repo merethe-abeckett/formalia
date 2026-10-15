@@ -1,8 +1,8 @@
 {
   "slug": "ramanujan-function",
   "name": "Ramanujan τ-function",
-  "name_zh": "",
-  "informal": "Lehmer's conjecture: $\\tau(n) \\ne 0$ for all $n > 0$.",
+  "name_zh": "拉马努金 τ 函数",
+  "informal": "莱默猜想：对所有 n > 0，拉马努金 τ 函数的值 τ(n) ≠ 0。",
   "references": [
     {
       "label": "Ramanujan-Petersson conjecture",

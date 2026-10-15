@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `exists_magic_square_squares`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "Does there exist a $3 \\times 3$ matrix such that every entry is a distinct square,\nand all rows, columns, and diagonals add up to the same value?\n\n0 is excluded, as a Magic Square of Squares with 0 and 8 distinct squares is know is knownn.\nSee [Magic Square of Squares](https://static.nsta.org/pdfs/QuantumV6N3.pdf)"
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "是否存在 3×3 幻方，其中 9 个数是互不相同的非零完全平方数，且每行、每列、两条对角线之和都相等？",
+    "text_en": "Does there exist a $3 \\times 3$ matrix such that every entry is a distinct square,\nand all rows, columns, and diagonals add up to the same value?\n\n0 is excluded, as a Magic Square of Squares with 0 and 8 distinct squares is know is knownn.\nSee [Magic Square of Squares](https://static.nsta.org/pdfs/QuantumV6N3.pdf)"
   },
   "claimed_proofs": [],
   "external_links": []

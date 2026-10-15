@@ -1,8 +1,8 @@
 {
   "slug": "cunningham-chains-jones-conjecture",
   "name": "Cunningham chains — Jones's conjecture",
-  "name_zh": "",
-  "informal": "Jones's conjecture (first kind): for every positive integer $k$, there are\ninfinitely many primes $p$ that start a first-kind Cunningham chain of\nexactly length $k$.",
+  "name_zh": "坎宁安链：琼斯猜想",
+  "informal": "琼斯猜想（第一类）：对每个正整数 k，有无穷多个素数 p 恰好开始一条长度为 k 的第一类坎宁安链。",
   "references": [
     {
       "label": "Polynomial Cunningham Chains",

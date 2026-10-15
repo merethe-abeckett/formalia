@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `schanuel_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。（命题本体写在辅助定义 `statement` 中，因为它依赖原文件顶部的 `open`，登记库的规范不允许命题里出现 `open`。）"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "Given any set of $n$ complex numbers $\\{z_1, ..., z_n\\}$ that are linearly independent over\n$\\mathbb{Q}$, the field extension $\\mathbb{Q}(z_1, ..., z_n, e^{z_1}, ..., e^{z_n})$\nhas transcendence degree at least $n$ over $\\mathbb{Q}$."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "若复数 z₁, …, zₙ 在 ℚ 上线性无关，则域 ℚ(z₁, …, zₙ, e^{z₁}, …, e^{zₙ}) 在 ℚ 上的超越次数至少为 n。",
+    "text_en": "Given any set of $n$ complex numbers $\\{z_1, ..., z_n\\}$ that are linearly independent over\n$\\mathbb{Q}$, the field extension $\\mathbb{Q}(z_1, ..., z_n, e^{z_1}, ..., e^{z_n})$\nhas transcendence degree at least $n$ over $\\mathbb{Q}$."
   },
   "claimed_proofs": [],
   "external_links": []

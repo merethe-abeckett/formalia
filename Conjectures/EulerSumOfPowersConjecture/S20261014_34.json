@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `eulers_sum_of_powers_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "Euler's sum of powers conjecture states that for integers $n > 1$ and $k > 1$,\nif the sum of $n$ positive integers each raised to the $k$-th power equals another integer\nraised to the $k$-th power, then $n ≥ k$.\n\nThe conjecture is known to be false for $k = 4$ and $k = 5$,\nbut remains open for $k ≥ 6$."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "对整数 n > 1、k > 1，若 n 个正整数的 k 次方之和等于另一个整数的 k 次方，则 n ≥ k。已知 k = 4 和 k = 5 时有反例，k ≥ 6 时仍未解决。",
+    "text_en": "Euler's sum of powers conjecture states that for integers $n > 1$ and $k > 1$,\nif the sum of $n$ positive integers each raised to the $k$-th power equals another integer\nraised to the $k$-th power, then $n ≥ k$.\n\nThe conjecture is known to be false for $k = 4$ and $k = 5$,\nbut remains open for $k ≥ 6$."
   },
   "claimed_proofs": [],
   "external_links": []

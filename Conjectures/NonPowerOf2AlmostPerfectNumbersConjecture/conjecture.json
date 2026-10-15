@@ -1,8 +1,8 @@
 {
   "slug": "non-power-of-2-almost-perfect-numbers-conjecture",
   "name": "Non-Power-of-2 Almost Perfect Numbers Conjecture",
-  "name_zh": "",
-  "informal": "**Non-Power-of-2 Almost Perfect Numbers Conjecture.**\nDoes there exist an almost perfect number that is not a power of 2?",
+  "name_zh": "非 2 的幂的几乎完全数",
+  "informal": "是否存在不是 2 的幂的几乎完全数（因数和等于 2n − 1 的正整数 n）？",
   "references": [
     {
       "label": "Wikipedia",

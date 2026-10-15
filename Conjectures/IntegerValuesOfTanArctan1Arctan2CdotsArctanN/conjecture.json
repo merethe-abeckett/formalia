@@ -1,8 +1,8 @@
 {
   "slug": "integer-values-of-tan-arctan-1-arctan-2-cdots-arctan-n",
   "name": "Integer values of $\\tan(\\arctan 1 + \\arctan 2 + \\cdots + \\arctan n)$",
-  "name_zh": "",
-  "informal": "**Conjecture (Amdeberhan-Medina-Moll, 2008).** For every integer $n \\geq 5$, the value\n$$x_n = \\tan(\\arctan 1 + \\arctan 2 + \\cdots + \\arctan n)$$\nis not an integer.",
+  "name_zh": "tan(arctan 1 + arctan 2 + … + arctan n) 的整数值",
+  "informal": "阿姆德伯汉-梅迪纳-莫尔猜想（2008）：对每个整数 n ≥ 5，tan(arctan 1 + arctan 2 + … + arctan n) 不是整数。",
   "references": [
     {
       "label": "arxiv/2607.05739",

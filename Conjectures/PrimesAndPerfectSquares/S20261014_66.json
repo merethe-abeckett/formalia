@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `infinite_prime_sq_add_one`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "Are there infinitely many primes $p$ such that $p - 1$ is a perfect square? In other words: Are there infinitely many primes of the form $n^2 + 1$?"
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "是否有无穷多个素数 p 使 p − 1 是完全平方数，即无穷多个形如 n² + 1 的素数？",
+    "text_en": "Are there infinitely many primes $p$ such that $p - 1$ is a perfect square? In other words: Are there infinitely many primes of the form $n^2 + 1$?"
   },
   "claimed_proofs": [],
   "external_links": []

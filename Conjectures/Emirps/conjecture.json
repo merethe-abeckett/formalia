@@ -1,8 +1,8 @@
 {
   "slug": "emirps",
   "name": "Emirps",
-  "name_zh": "",
-  "informal": "[Wikipedia's article on emirps](https://en.wikipedia.org/wiki/Emirp) states: \"It is not known\nwhether there are infinitely many emirps.\"",
+  "name_zh": "反素数",
+  "informal": "有无穷多个反素数（倒过来写是另一个不同素数的素数）。目前尚不知道是否如此。",
   "references": [
     {
       "label": "Wikipedia, Emirp",

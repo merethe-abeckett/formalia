@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `MLC`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "The MLC conjecture, stating that the mandelbrot set is locally connected."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "MLC 猜想：曼德博集合是局部连通的。",
+    "text_en": "The MLC conjecture, stating that the mandelbrot set is locally connected."
   },
   "claimed_proofs": [],
   "external_links": []

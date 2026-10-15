@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `two_pow_three_pow_transcendental`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "The four exponential conjecture would imply that for any irrational number $t$,\nat least one of the numbers $2^t$ and $3^t$ is transcendental."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "四指数猜想的一个推论：对任意无理数 t，2^t 与 3^t 中至少有一个是超越数。",
+    "text_en": "The four exponential conjecture would imply that for any irrational number $t$,\nat least one of the numbers $2^t$ and $3^t$ is transcendental."
   },
   "claimed_proofs": [],
   "external_links": []

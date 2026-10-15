@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `irrational_seven`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "$\\zeta(7)$ is irrational."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "ζ(7) 是无理数。",
+    "text_en": "$\\zeta(7)$ is irrational."
   },
   "claimed_proofs": [],
   "external_links": []

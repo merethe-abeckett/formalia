@@ -1,8 +1,8 @@
 {
   "slug": "abc-conjecture",
   "name": "*abc* conjecture",
-  "name_zh": "",
-  "informal": "For every positive real number `ε`, there exist only finitely many triples `(a, b, c)` of coprime positive integers, with `a + b = c`, such that `c > rad(abc)^(1+ε)`",
+  "name_zh": "abc 猜想",
+  "informal": "对任意正实数 ε，满足 a + b = c、且 c > rad(abc)^(1+ε) 的互素正整数三元组 (a, b, c) 只有有限多个。这里 rad(abc) 是 abc 的所有不同素因子之积。",
   "references": [
     {
       "label": "Wikipedia",

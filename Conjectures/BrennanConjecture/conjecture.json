@@ -1,8 +1,8 @@
 {
   "slug": "brennan-conjecture",
   "name": "Brennan's Conjecture",
-  "name_zh": "",
-  "informal": "Brennan's conjecture, part 2: $B_b(-2) = 1$.",
+  "name_zh": "布伦南猜想",
+  "informal": "布伦南猜想的第二种表述：单位圆盘上有界单叶函数的普适积分平均谱在 −2 处的值 B_b(−2) 等于 1。",
   "references": [
     {
       "label": "Wikipedia",

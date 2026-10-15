@@ -1,8 +1,8 @@
 {
   "slug": "the-curling-number-conjecture",
   "name": "The Curling Number Conjecture",
-  "name_zh": "",
-  "informal": "Starting from any nonempty finite integer sequence, repeatedly appending its curling number\neventually gives a sequence with curling number $1$ [Chaffin and Sloane, Conjecture 1].",
+  "name_zh": "卷曲数猜想",
+  "informal": "从任意非空有限整数序列出发，不断在末尾添上它的卷曲数，最终会得到卷曲数为 1 的序列（Chaffin 与 Sloane 的猜想 1）。",
   "references": [
     {
       "label": "arxiv/0912.2382",

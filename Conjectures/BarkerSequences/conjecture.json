@@ -1,8 +1,8 @@
 {
   "slug": "barker-sequences",
   "name": "Barker sequences",
-  "name_zh": "",
-  "informal": "Every Barker sequence has length at most $13$.",
+  "name_zh": "巴克序列",
+  "informal": "每个巴克序列的长度都不超过 13。",
   "references": [
     {
       "label": "A note on Barker sequences of even length",

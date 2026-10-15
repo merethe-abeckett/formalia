@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `erdos_1002`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。（命题本体写在辅助定义 `statement` 中，因为它依赖原文件顶部的 `open`，登记库的规范不允许命题里出现 `open`。）"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "For any $0<\\alpha<1$, let $f(\\alpha,n)=\\frac{1}{\\log n}\\sum_{1\\leq k\\leq n}(\\tfrac{1}{2}-\n\\{ \\alpha k\\})$. Does $f(\\alpha,n)$ have an asymptotic distribution function?\n\nIn other words, is there a non-decreasing function $g$ such that $g(-\\infty)=0$, $g(\\infty)=1$,\nand $\\lim_{n\\to \\infty}\\lvert \\{ \\alpha\\in (0,1): f(\\alpha,n)\\leq c\\}\\rvert=g(c)$?"
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "对 0 < α < 1，令 f(α, n) = (1 / log n)·Σ_{k ≤ n} (1/2 − {αk})，其中 {·} 是小数部分。f(α, n) 是否有渐近分布函数？",
+    "text_en": "For any $0<\\alpha<1$, let $f(\\alpha,n)=\\frac{1}{\\log n}\\sum_{1\\leq k\\leq n}(\\tfrac{1}{2}-\n\\{ \\alpha k\\})$. Does $f(\\alpha,n)$ have an asymptotic distribution function?\n\nIn other words, is there a non-decreasing function $g$ such that $g(-\\infty)=0$, $g(\\infty)=1$,\nand $\\lim_{n\\to \\infty}\\lvert \\{ \\alpha\\in (0,1): f(\\alpha,n)\\leq c\\}\\rvert=g(c)$?"
   },
   "claimed_proofs": [],
   "external_links": []

@@ -1,8 +1,8 @@
 {
   "slug": "open-questions-about-fermat-numbers",
   "name": "Open questions about Fermat numbers",
-  "name_zh": "",
-  "informal": "Are Fermat numbers composite for all `n > 4`?",
+  "name_zh": "费马数的开放问题",
+  "informal": "当 n > 4 时，费马数 2^(2^n) + 1 是否都是合数？",
   "references": [
     {
       "label": "Wikipedia",

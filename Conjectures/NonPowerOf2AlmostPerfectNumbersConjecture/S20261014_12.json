@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `exists_almost_perfect_not_power_of_two`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "**Non-Power-of-2 Almost Perfect Numbers Conjecture.**\nDoes there exist an almost perfect number that is not a power of 2?"
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "是否存在不是 2 的幂的几乎完全数（因数和等于 2n − 1 的正整数 n）？",
+    "text_en": "**Non-Power-of-2 Almost Perfect Numbers Conjecture.**\nDoes there exist an almost perfect number that is not a power of 2?"
   },
   "claimed_proofs": [],
   "external_links": []

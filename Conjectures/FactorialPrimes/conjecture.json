@@ -1,8 +1,8 @@
 {
   "slug": "factorial-primes",
   "name": "Factorial primes",
-  "name_zh": "",
-  "informal": "There are infinitely many factorial primes.",
+  "name_zh": "阶乘素数",
+  "informal": "有无穷多个阶乘素数（形如 n! ± 1 的素数）。",
   "references": [
     {
       "label": "Wikipedia, Factorial prime",

@@ -1,8 +1,8 @@
 {
   "slug": "open-questions-on-transcendence-of-numbers",
   "name": "Open questions on transcendence of numbers",
-  "name_zh": "",
-  "informal": "$\\log(\\log(2))$ is transcendental.",
+  "name_zh": "数的超越性开放问题",
+  "informal": "log(log 2) 是超越数。",
   "references": [
     {
       "label": "Wikipedia",

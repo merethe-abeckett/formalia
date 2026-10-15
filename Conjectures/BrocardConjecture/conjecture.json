@@ -1,8 +1,8 @@
 {
   "slug": "brocard-conjecture",
   "name": "Brocard's Conjecture",
-  "name_zh": "",
-  "informal": "**Brocard's Conjecture**\nFor every `n ≥ 2`, between the squares of the `n`-th and `(n+1)`-th primes,\nthere are at least four prime numbers.",
+  "name_zh": "布罗卡猜想",
+  "informal": "对每个 n ≥ 2，第 n 个素数的平方与第 n + 1 个素数的平方之间至少有四个素数。",
   "references": [
     {
       "label": "Wikipedia",

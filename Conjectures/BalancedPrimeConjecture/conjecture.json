@@ -1,8 +1,8 @@
 {
   "slug": "balanced-prime-conjecture",
   "name": "Balanced prime conjecture",
-  "name_zh": "",
-  "informal": "Let $p_k$ be the $k$-th prime number.\nAre there infinitely many $n$ such that $(p_n + p_{n+2}) / 2$ is prime?",
+  "name_zh": "平衡素数猜想",
+  "informal": "记 pₖ 为第 k 个素数。是否有无穷多个 n，使 (pₙ + pₙ₊₂) / 2 是素数？",
   "references": [
     {
       "label": "Wikipedia",

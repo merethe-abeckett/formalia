@@ -1,8 +1,8 @@
 {
   "slug": "woodalprimes",
   "name": "WoodalPrimes",
-  "name_zh": "",
-  "informal": "There are infinitely many prime numbers of the form `k * 2 ^ k - 1` for `k > 1`.",
+  "name_zh": "伍德尔素数",
+  "informal": "有无穷多个形如 k·2^k − 1（k > 1）的素数。",
   "references": [
     {
       "label": "Wikipedia/Woodall Number",

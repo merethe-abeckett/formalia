@@ -1,8 +1,8 @@
 {
   "slug": "beckfiala-theorem-and-conjecture",
   "name": "Beck–Fiala theorem and conjecture",
-  "name_zh": "",
-  "informal": "**The Beck–Fiala conjecture**\n\nThere exists a universal constant $C > 0$ such that every set system\n$S_1, \\dots, S_m \\subseteq [n]$ of degree at most $t$ admits a colouring\n$\\chi \\colon [n] \\to \\{-1, +1\\}$ with\n$\\left|\\sum_{j \\in S_i} \\chi(j)\\right| \\le C \\sqrt{t}$ for every $i$.",
+  "name_zh": "贝克-菲亚拉猜想",
+  "informal": "存在常数 C > 0，使任何度数不超过 t 的集合系 S₁, …, Sₘ ⊆ {1, …, n} 都有一种 ±1 染色 χ，使每个集合内染色之和的绝对值不超过 C·√t。",
   "references": [
     {
       "label": "Wikipedia",

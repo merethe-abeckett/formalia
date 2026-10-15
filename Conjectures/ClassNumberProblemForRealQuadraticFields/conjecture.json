@@ -1,8 +1,8 @@
 {
   "slug": "class-number-problem-for-real-quadratic-fields",
   "name": "Class number problem for real quadratic fields",
-  "name_zh": "",
-  "informal": "There are infinitely many real quadratic fields `ℚ(√d)` with class number one,\nwhere `d > 1` is a squarefree integer.",
+  "name_zh": "实二次域的类数问题",
+  "informal": "有无穷多个类数为 1 的实二次域 ℚ(√d)，其中 d > 1 是无平方因子整数。",
   "references": [
     {
       "label": "Wikipedia",

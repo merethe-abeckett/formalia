@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `tan_arctan_sum_not_integer`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "**Conjecture (Amdeberhan-Medina-Moll, 2008).** For every integer $n \\geq 5$, the value\n$$x_n = \\tan(\\arctan 1 + \\arctan 2 + \\cdots + \\arctan n)$$\nis not an integer."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "阿姆德伯汉-梅迪纳-莫尔猜想（2008）：对每个整数 n ≥ 5，tan(arctan 1 + arctan 2 + … + arctan n) 不是整数。",
+    "text_en": "**Conjecture (Amdeberhan-Medina-Moll, 2008).** For every integer $n \\geq 5$, the value\n$$x_n = \\tan(\\arctan 1 + \\arctan 2 + \\cdots + \\arctan n)$$\nis not an integer."
   },
   "claimed_proofs": [],
   "external_links": []

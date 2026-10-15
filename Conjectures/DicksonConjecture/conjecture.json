@@ -1,8 +1,8 @@
 {
   "slug": "dickson-conjecture",
   "name": "Dickson's conjecture",
-  "name_zh": "",
-  "informal": "**The generalized twin-prime conjecture**\nFor any positive integer $k$ there are infinitely many primes $p$ such that $p + 2k$ is prime.",
+  "name_zh": "狄克森猜想",
+  "informal": "广义孪生素数猜想：对任意正整数 k，有无穷多个素数 p 使 p + 2k 也是素数。",
   "references": [
     {
       "label": "Wikipedia",

@@ -1,8 +1,8 @@
 {
   "slug": "particular-values-of-the-riemann-zeta-function",
   "name": "Particular values of the Riemann zeta function",
-  "name_zh": "",
-  "informal": "$\\zeta(7)$ is irrational.",
+  "name_zh": "黎曼 ζ 函数的特殊值",
+  "informal": "ζ(7) 是无理数。",
   "references": [
     {
       "label": "Wikipedia",

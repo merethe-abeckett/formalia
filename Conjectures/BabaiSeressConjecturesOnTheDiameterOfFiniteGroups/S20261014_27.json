@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `babai_seress_conjecture_alternating`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "**Babai–Seress Conjecture (Conjecture 1.5)**: There exists an absolute constant $C$ such\nthat the diameter of the alternating group $A_n$ satisfies\n$$\\operatorname{diam}(A_n) \\leq n^C.$$\n\n*Reference:* [L. Babai and Á. Seress, *On the diameter of permutation groups*,\nEuropean Journal of Combinatorics 13 (1992), Conjecture 1.5](https://doi.org/10.1016/S0195-6698(05)80029-0)"
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "存在绝对常数 C，使交错群 Aₙ 的凯莱图直径（对任意生成集）不超过 n^C。出自 Babai 与 Seress 1992 年论文的猜想 1.5。",
+    "text_en": "**Babai–Seress Conjecture (Conjecture 1.5)**: There exists an absolute constant $C$ such\nthat the diameter of the alternating group $A_n$ satisfies\n$$\\operatorname{diam}(A_n) \\leq n^C.$$\n\n*Reference:* [L. Babai and Á. Seress, *On the diameter of permutation groups*,\nEuropean Journal of Combinatorics 13 (1992), Conjecture 1.5](https://doi.org/10.1016/S0195-6698(05)80029-0)"
   },
   "claimed_proofs": [],
   "external_links": []

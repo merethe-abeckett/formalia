@@ -1,8 +1,8 @@
 {
   "slug": "conjectures-about-the-mandelbrot-and-multibrot-sets",
   "name": "Conjectures about the Mandelbrot and Multibrot sets",
-  "name_zh": "",
-  "informal": "The MLC conjecture, stating that the mandelbrot set is locally connected.",
+  "name_zh": "曼德博集合相关猜想",
+  "informal": "MLC 猜想：曼德博集合是局部连通的。",
   "references": [
     {
       "label": "Wikipedia",

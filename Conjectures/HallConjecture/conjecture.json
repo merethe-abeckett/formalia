@@ -1,8 +1,8 @@
 {
   "slug": "hall-conjecture",
   "name": "Hall's conjecture",
-  "name_zh": "",
-  "informal": "Original Hall's conjecture with exponent $1/2$.",
+  "name_zh": "霍尔猜想",
+  "informal": "霍尔猜想的原始形式（指数 1/2）：存在常数 C > 0，使对所有满足 y² ≠ x³ 的整数 x、y，都有 |y² − x³| > C·|x|^(1/2)。",
   "references": [
     {
       "label": "Wikipedia",

@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `erdos_10.variants.granville_soundararajan_odd`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "Granville and Soundararajan [GrSo98] have conjectured that at most $3$\npowers of $2$ suffice for all odd integers, and hence at most $4$ powers of $2$\nsuffice for all even integers.\n\nRef: Granville, A. and Soundararajan, K., _A Binary Additive Problem of Erdős and the Order of $2$ mod $p^2$_"
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "格兰维尔与桑达拉拉詹猜想：每个大于 1 的奇数都能写成一个素数加至多 3 个 2 的幂，每个正偶数都能写成一个素数加至多 4 个 2 的幂。",
+    "text_en": "Granville and Soundararajan [GrSo98] have conjectured that at most $3$\npowers of $2$ suffice for all odd integers, and hence at most $4$ powers of $2$\nsuffice for all even integers.\n\nRef: Granville, A. and Soundararajan, K., _A Binary Additive Problem of Erdős and the Order of $2$ mod $p^2$_"
   },
   "claimed_proofs": [],
   "external_links": []

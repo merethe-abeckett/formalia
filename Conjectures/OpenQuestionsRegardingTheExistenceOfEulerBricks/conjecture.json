@@ -1,8 +1,8 @@
 {
   "slug": "open-questions-regarding-the-existence-of-euler-bricks",
   "name": "Open questions regarding the existence of Euler bricks",
-  "name_zh": "",
-  "informal": "Is there a perfect Euler brick?",
+  "name_zh": "完美欧拉砖",
+  "informal": "是否存在完美欧拉砖：三条棱、三条面对角线和体对角线都是整数的长方体？",
   "references": [
     {
       "label": "Wikipedia",

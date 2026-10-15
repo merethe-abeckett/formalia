@@ -1,8 +1,8 @@
 {
   "slug": "babaiseress-conjectures-on-the-diameter-of-finite-groups",
   "name": "Babai–Seress Conjectures on the Diameter of Finite Groups",
-  "name_zh": "",
-  "informal": "**Babai–Seress Conjecture (Conjecture 1.5)**: There exists an absolute constant $C$ such\nthat the diameter of the alternating group $A_n$ satisfies\n$$\\operatorname{diam}(A_n) \\leq n^C.$$\n\n*Reference:* [L. Babai and Á. Seress, *On the diameter of permutation groups*,\nEuropean Journal of Combinatorics 13 (1992), Conjecture 1.5](https://doi.org/10.1016/S0195-6698(05)80029-0)",
+  "name_zh": "巴拜-塞雷斯猜想（有限群的直径）",
+  "informal": "存在绝对常数 C，使交错群 Aₙ 的凯莱图直径（对任意生成集）不超过 n^C。出自 Babai 与 Seress 1992 年论文的猜想 1.5。",
   "references": [
     {
       "label": "Wikipedia, *Diameter (group theory)*",

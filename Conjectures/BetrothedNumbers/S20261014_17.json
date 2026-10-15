@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `same_parity_betrothed`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "**Same parity betrothed numbers conjecture.**\nDo there exist betrothed numbers $(m, n)$ where both have the same parity\n(both even or both odd)?\n\nAll known betrothed pairs consist of one even and one odd number.\n\nThe requirement $m \\neq n$ is part of the question: $\\mathrm{IsBetrothed}\\ n\\ n$ says\n$\\sigma(n) = 2n + 1$, i.e. that $n$ is quasiperfect, which is the separate open problem\n`QuasiperfectNumbers.exists_quasiperfect`."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "是否存在奇偶性相同（同为偶数或同为奇数）的一对订婚数 (m, n)，m ≠ n？已知的订婚数对都是一奇一偶。",
+    "text_en": "**Same parity betrothed numbers conjecture.**\nDo there exist betrothed numbers $(m, n)$ where both have the same parity\n(both even or both odd)?\n\nAll known betrothed pairs consist of one even and one odd number.\n\nThe requirement $m \\neq n$ is part of the question: $\\mathrm{IsBetrothed}\\ n\\ n$ says\n$\\sigma(n) = 2n + 1$, i.e. that $n$ is quasiperfect, which is the separate open problem\n`QuasiperfectNumbers.exists_quasiperfect`."
   },
   "claimed_proofs": [],
   "external_links": []

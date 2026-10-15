@@ -1,8 +1,8 @@
 {
   "slug": "pollock-tetrahedral-numbers-conjecture",
   "name": "Pollock's (tetrahedral numbers) conjecture",
-  "name_zh": "",
-  "informal": "Pollock's (tetrahedral numbers) conjecture:\nevery integer is the sum of at most $5$ tetrahedral numbers.",
+  "name_zh": "波洛克四面体数猜想",
+  "informal": "每个正整数都能写成至多 5 个四面体数之和。",
   "references": [
     {
       "label": "Wikipedia",

@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `riemannHypothesis`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "The **Riemann Hypothesis**: all non-trivial zeros of the Riemann zeta function have real\npart $\\frac{1}{2}$. That is, if $\\zeta(s) = 0$, $s \\neq 1$, and $s$ is not a trivial zero\n$-2(n+1)$ for some $n \\in \\mathbb{N}$, then $\\operatorname{Re}(s) = \\frac{1}{2}$.\n\nThis is the official Millennium Prize Problem as posed by the\n[Clay Mathematics Institute](https://www.claymath.org/wp-content/uploads/2022/05/riemann.pdf).\n\nThis uses the `RiemannHypothesis` type from Mathlib, which is defined as\n`∀ (s : ℂ), riemannZeta s = 0 → (¬∃ n : ℕ, s = -2 * (n + 1)) → s ≠ 1 → s.re = 1 / 2`."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "黎曼 ζ 函数的所有非平凡零点的实部都是 1/2。这是克雷数学研究所的千禧年大奖难题之一，这里使用 Mathlib 中的 RiemannHypothesis 定义。",
+    "text_en": "The **Riemann Hypothesis**: all non-trivial zeros of the Riemann zeta function have real\npart $\\frac{1}{2}$. That is, if $\\zeta(s) = 0$, $s \\neq 1$, and $s$ is not a trivial zero\n$-2(n+1)$ for some $n \\in \\mathbb{N}$, then $\\operatorname{Re}(s) = \\frac{1}{2}$.\n\nThis is the official Millennium Prize Problem as posed by the\n[Clay Mathematics Institute](https://www.claymath.org/wp-content/uploads/2022/05/riemann.pdf).\n\nThis uses the `RiemannHypothesis` type from Mathlib, which is defined as\n`∀ (s : ℂ), riemannZeta s = 0 → (¬∃ n : ℕ, s = -2 * (n + 1)) → s ≠ 1 → s.re = 1 / 2`."
   },
   "claimed_proofs": [],
   "external_links": []

@@ -1,8 +1,8 @@
 {
   "slug": "lehmer-totient-problem",
   "name": "Lehmer's totient problem",
-  "name_zh": "",
-  "informal": "Does there exist a composite number $n > 1$ such that Euler’s totient function\n$\\varphi(n)$ divides $n - 1$?",
+  "name_zh": "莱默欧拉函数问题",
+  "informal": "是否存在合数 n > 1，使欧拉函数 φ(n) 整除 n − 1？",
   "references": [
     {
       "label": "Wikipedia",

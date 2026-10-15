@@ -1,8 +1,8 @@
 {
   "slug": "agrawal-conjecture",
   "name": "Agrawal's conjecture",
-  "name_zh": "",
-  "informal": "**Agrawal's Primality Conjecture.**\n\nDoes the congruence $(X-1)^n \\equiv X^n - 1 \\pmod{n, X^r-1}$ imply\n$n$ is prime (with a specific exception for $n^2 \\equiv 1 \\pmod{r}$)?\n\nWhile the \"if\" direction is a known theorem, the \"only if\" direction\nremains a conjecture.",
+  "name_zh": "阿格拉瓦尔猜想",
+  "informal": "若多项式同余 (X − 1)^n ≡ X^n − 1（模 n 和 X^r − 1）成立，则 n 是素数（n² ≡ 1 模 r 的情形另有例外条件）。“素数蕴含同余”这一方向是已知定理，反方向是猜想。",
   "references": [
     {
       "label": "Wikipedia",

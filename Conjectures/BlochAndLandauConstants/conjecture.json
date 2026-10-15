@@ -1,8 +1,8 @@
 {
   "slug": "bloch-and-landau-constants",
   "name": "Bloch and Landau constants",
-  "name_zh": "",
-  "informal": "Ahlfors and Grunsky also conjectured in [AG37] that this upper bound is the precise value of the\nBloch constant.",
+  "name_zh": "布洛赫常数与朗道常数",
+  "informal": "阿尔福斯与格伦斯基猜想：布洛赫常数恰好等于 Γ(1/3)·Γ(11/12) / (Γ(1/4)·√(1 + √3))，即他们给出的上界就是精确值。",
   "references": [
     {
       "label": "Wikipedia",

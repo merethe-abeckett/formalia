@@ -1,8 +1,8 @@
 {
   "slug": "lychrel-numbers-in-base-10",
   "name": "Lychrel numbers in base 10",
-  "name_zh": "",
-  "informal": "**Lychrel conjecture (base 10):** conjecturally, there are no Lychrel numbers in base 10.\n\nEquivalently, every positive integer eventually becomes a palindrome under the Lychrel iteration.",
+  "name_zh": "十进制利克瑞尔数",
+  "informal": "十进制中不存在利克瑞尔数：每个正整数反复“加上自己的倒序数”，最终都会得到回文数。",
   "references": [
     {
       "label": "Wikipedia: Lychrel number",

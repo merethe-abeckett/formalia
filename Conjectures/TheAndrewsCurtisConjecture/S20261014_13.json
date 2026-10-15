@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `andrews_curtis_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "**The Andrews-Curtis conjecture.**\n\nEvery normally generating `n`-tuple in the free group of rank `n` is\nAndrews-Curtis equivalent to the standard tuple of free generators."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "秩为 n 的自由群中，每个正规生成的 n 元组都与标准生成元组安德鲁斯-柯蒂斯等价。",
+    "text_en": "**The Andrews-Curtis conjecture.**\n\nEvery normally generating `n`-tuple in the free group of rank `n` is\nAndrews-Curtis equivalent to the standard tuple of free generators."
   },
   "claimed_proofs": [],
   "external_links": []

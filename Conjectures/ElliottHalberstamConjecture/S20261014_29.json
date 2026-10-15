@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `elliott_halberstam`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "The Elliott–Halberstam conjecture: for every $\\theta < 1$ and $A > 0$ there exists a\nconstant $C > 0$ such that\n$$\\sum_{1 \\le q \\le x^{\\theta}} E(x; q) \\le \\frac{C x}{\\log^A x}$$\nfor all $x > 2$."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "对任意 θ < 1 和 A > 0，存在常数 C > 0，使对所有 x > 2，素数在等差数列中分布的误差 E(x; q) 对 q ≤ x^θ 求和后不超过 C·x / (log x)^A。",
+    "text_en": "The Elliott–Halberstam conjecture: for every $\\theta < 1$ and $A > 0$ there exists a\nconstant $C > 0$ such that\n$$\\sum_{1 \\le q \\le x^{\\theta}} E(x; q) \\le \\frac{C x}{\\log^A x}$$\nfor all $x > 2$."
   },
   "claimed_proofs": [],
   "external_links": []

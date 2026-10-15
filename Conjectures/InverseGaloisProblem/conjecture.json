@@ -1,8 +1,8 @@
 {
   "slug": "inverse-galois-problem",
   "name": "Inverse Galois problem",
-  "name_zh": "",
-  "informal": "The **Inverse Galois Problem**: every finite group is\nisomorphic to the Galois group of a Galois extension of the\nrationals.",
+  "name_zh": "逆伽罗瓦问题",
+  "informal": "每个有限群都同构于有理数域的某个伽罗瓦扩张的伽罗瓦群。",
   "references": [
     {
       "label": "Wikipedia",

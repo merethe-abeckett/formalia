@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `selfridge_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "**PSW conjecture** (Selfridge's test)\nLet $p$ be an odd number, with $p \\equiv \\pm 2 \\pmod{5}$, $2^{p-1} \\equiv 1 \\pmod{p}$\nand $F_{p+1} \\equiv 0 \\pmod{p}$, then $p$ is a prime number."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "PSW 猜想（塞尔弗里奇测试）：若奇数 p 满足 p ≡ ±2（模 5）、2^(p−1) ≡ 1（模 p），且斐波那契数 F_{p+1} ≡ 0（模 p），则 p 是素数。",
+    "text_en": "**PSW conjecture** (Selfridge's test)\nLet $p$ be an odd number, with $p \\equiv \\pm 2 \\pmod{5}$, $2^{p-1} \\equiv 1 \\pmod{p}$\nand $F_{p+1} \\equiv 0 \\pmod{p}$, then $p$ is a prime number."
   },
   "claimed_proofs": [],
   "external_links": []

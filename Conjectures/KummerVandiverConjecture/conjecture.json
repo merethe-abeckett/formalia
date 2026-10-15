@@ -1,8 +1,8 @@
 {
   "slug": "kummervandiver-conjecture",
   "name": "Kummer–Vandiver conjecture",
-  "name_zh": "",
-  "informal": "Kummer–Vandiver conjecture states that for every prime $p$, the class number of the maximal\nreal subfield of $\\mathbb{Q}(\\zeta_p)$ is not divisible by $p$.\n-",
+  "name_zh": "库默尔-范迪弗猜想",
+  "informal": "对每个素数 p，分圆域 ℚ(ζₚ) 的最大实子域的类数不被 p 整除。",
   "references": [
     {
       "label": "Wikipedia",

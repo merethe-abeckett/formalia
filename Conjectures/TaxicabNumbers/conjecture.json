@@ -1,8 +1,8 @@
 {
   "slug": "taxicab-numbers",
   "name": "Taxicab numbers",
-  "name_zh": "",
-  "informal": "Taxicab number for $k=5$, $m=2$, and $n=2$ is not known.\nWhether such a number exists is also not known.",
+  "name_zh": "出租车数",
+  "informal": "是否存在能用两种方式写成两个正整数五次方之和的数？对应的出租车数 Ta(5, 2, 2) 目前未知，是否存在也未知。",
   "references": [
     {
       "label": "Wikipedia",

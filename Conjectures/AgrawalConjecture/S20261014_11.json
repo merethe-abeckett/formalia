@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `agrawal_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "**Agrawal's Primality Conjecture.**\n\nDoes the congruence $(X-1)^n \\equiv X^n - 1 \\pmod{n, X^r-1}$ imply\n$n$ is prime (with a specific exception for $n^2 \\equiv 1 \\pmod{r}$)?\n\nWhile the \"if\" direction is a known theorem, the \"only if\" direction\nremains a conjecture."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "若多项式同余 (X − 1)^n ≡ X^n − 1（模 n 和 X^r − 1）成立，则 n 是素数（n² ≡ 1 模 r 的情形另有例外条件）。“素数蕴含同余”这一方向是已知定理，反方向是猜想。",
+    "text_en": "**Agrawal's Primality Conjecture.**\n\nDoes the congruence $(X-1)^n \\equiv X^n - 1 \\pmod{n, X^r-1}$ imply\n$n$ is prime (with a specific exception for $n^2 \\equiv 1 \\pmod{r}$)?\n\nWhile the \"if\" direction is a known theorem, the \"only if\" direction\nremains a conjecture."
   },
   "claimed_proofs": [],
   "external_links": []

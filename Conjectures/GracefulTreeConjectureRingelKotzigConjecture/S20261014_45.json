@@ -12,8 +12,9 @@
     "note": "取自 formal-conjectures 的 `graceful_tree_conjecture`（Copyright 2025 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `answer(sorry) ↔`、`@[category …]` 属性与 `sorry`，theorem 的参数改写成 `∀`，保留命题用到的辅助定义。"
   },
   "informal_restatement": {
-    "author": "formal-conjectures 文档注释（原文）",
-    "text": "Every tree admits a graceful labeling.\n\nA graceful labeling of a tree $T$ with $m$ edges is an injective map $f : V \\to \\{0, \\dots, m\\}$\nsuch that the multiset of absolute differences $|f(u) - f(v)|$ over edges $\\{u,v\\}$ of $T$\nequals $\\{1, \\dots, m\\}$."
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "每棵树都有优美标号：有 m 条边的树，可以给顶点标上 0 到 m 中互不相同的数，使各条边两端标号之差的绝对值恰好取遍 1 到 m。",
+    "text_en": "Every tree admits a graceful labeling.\n\nA graceful labeling of a tree $T$ with $m$ edges is an injective map $f : V \\to \\{0, \\dots, m\\}$\nsuch that the multiset of absolute differences $|f(u) - f(v)|$ over edges $\\{u,v\\}$ of $T$\nequals $\\{1, \\dots, m\\}$."
   },
   "claimed_proofs": [],
   "external_links": []

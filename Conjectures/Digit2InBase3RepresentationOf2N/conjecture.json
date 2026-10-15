@@ -1,8 +1,8 @@
 {
   "slug": "digit-2-in-base-3-representation-of-2-n",
   "name": "Digit $2$ in base $3$ representation of $2^n$",
-  "name_zh": "",
-  "informal": "For $n > 8$, $2^n$ is not the the sum of distinct powers of $3$. Expressed here in terms of the base $3$ digits of $n$.\n\nThis conjecture is equivalent to the halting of a $15$-state $2$-symbol Turing Machine.\n\nTODO(lezeau): Formalize the Turing Machine version of this problem.\n\nSource: *Hardness of Busy Beaver Value BB(15)*: https://link.springer.com/chapter/10.1007/978-3-031-72621-7_9\nThis is also https://arxiv.org/abs/2107.12475.",
+  "name_zh": "2^n 的三进制表示中的数字 2",
+  "informal": "当 n > 8 时，2^n 的三进制表示中一定含有数字 2，即 2^n 不是若干个互不相同的 3 的幂之和。该猜想等价于某台 15 状态、2 符号的图灵机停机。",
   "references": [
     {
       "label": "Some Unconventional Problems in Number Theory",
