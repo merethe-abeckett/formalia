@@ -1,5 +1,8 @@
 {
-  "slug": "kummervandiver-conjecture",
+  "slug": "kummer-vandiver-conjecture",
+  "former_slugs": [
+    "kummervandiver-conjecture"
+  ],
   "name": "Kummer–Vandiver conjecture",
   "name_zh": "库默尔-范迪弗猜想",
   "informal": "对每个素数 p，分圆域 ℚ(ζₚ) 的最大实子域的类数不被 p 整除。",

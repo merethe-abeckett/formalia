@@ -24,6 +24,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lean_policy
 import licenses
+import mathtext
 
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
@@ -87,6 +88,13 @@ def find_statement(sid):
             raise EditError(f"表述 #{sid} 已归档，不再接受编辑")
         raise EditError(f"找不到表述 #{sid}")
     return hits[0]
+
+def former_slugs():
+    """改名前用过的网址名。它们在网站上是跳转页，不能再分配给新猜想。"""
+    out = set()
+    for cj in CONJ.glob("*/conjecture.json"):
+        out.update(json.loads(cj.read_text(encoding="utf-8")).get("former_slugs") or [])
+    return out
 
 def load_conjectures():
     out = {}
@@ -283,9 +291,10 @@ def apply_conjecture(sub, editor):
     return slug, [p], False
 
 def dir_name_from(name):
-    words = re.findall(r"[A-Za-z0-9]+", name)
+    """英文名 → (目录名, 网址名)。去掉 LaTeX 和重音，连接号两边分成两个词，只在单词边界截断。"""
+    words = mathtext.ascii_words(name)
     if not words or not words[0][0].isalpha(): raise EditError("新猜想需要一个以字母开头的英文名称，用来生成目录名")
-    return "".join(w[:1].upper() + w[1:] for w in words)[:60], "-".join(w.lower() for w in words)[:60]
+    return mathtext.dir_name(name), mathtext.slugify(name)
 
 def next_id(date):
     nns = [int(m.group(1)) for base in (CONJ, ARCH) if base.exists()
@@ -308,6 +317,8 @@ def apply_statement(sub, editor, created_at):
         name = clean(nc.get("name"), 120, "猜想英文名", required=True)
         dirname, slug = dir_name_from(name)
         if slug in conjs or (CONJ / dirname).exists(): raise EditError(f"已有同名猜想（{slug}），请在已有猜想下新增表述")
+        if slug in former_slugs(): raise EditError(f"网址名 {slug} 曾被一个已改名的猜想使用，请换一个英文名")
+        if slug in mathtext.RESERVED_SLUGS: raise EditError(f"网址名 {slug} 是网站保留的地址，请换一个英文名")
         conj = {"slug": slug, "name": name,
                 "name_zh": clean(nc.get("name_zh"), 120, "猜想中文名"),
                 "informal": clean(nc.get("informal"), 4000, "自然语言表述", multiline=True, required=True),

@@ -1,5 +1,8 @@
 {
-  "slug": "first-hardylittlewood-conjecture",
+  "slug": "first-hardy-littlewood-conjecture",
+  "former_slugs": [
+    "first-hardylittlewood-conjecture"
+  ],
   "name": "First Hardy–Littlewood conjecture",
   "name_zh": "哈代-李特尔伍德猜想（素数计数的次可加性）",
   "informal": "对整数 x、y ≥ 2，π(x + y) ≤ π(x) + π(y)，其中 π(z) 是不超过 z 的素数个数。",

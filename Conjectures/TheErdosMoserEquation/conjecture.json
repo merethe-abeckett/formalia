@@ -1,5 +1,8 @@
 {
-  "slug": "the-erdosmoser-equation",
+  "slug": "the-erdos-moser-equation",
+  "former_slugs": [
+    "the-erdosmoser-equation"
+  ],
   "name": "The Erdős–Moser equation",
   "name_zh": "埃尔德什-莫泽方程",
   "informal": "方程 1^k + 2^k + … + (m − 1)^k = m^k 的正整数解只有 (k, m) = (1, 3)。",

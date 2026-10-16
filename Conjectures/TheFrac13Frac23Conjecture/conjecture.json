@@ -1,5 +1,8 @@
 {
-  "slug": "the-frac-1-3-frac-2-3-conjecture",
+  "slug": "the-1-3-2-3-conjecture",
+  "former_slugs": [
+    "the-frac-1-3-frac-2-3-conjecture"
+  ],
   "name": "The $\\frac 1 3$–$\\frac 2 3$ conjecture",
   "name_zh": "1/3–2/3 猜想",
   "informal": "每个不是全序的有限偏序集中，是否都存在两个元素 x、y，使在随机线性扩张中 x 排在 y 前面的概率介于 1/3 与 2/3 之间？",
