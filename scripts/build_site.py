@@ -15,6 +15,7 @@ import hashlib, html, json, os, re, sys, subprocess, datetime, urllib.parse
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import licenses
+import mathtext
 
 ROOT = Path(__file__).resolve().parent.parent
 CONJ = ROOT / "Conjectures"
@@ -166,6 +167,7 @@ pre.msg{white-space:pre-wrap}
 #results .tag.c{background:var(--accent);color:var(--card)}
 #results .snip{font-size:13.5px;color:var(--muted);margin-top:4px;line-height:1.6}
 #results li.new{background:none;border-style:dashed}
+#results li.more{background:none;border:0;text-align:center}#results li.more button{font:14px var(--sans);padding:8px 18px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--fg);cursor:pointer}
 mark{background:#fde68a;color:inherit;border-radius:2px;padding:0 1px}
 @media(prefers-color-scheme:dark){mark{background:#6b5310}}
 /* 解读 */
@@ -234,6 +236,8 @@ mark{background:#fde68a}
 .top nav{display:flex;flex-wrap:wrap;gap:2px 14px;margin:0;padding:0 16px 10px}
 .top nav::before{display:none}
 .crumbs,main,footer,header+main{margin-left:0;margin-top:0;border-left:0}
+/* 提交哈希、链接、Lean 声明名不能断开时会把整页撑宽：允许在任意处断行。pre 仍然横向滚动 */
+main,footer,.crumbs{overflow-wrap:anywhere}
 }
 """
 
@@ -506,7 +510,7 @@ def render_conjecture(conj, entries, archived=()):
     body += f'<p class="muted" style="font-family:var(--sans);font-size:14px;margin-top:14px">关于这个猜想的解读：{essays_line(conj["slug"], "../")}</p>'
     refs = conj.get("references") or []
     if refs:
-        body += "<h2>参考资料</h2><ul class='plain'>" + "".join(f'<li><a href="{esc(r["url"])}">{esc(r.get("label", r["url"]))}</a></li>' for r in refs) + "</ul>"
+        body += "<h2>参考资料</h2><ul class='plain'>" + "".join(f'<li><a href="{esc(r["url"])}">{mathtext.html_text(r.get("label") or r["url"])}</a></li>' for r in refs) + "</ul>"
     body += "<h2>编辑历史</h2>" + history_html([f"Conjectures/{conj['_dir']}/conjecture.json"])
     cname = conj.get("name_zh") or conj["name"]
     return page(cname, [(cname, None)], body, 1)
@@ -605,7 +609,8 @@ def write_edit_pages(index_rows):
             "essays": {m["id"]: {"title": m["title"], "about": m.get("about") or [], "body": m["_body"].strip()} for m in load_essays()}}
     for conj, _ in index_rows:
         cdir = CONJ / conj["_dir"]
-        data["conjectures"][conj["slug"]] = {k: conj.get(k) or ([] if k == "references" else "") for k in ("name", "name_zh", "informal", "references")}
+        # name 只用来显示；name_zh、informal、references 是编辑冲突比对的原文，必须原样给出
+        data["conjectures"][conj["slug"]] = {"name": conj["name"], **{k: conj["_raw"].get(k) or ([] if k == "references" else "") for k in ("name_zh", "informal", "references")}}
         for mj in sorted(cdir.glob("S*.json")):
             m = read_json(mj)
             data["statements"][m["id"]] = {
@@ -638,7 +643,7 @@ def write_ask_context(conj, meta, lean_src, decl, tc, deps):
     ir = meta.get("informal_restatement") or {}
     ctx = {
         "id": meta["id"], "declaration": meta["declaration"], "module": meta["module"],
-        "conjecture": {"name": conj["name"], "name_zh": conj.get("name_zh") or "", "informal": conj.get("informal") or ""},
+        "conjecture": {"name": conj["_raw"]["name"], "name_zh": conj["_raw"].get("name_zh") or "", "informal": conj.get("informal") or ""},
         "lean": lean_src, "toolchain": tc,
         "mathlib": next((r for n, r, _ in deps if n == "mathlib"), "?"),
         "dependencies": [{"name": d["name"], "module": d.get("module") or ""} for d in (decl or {}).get("direct_dependencies", [])],
@@ -654,7 +659,7 @@ def write_search(index_rows, essays=()):
     for conj, n in index_rows:
         cdir = CONJ / conj["_dir"]
         cname = conj.get("name_zh") or conj["name"]
-        refs = " ".join(r.get("label", "") for r in conj.get("references") or [])
+        refs = " ".join(mathtext.plain_text(r.get("label", "")) for r in conj.get("references") or [])
         docs.append({"kind": "c", "url": f'{conj["slug"]}/index.html', "title": cname,
                      "sub": conj["name"] if conj.get("name_zh") else "", "text": f'{conj.get("informal","")} {refs}'.strip(), "code": ""})
         for mj in sorted(cdir.glob("S*.json")):
@@ -709,6 +714,24 @@ def founder_quote():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     return next((l for l in text.splitlines() if l.startswith(">") and "我觉得中国" in l), "")
 
+def redirect_page(target, title):
+    """旧网址的跳转页：立即跳到新地址，保留 ?查询 和 #锚点；不支持脚本时靠 meta refresh 和链接。"""
+    t = esc(target)
+    return (f'<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>{esc(title)} · {SITE_NAME}</title>'
+            f'<meta name="robots" content="noindex"><link rel="canonical" href="{t}"><meta http-equiv="refresh" content="0; url={t}">'
+            f'<script>location.replace({json.dumps(target)} + location.search + location.hash)</script></head>'
+            f'<body><p>这个页面已经搬到 <a href="{t}">{esc(title)}</a>。</p></body></html>')
+
+def write_redirects(conj, ids):
+    """猜想改过网址名时，在每个旧网址名下给猜想页和各条表述页写跳转页。"""
+    cname = conj.get("name_zh") or conj["name"]
+    for old in conj.get("former_slugs") or []:
+        d = OUT / old; d.mkdir(parents=True, exist_ok=True)
+        (d / "index.html").write_text(redirect_page(f"../{conj['slug']}/index.html", cname), encoding="utf-8")
+        for sid in ids:
+            (d / sid).mkdir(exist_ok=True)
+            (d / sid / "index.html").write_text(redirect_page(f"../../{conj['slug']}/{sid}/index.html", f"#{sid} · {cname}"), encoding="utf-8")
+
 def main():
     tc, deps = pinned_versions()
     OUT.mkdir(exist_ok=True)
@@ -725,6 +748,9 @@ def main():
         cj = cdir / "conjecture.json"
         if not cj.exists(): continue
         conj = read_json(cj); conj["_dir"] = cdir.name
+        conj["_raw"] = {k: conj.get(k) for k in ("name", "name_zh", "informal", "references")}   # 编辑表单要比对原文
+        for k in ("name", "name_zh"):
+            if conj.get(k): conj[k] = mathtext.plain_text(conj[k])
         entries = []
         for mj in sorted(cdir.glob("S*.json")):
             meta = read_json(mj); meta["_stem"] = mj.stem
@@ -748,6 +774,7 @@ def main():
                 archived.append(meta)
         (OUT / conj["slug"]).mkdir(parents=True, exist_ok=True)
         (OUT / conj["slug"] / "index.html").write_text(render_conjecture(conj, entries, archived), encoding="utf-8")
+        write_redirects(conj, [m["id"] for m, _ in entries] + [m["id"] for m in archived])
         index_rows.append((conj, len(entries)))
     (OUT / "index.html").write_text(render_index(index_rows, tc, deps, all_ok), encoding="utf-8")
     write_edit_pages(index_rows)

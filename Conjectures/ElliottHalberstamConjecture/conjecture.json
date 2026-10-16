@@ -1,5 +1,8 @@
 {
-  "slug": "elliotthalberstam-conjecture",
+  "slug": "elliott-halberstam-conjecture",
+  "former_slugs": [
+    "elliotthalberstam-conjecture"
+  ],
   "name": "Elliott–Halberstam conjecture",
   "name_zh": "埃利奥特-哈尔伯斯坦猜想",
   "informal": "对任意 θ < 1 和 A > 0，存在常数 C > 0，使对所有 x > 2，素数在等差数列中分布的误差 E(x; q) 对 q ≤ x^θ 求和后不超过 C·x / (log x)^A。",

@@ -76,30 +76,48 @@
     return (d.text || "").slice(0, 120);
   }
 
+  const PAGE = 50;   // 每次显示的条数；更多结果点按钮再加载
+  let hits = [], shown = 0, curTs = [], pageSize = PAGE;
+
+  function renderMore() {
+    out.querySelector("li.more")?.remove();
+    const next = hits.slice(shown, shown + pageSize); shown += next.length;
+    for (const [, d] of next) out.append(item(d, curTs));
+    if (shown < hits.length) {
+      const li = document.createElement("li"); li.className = "more";
+      const b = document.createElement("button"); b.type = "button";
+      b.textContent = `再显示 ${Math.min(pageSize, hits.length - shown)} 条（还有 ${hits.length - shown} 条）`;
+      b.addEventListener("click", renderMore); li.append(b); out.append(li);
+    }
+  }
+
+  function item(d, ts) {
+    const li = document.createElement("li");
+    const a = document.createElement("a"); a.href = "../" + d.url;
+    const tag = document.createElement("span"); tag.className = "tag " + d.kind; tag.textContent = { c: "猜想", s: "表述", e: "解读" }[d.kind] || "";
+    const t = document.createElement("span"); t.className = "t"; t.append(highlight(d.title, ts));
+    a.append(tag, t);
+    if (d.sub) { const s = document.createElement("span"); s.className = "e"; s.append(" · ", highlight(d.sub, ts)); a.append(s); }
+    const p = document.createElement("div"); p.className = "snip"; p.append(highlight(snippet(d, ts), ts));
+    a.append(p); li.append(a); return li;
+  }
+
   function render() {
     const q = input.value.trim();
     const url = new URL(location.href); if (q) url.searchParams.set("q", q); else url.searchParams.delete("q");
     history.replaceState(null, "", url);
     out.replaceChildren();
     const ts = terms(q);
-    let hits;
+    curTs = ts; shown = 0; pageSize = q ? PAGE : Infinity;   // 没输入时列出全部猜想，不分页
     if (!q) {   // 没输入时列出全部猜想，方便直接浏览
       hits = docs.filter(d => d.kind === "c").map(d => [1, d]);
       info.textContent = `共 ${hits.length} 个猜想、${docs.filter(d => d.kind === "s").length} 条表述。输入关键词开始搜索，中文、Lean 名称、编号都可以。`;
     } else {
-      hits = docs.map(d => [score(d, ts), d]).filter(([s]) => s > 0).sort((x, y) => y[0] - x[0]).slice(0, 50);
-      info.textContent = hits.length ? `找到 ${hits.length} 条结果` : "没有找到。换个说法试试，或者登记一个新猜想。";
+      hits = docs.map(d => [score(d, ts), d]).filter(([s]) => s > 0).sort((x, y) => y[0] - x[0]);
+      info.textContent = !hits.length ? "没有找到。换个说法试试，或者登记一个新猜想。"
+        : hits.length > PAGE ? `找到 ${hits.length} 条结果，先显示最相关的 ${PAGE} 条` : `找到 ${hits.length} 条结果`;
     }
-    for (const [, d] of hits) {
-      const li = document.createElement("li");
-      const a = document.createElement("a"); a.href = "../" + d.url;
-      const tag = document.createElement("span"); tag.className = "tag " + d.kind; tag.textContent = { c: "猜想", s: "表述", e: "解读" }[d.kind] || "";
-      const t = document.createElement("span"); t.className = "t"; t.append(highlight(d.title, ts));
-      a.append(tag, t);
-      if (d.sub) { const s = document.createElement("span"); s.className = "e"; s.append(" · ", highlight(d.sub, ts)); a.append(s); }
-      const p = document.createElement("div"); p.className = "snip"; p.append(highlight(snippet(d, ts), ts));
-      a.append(p); li.append(a); out.append(li);
-    }
+    renderMore();
     if (!hits.length) {
       const li = document.createElement("li"); li.className = "new"; const a = document.createElement("a");
       a.href = "../edit/index.html?type=statement"; a.textContent = "＋ 登记一条新表述（可以顺便登记新猜想）"; li.append(a); out.append(li);

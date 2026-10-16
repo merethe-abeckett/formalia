@@ -60,6 +60,7 @@ docs/ZENODO.md               用 Zenodo 为发布版本申请 DOI
 .github/workflows/edit.yml   处理网页编辑和 GitHub 声明表单：检查、写入、发布
 scripts/apply_edit.py        把一条编辑确定性地写成文件
 scripts/lean_policy.py       表述文件只允许的受限 Lean 子集
+scripts/mathtext.py          名称里的 LaTeX、Markdown 转成显示文字；生成网址名和目录名
 scripts/edit_check.sh        Edit 工作流的检查步骤
 worker/                      Cloudflare Worker：编辑网关（人机验证、限流、匿名编号、开议题）
 site/                        编辑表单脚本与隐私说明
@@ -69,6 +70,8 @@ tests/                       Lean 规范、编辑应用、Worker 的测试
 ### 编号
 
 编号为日期式 `YYYYMMDD-NN`，`NN` 是同一天提交的流水号。`#20261014-01` 对应文件 `S20261014_01.lean`，因为 Lean 标识符不能以数字开头，也不能含连字符。编号永不复用、永不改号。
+
+猜想的网址名是 `conjecture.json` 里的 `slug`。万一要改，把旧的写进 `former_slugs` 列表，网站会在旧地址生成跳转页，猜想页和各条表述页的旧链接都继续有效。现用和用过的网址名全库唯一，不能再分给别的猜想。
 
 ### 表述文件的要求
 

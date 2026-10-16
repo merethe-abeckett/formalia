@@ -1,5 +1,8 @@
 {
-  "slug": "piercebirkhoff-conjecture",
+  "slug": "pierce-birkhoff-conjecture",
+  "former_slugs": [
+    "piercebirkhoff-conjecture"
+  ],
   "name": "Pierce–Birkhoff conjecture",
   "name_zh": "皮尔斯-伯克霍夫猜想",
   "informal": "每个分段多项式函数 f : ℝⁿ → ℝ 都能写成有限个多项式的“先取最小、再取最大”：f = maxᵢ minⱼ gᵢⱼ。",

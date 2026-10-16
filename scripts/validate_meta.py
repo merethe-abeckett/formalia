@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lean_policy
 import licenses
+import mathtext
 
 ROOT = Path(__file__).resolve().parent.parent / "Conjectures"
 ID_RE = re.compile(r"^(\d{8})-(\d{2})$")
@@ -78,6 +79,22 @@ for cdir in sorted(p for p in ROOT.iterdir() if p.is_dir()):
              + [l.get("url") for l in meta.get("external_links") or []]
         for u in urls:
             if u and not re.match(r"^https?://[^\s<>\"'`]+$", u): err(mj, f"非法链接：{u!r}")
+
+# ---------- 网址名 ----------
+# 现用的和改名前用过的网址名全库唯一：旧网址名在网站上是跳转页，不能再指向别的猜想
+SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+slug_owner = {}
+for cj in sorted(ROOT.glob("*/conjecture.json")):
+    conj = json.loads(cj.read_text(encoding="utf-8"))
+    former = conj.get("former_slugs", [])
+    if not isinstance(former, list) or not all(isinstance(x, str) for x in former):
+        err(cj, "former_slugs 必须是字符串列表"); former = []
+    for sl in [conj.get("slug")] + former:
+        if not sl: continue
+        if not SLUG_RE.match(sl): err(cj, f"网址名只能用小写字母、数字和单个连字符：{sl!r}")
+        if sl in slug_owner: err(cj, f"网址名 {sl} 已被 {slug_owner[sl]} 使用")
+        if sl in mathtext.RESERVED_SLUGS: err(cj, f"网址名 {sl} 是网站保留的地址")
+        slug_owner.setdefault(sl, cj.relative_to(ROOT.parent))
 
 # ---------- 解读 ----------
 ESSAYS = ROOT.parent / "Essays"

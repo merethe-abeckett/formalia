@@ -1,5 +1,8 @@
 {
-  "slug": "beckfiala-theorem-and-conjecture",
+  "slug": "beck-fiala-theorem-and-conjecture",
+  "former_slugs": [
+    "beckfiala-theorem-and-conjecture"
+  ],
   "name": "Beck–Fiala theorem and conjecture",
   "name_zh": "贝克-菲亚拉猜想",
   "informal": "存在常数 C > 0，使任何度数不超过 t 的集合系 S₁, …, Sₘ ⊆ {1, …, n} 都有一种 ±1 染色 χ，使每个集合内染色之和的绝对值不超过 C·√t。",

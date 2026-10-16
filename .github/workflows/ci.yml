@@ -35,6 +35,8 @@ jobs:
         run: node worker/test.mjs "$RUNNER_TEMP/issue.md"
       - name: 表述文件规范
         run: python3 scripts/lean_policy.py Conjectures/*/*.lean
+      - name: 网站显示与网址名测试
+        run: python3 tests/test_site.py
 
   check:
     runs-on: ubuntu-latest

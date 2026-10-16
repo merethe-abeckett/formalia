@@ -1,5 +1,8 @@
 {
-  "slug": "babaiseress-conjectures-on-the-diameter-of-finite-groups",
+  "slug": "babai-seress-conjectures-on-the-diameter-of-finite-groups",
+  "former_slugs": [
+    "babaiseress-conjectures-on-the-diameter-of-finite-groups"
+  ],
   "name": "Babai–Seress Conjectures on the Diameter of Finite Groups",
   "name_zh": "巴拜-塞雷斯猜想（有限群的直径）",
   "informal": "存在绝对常数 C，使交错群 Aₙ 的凯莱图直径（对任意生成集）不超过 n^C。出自 Babai 与 Seress 1992 年论文的猜想 1.5。",
