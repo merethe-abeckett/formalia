@@ -27,6 +27,10 @@ jobs:
         run: python3 tests/test_lean_policy.py
       - name: 编辑应用测试
         run: bash tests/test_apply_edit.sh
+      - name: 巡查判定测试
+        run: python3 tests/test_patrol.py
+      - name: 元数据校验测试
+        run: bash tests/test_validate_meta.sh
       - name: 编辑网关（Worker）测试
         run: node worker/test.mjs "$RUNNER_TEMP/issue.md"
       - name: 表述文件规范

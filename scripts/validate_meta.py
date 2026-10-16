@@ -15,6 +15,16 @@ claim_ids = set()   # 声明编号全库唯一
 
 def err(p, msg): errors.append(f"{p}: {msg}")
 
+# 表述编号全库唯一，并且永不复用：已归档条目的编号同样占位
+statement_ids = {}  # 编号 -> 首次出现的文件
+archived_ids = set()
+_arch = ROOT.parent / "Archive"
+if _arch.exists():
+    for mj in sorted(_arch.glob("*/S*.json")):
+        aid = json.loads(mj.read_text(encoding="utf-8")).get("id")
+        if aid in statement_ids: err(mj, f"归档条目编号重复：{aid}，已用于 {statement_ids[aid]}")
+        statement_ids.setdefault(aid, mj.relative_to(ROOT.parent)); archived_ids.add(aid)
+
 for cdir in sorted(p for p in ROOT.iterdir() if p.is_dir()):
     cj = cdir / "conjecture.json"
     if not cj.exists():
@@ -22,7 +32,6 @@ for cdir in sorted(p for p in ROOT.iterdir() if p.is_dir()):
     conj = json.loads(cj.read_text(encoding="utf-8"))
     for k in ("slug", "name", "informal"):
         if not conj.get(k): err(cj, f"missing field {k}")
-    seen = set()
     for lf in sorted(cdir.glob("S*.lean")):
         mj = lf.with_suffix(".json")
         if not mj.exists():
@@ -35,8 +44,10 @@ for cdir in sorted(p for p in ROOT.iterdir() if p.is_dir()):
         else:
             expected = f"S{m.group(1)}_{m.group(2)}"
             if lf.stem != expected: err(lf, f"file should be named {expected}.lean for id {meta['id']}")
-        if meta.get("id") in seen: err(mj, "duplicate id"); 
-        seen.add(meta.get("id"))
+        sid = meta.get("id")
+        if sid in archived_ids: err(mj, f"编号 {sid} 属于已归档条目 {statement_ids[sid]}，编号永不复用")
+        elif sid in statement_ids: err(mj, f"duplicate id {sid}（已用于 {statement_ids[sid]}）")
+        statement_ids.setdefault(sid, mj.relative_to(ROOT.parent))
         if meta.get("conjecture") != conj.get("slug"): err(mj, "conjecture does not match conjecture.json slug")
         exp_mod = "Conjectures." + cdir.name + "." + lf.stem
         if meta.get("module") != exp_mod: err(mj, f"module should be {exp_mod}")
