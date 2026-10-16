@@ -10,14 +10,17 @@ Two independent models review every statement. With only one provider configured
 the patrol still runs, but a flag can only open a "patrol finding" for the
 maintainer; deletion proposals always need two models. The combination rule:
   * both flag a problem AND CI evidence exists (checker report not ok)  -> "deletion proposal" issue, public notice period starts
-  * both flag a problem, no CI evidence                                 -> "patrol finding" issue, for the maintainer to look at
+  * both flag a problem, checker report clean OR missing                -> "patrol finding" issue, for the maintainer to look at
   * exactly one flags                                                   -> "patrol disagreement" issue, maintainer decides
   * neither flags                                                       -> nothing
+A missing checker report is NOT CI evidence: `lake build` stops at the first
+broken module, so one bad file leaves every entry without a report.
 Issues are deduplicated by a marker line, so a re-run never opens a second
 issue for the same statement while the first is open.
 
 Providers are configured by environment variables and use only the standard
-library (no SDKs):
+library (no SDKs). An empty variable counts as unset, because the workflow
+passes `${{ vars.X }}` as "" when the repository variable does not exist:
   QWEN_API_KEY, QWEN_BASE_URL (default DashScope OpenAI-compatible, intl), QWEN_MODEL (default qwen-plus)
   GEMINI_API_KEY, GEMINI_MODEL (default gemini-3.8-flash)
   GITHUB_TOKEN, GITHUB_REPOSITORY  (for opening issues; omitted => dry run)
@@ -67,10 +70,14 @@ def http_json(url, payload, headers, timeout=120):
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())
 
+def env(name, default):
+    """环境变量；未设置或为空字符串时用默认值。"""
+    return (os.environ.get(name) or "").strip() or default
+
 def ask_qwen(prompt):
     key = os.environ["QWEN_API_KEY"]
-    base = os.environ.get("QWEN_BASE_URL", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1")
-    model = os.environ.get("QWEN_MODEL", "qwen-plus")
+    base = env("QWEN_BASE_URL", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1").rstrip("/")
+    model = env("QWEN_MODEL", "qwen-plus")
     out = http_json(f"{base}/chat/completions",
         {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0},
         {"Authorization": f"Bearer {key}"})
@@ -79,9 +86,23 @@ def ask_qwen(prompt):
 def ask_gemini(prompt):
     return llm_gemini.generate(prompt, temperature=0, json_mode=True)
 
+def strip_lean_comments(code):
+    """去掉 Lean 的行注释和（可嵌套的）块注释，只留代码。"""
+    out, i, depth = [], 0, 0
+    while i < len(code):
+        two = code[i:i+2]
+        if two == "/-": depth += 1; i += 2; continue
+        if depth and two == "-/": depth -= 1; i += 2; continue
+        if not depth and two == "--":
+            j = code.find("\n", i); i = len(code) if j < 0 else j; continue
+        if not depth: out.append(code[i])
+        i += 1
+    return "".join(out)
+
 def ask_fake(prompt):
-    # Stub for testing the plumbing: flags anything containing `True ∧` or `sorry`.
-    flag = ("sorry" in prompt.split("```lean",1)[1]) or ("True ∧" in prompt)
+    # Stub for testing the plumbing: flags code (not comments) containing `True ∧` or `sorry`.
+    code = strip_lean_comments(prompt.split("```lean", 1)[1].rsplit("```", 1)[0])
+    flag = ("sorry" in code) or ("True ∧" in code)
     return json.dumps({"problem": flag, "category": "stub" if flag else "", "reason": "stub provider" if flag else ""})
 
 def parse_verdict(text):
@@ -108,7 +129,23 @@ def entries():
             if rep:
                 decl = next((d for d in rep["declarations"] if d["name"] == meta["declaration"]), None)
             yield {"meta": meta, "path": str(lean.relative_to(ROOT)), "code": lean.read_text(encoding="utf-8"),
-                   "report": decl, "toolchain": tc, "ci_ok": bool(decl and decl.get("ok") and decl.get("is_prop"))}
+                   "report": decl, "toolchain": tc, "ci": ci_status(rep, decl)}
+
+def ci_status(rep, decl):
+    """检查器给出的事实：'ok' 通过，'fail' 未通过，'missing' 没有报告（不算证据）。"""
+    if rep is None: return "missing"
+    if decl is None: return "fail"     # 模块检查过了，却找不到登记的声明
+    return "ok" if decl.get("ok") and decl.get("is_prop") else "fail"
+
+def decide_kind(flags, ci):
+    """按 docs/DELETION.md 的规则，由各模型的标记和 CI 事实决定开哪种议题。"""
+    if len(flags) == 1:
+        return "patrol-finding" if flags[0] else None
+    if flags and all(flags):
+        return "deletion-proposal" if ci == "fail" else "patrol-finding"
+    if any(flags):
+        return "patrol-disagreement"
+    return None
 
 # ---------- GitHub issues ----------
 def gh(method, path, payload=None):
@@ -138,6 +175,8 @@ def issue_text(kind, e, verdicts):
     elif kind == "patrol-finding":
         if len(verdicts) == 1:
             lines += ["**巡查发现（单模型）。** 当前只配置了一个巡查模型，它标记了 Lean 层面的问题。请维护者核实。提删公示需要两个独立模型加 CI 证据。", ""]
+        elif e["ci"] == "missing":
+            lines += ["**巡查发现。** 两个巡查模型都标记了 Lean 层面的问题，但本次没有该条目的检查器报告，无法确认 CI 是否通过。请维护者核实。没有 CI 证据前不进入公示。", ""]
         else:
             lines += ["**巡查发现。** 两个巡查模型都标记了 Lean 层面的问题，但 CI 报告该条目干净。请维护者核实。没有 CI 证据前不进入公示。", ""]
     else:
@@ -146,7 +185,7 @@ def issue_text(kind, e, verdicts):
     for name, v in verdicts.items():
         lines.append(f"| {name} | {'是' if v['problem'] else '否'} | {v['category']} | {v['reason'].replace('|','/')} |")
     rep = e["report"]
-    lines += ["", "CI 检查器报告：" + ("不可用" if rep is None else f"ok={rep['ok']}, is_prop={rep['is_prop']}, axioms={rep['axioms']}, sorry={rep['uses_sorry']}, native_decide={rep['uses_native_decide']}, non_standard={rep['non_standard_axioms']}")]
+    lines += ["", "CI 检查器报告：" + ({"missing": "不可用", "fail": "模块已检查，但报告中没有这条声明"}[e["ci"]] if rep is None else f"ok={rep['ok']}, is_prop={rep['is_prop']}, axioms={rep['axioms']}, sorry={rep['uses_sorry']}, native_decide={rep['uses_native_decide']}, non_standard={rep['non_standard_axioms']}")]
     return marker, lines
 
 def main():
@@ -184,15 +223,7 @@ def main():
                 had_error = True
                 print(f"[错误] {name} 审查 #{e['meta']['id']} 失败: {ex}", file=sys.stderr)
             time.sleep(0.5)
-        flags = [v["problem"] for v in verdicts.values()]
-        if len(flags) == 1:
-            kind = "patrol-finding" if flags[0] else None
-        elif all(flags):
-            kind = "deletion-proposal" if not e["ci_ok"] else "patrol-finding"
-        elif any(flags):
-            kind = "patrol-disagreement"
-        else:
-            kind = None
+        kind = decide_kind([v["problem"] for v in verdicts.values()], e["ci"])
         sid = e["meta"]["id"]
         summary.append((sid, kind, verdicts))
         def tag(v):
