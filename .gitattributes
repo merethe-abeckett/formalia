@@ -1,0 +1,2 @@
+# 统一使用 LF 换行。在 Windows 上编辑、保存成 CRLF 的文本文件，提交时会自动转成 LF。
+* text=auto eol=lf
