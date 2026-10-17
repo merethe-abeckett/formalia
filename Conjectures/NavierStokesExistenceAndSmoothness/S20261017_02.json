@@ -1,0 +1,21 @@
+{
+  "id": "20261017-02",
+  "conjecture": "navier-stokes-existence-and-smoothness",
+  "module": "Conjectures.NavierStokesExistenceAndSmoothness.S20261017_02",
+  "declaration": "Registry.NavierStokesExistenceAndSmoothness.S20261017_02",
+  "submitted_by": "merethe-abeckett",
+  "submitted_at": "2026-10-17",
+  "license": "Apache-2.0",
+  "source": {
+    "kind": "adapted",
+    "url": "https://github.com/google-deepmind/formal-conjectures/blob/8bf45ed70d48b2b2a501de9c00b26bfa38c573ee/FormalConjectures/Millenium/NavierStokes.lean",
+    "note": "取自 formal-conjectures 的 FormalConjectures/Millenium/NavierStokes.lean（提交 8bf45ed，Copyright 2026 The Formal Conjectures Authors，Apache License 2.0）。改动：去掉 `@[category …]`、`@[simp]` 等属性和 `sorry`；局部记号 ℝ^n、ℝ³、∇⬝、Δ、∞ 改写为 EuclideanSpace ℝ (Fin n)、divergence、Laplacian.laplacian、((⊤ : ℕ∞) : WithTop ℕ∞)；`variable {n : ℕ}` 改为每个定义各自的隐式参数；删去命题不用的辅助引理；theorem 的参数改写成 ∀，只登记命题本身，写成 def。改写后的定义和命题已在钉死版本的 Mathlib 下与原文逐项比对，展开后的表达式一致。"
+  },
+  "informal_restatement": {
+    "author": "Formalia 维护者（据 formal-conjectures 文档注释翻译）",
+    "text": "(B) 周期情形 ℝ³/ℤ³，无外力：对任意粘性系数 ν > 0 和任意光滑、无散、以 1 为周期的初始速度 u₀，在外力 f = 0 时存在解 (v, p)：满足纳维-斯托克斯方程和初始条件，在 t ≥ 0 上光滑，且速度和压力在所有时刻都以 1 为周期。",
+    "text_en": "(B) Existence and smoothness of (unforced) Navier–Stokes solutions in ℝ³/ℤ³."
+  },
+  "claimed_proofs": [],
+  "external_links": []
+}

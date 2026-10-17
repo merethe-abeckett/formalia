@@ -1,0 +1,21 @@
+{
+  "slug": "navier-stokes-existence-and-smoothness",
+  "name": "Navier–Stokes existence and smoothness",
+  "name_zh": "纳维-斯托克斯方程解的存在性与光滑性",
+  "informal": "三维不可压缩纳维-斯托克斯方程描述粘性流体的运动。克雷数学研究所把它列为千禧年大奖难题之一，官方问题说明给出四种情形，证明其中任意一种即可：(A) 全空间 ℝ³ 上、无外力时，任何光滑且快速衰减的初始速度都有全局光滑、能量有界的解；(B) 周期情形 ℝ³/ℤ³ 上的同样结论；(C) 全空间上存在光滑、快速衰减的初始速度和外力，使全局光滑、能量有界的解不存在；(D) 周期情形上的同样结论。",
+  "references": [
+    {
+      "label": "Clay Mathematics Institute, C. L. Fefferman, *Existence and smoothness of the Navier–Stokes equation*（官方问题说明）",
+      "url": "https://www.claymath.org/wp-content/uploads/2022/06/navierstokes.pdf"
+    },
+    {
+      "label": "Wikipedia: Navier–Stokes existence and smoothness",
+      "url": "https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_existence_and_smoothness"
+    },
+    {
+      "label": "formal-conjectures（DeepMind）",
+      "url": "https://github.com/google-deepmind/formal-conjectures/blob/8bf45ed70d48b2b2a501de9c00b26bfa38c573ee/FormalConjectures/Millenium/NavierStokes.lean"
+    }
+  ],
+  "informal_en": "Existence and smoothness of solutions to the three-dimensional incompressible Navier–Stokes equations, one of the Clay Millennium Prize Problems. The official problem description lists four alternatives (A)–(D); establishing any one of them resolves the problem."
+}
