@@ -145,7 +145,7 @@ form.edit textarea.mono{font-family:var(--mono);font-size:14px}
 form.edit fieldset{border:1px solid var(--line);border-radius:6px;padding:4px 12px}
 form.edit button,.ask button{padding:8px 22px;border:0;border-radius:6px;background:var(--accent);color:#fff;font:inherit;cursor:pointer;margin-top:12px}
 form.edit button:disabled,.ask button:disabled{opacity:.5;cursor:default}
-pre.msg{white-space:pre-wrap}
+pre.msg{white-space:pre-wrap}pre.wrap{white-space:pre-wrap;overflow-wrap:anywhere}
 .cf-turnstile{margin-top:12px}
 /* 搜索 */
 .search{display:flex;align-items:center;max-width:680px;margin:18px 0 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:4px 4px 4px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
@@ -253,22 +253,37 @@ def script(name, prefix=""):
 
 REPO_URL = "https://github.com/merethe-abeckett/formalia"
 CONTACT = "merethe.abeckett@outlook.com"
+# 网站的正式地址：规范网址、站点地图、订阅源、JSON 接口里的链接都以它为准
+SITE_URL = os.environ.get("FORMALIA_SITE_URL", "https://formalnaturalist.co.nz").rstrip("/")
+SITE_DESC = "Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。"
+CANONICAL_MARK = "<!--canonical-->"   # 最后一遍处理时按文件路径换成规范网址
 
-def page(title, crumbs, body, depth, home=False):
+def short(text, n=150):
+    """摘要：去掉多余空白和 Markdown 标记，超长时截断。"""
+    t = mathtext.plain_text(text or "")
+    t = re.sub(r"(?m)^[ \t]*(#{1,6}|>|[-*+]|\d+\.)[ \t]+", "", t)   # 行首的标题、引用、列表标记
+    t = re.sub(r"\s+", " ", t.replace("`", "")).strip()
+    return t if len(t) <= n else t[:n].rstrip() + "…"
+
+def page(title, crumbs, body, depth, home=False, desc=None, head=""):
     rel = "../" * depth
+    desc = desc or SITE_DESC
     crumb_html = "" if home else ('<div class="crumbs"><a href="' + rel + 'index.html">首页</a> › ' + " › ".join(
         f'<a href="{esc(h)}">{esc(t)}</a>' if h else esc(t) for t, h in crumbs) + "</div>")
     full = SITE_NAME if home else f"{title} · {SITE_NAME}"
-    return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+    return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">{head}
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(full)}</title>
-<meta name="description" content="Formalia：数学猜想的 Lean 4 表述目录。只列出，不判断。">
+<meta name="description" content="{esc(desc)}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="{SITE_NAME}"><meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="{esc(full)}"><meta property="og:description" content="{esc(desc)}"><meta name="twitter:card" content="summary">
+{CANONICAL_MARK}<link rel="alternate" type="application/atom+xml" title="Formalia 最近更新" href="{rel}feed.xml">
 <link rel="stylesheet" href="{rel}style.css?v={ver(CSS)}"></head><body>
 <header class="top"><div class="in"><a class="brand" href="{rel}index.html">{SITE_NAME}</a>
-<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}essays/index.html">解读</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/lean.html">什么是 Lean</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
+<nav><a href="{rel}search/index.html">搜索</a><a href="{rel}index.html#conjectures">猜想</a><a href="{rel}essays/index.html">解读</a><a href="{rel}recent/index.html">最近更新</a><a href="{rel}about/guide.html">使用说明</a><a href="{rel}about/lean.html">什么是 Lean</a><a href="{rel}about/index.html">关于</a><a href="{rel}edit/index.html?type=statement">登记表述</a><a href="{rel}chat/index.html">灌水区</a><a href="{rel}about/contact.html">联系作者</a></nav></div></header>
 {crumb_html}<main>{body}</main>
 <footer>Formalia 只列出形式化表述及其事实，不判断某条表述是否等价于原猜想。<br>
 代码 Apache-2.0 · 条目内容按各自声明的许可，默认 CC-BY-4.0 · <a href="{rel}about/privacy.html">隐私与编辑规则</a> ·
-<a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · <a href="{rel}about/contact.html">联系作者</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
+<a href="{REPO_URL}">GitHub 仓库 merethe-abeckett/formalia</a> · <a href="{rel}about/contact.html">联系作者</a> · <a href="{rel}feed.xml">订阅更新</a> · <a href="{rel}about/api.html">数据接口</a> · 构建于 {esc(datetime.date.today().isoformat())}，提交 <code>{esc(git('rev-parse','--short','HEAD') or '?')}</code></footer>
 </body></html>"""
 
 def claim_counts(meta, rel):
@@ -485,9 +500,15 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     body += "<ul class='plain'>" + "".join(f'<li><a href="{esc(l["url"])}" rel="nofollow ugc">{esc(l.get("label", l["url"]))}</a></li>' for l in els) + "</ul>" if els else '<p class="muted">暂无记录</p>'
     if not meta.get("archived"):
         body += "<h2>自己验证</h2><p>不想相信本站的检查结果？在自己电脑上用同样的版本重跑一遍：</p>" + verify_html(meta, tc)
+    cite = citation(conj, meta, tc, deps)
+    body += ("<h2>引用</h2><p>在论文、公告或证明说明里提到这条表述时，请引用编号。纯文本：</p>"
+             f"<pre class=\"wrap\"><code>{esc(cite['text'])}</code></pre><p>BibTeX：</p><pre><code>{esc(cite['bibtex'])}</code></pre>"
+             f'<p class="note">机器可读的完整数据：<a href="../../statements/{esc(sid)}.json">statements/{esc(sid)}.json</a>，格式见<a href="../../about/api.html">数据接口</a>。</p>')
     base = "Archive" if meta.get("archived") else "Conjectures"
     body += "<h2>编辑历史</h2>" + history_html([f"{base}/{conj['_dir']}/{meta['_stem']}.lean", f"{base}/{conj['_dir']}/{meta['_stem']}.json"])
-    return page(f"#{sid} · {cname}", [(cname, "../index.html"), (f"#{sid}", None)], body, 2)
+    ir_text = (meta.get("informal_restatement") or {}).get("text") or ""
+    desc = f"表述 #{sid}：{cname}的一种 Lean 4 形式化。" + (short(ir_text, 120) if ir_text else "")
+    return page(f"#{sid} · {cname}", [(cname, "../index.html"), (f"#{sid}", None)], body, 2, desc=desc)
 
 def render_conjecture(conj, entries, archived=()):
     body = f"<h1>{esc(conj.get('name_zh') or conj['name'])}</h1>"
@@ -513,7 +534,8 @@ def render_conjecture(conj, entries, archived=()):
         body += "<h2>参考资料</h2><ul class='plain'>" + "".join(f'<li><a href="{esc(r["url"])}">{mathtext.html_text(r.get("label") or r["url"])}</a></li>' for r in refs) + "</ul>"
     body += "<h2>编辑历史</h2>" + history_html([f"Conjectures/{conj['_dir']}/conjecture.json"])
     cname = conj.get("name_zh") or conj["name"]
-    return page(cname, [(cname, None)], body, 1)
+    desc = f"{cname}：{short(conj.get('informal', ''), 110)} 已登记 {len(entries)} 条 Lean 4 表述。"
+    return page(cname, [(cname, None)], body, 1, desc=desc)
 
 def render_index(conjs, tc, deps, check_ok):
     n_stmt = sum(n for _, n in conjs)
@@ -599,7 +621,8 @@ def write_essays(essays, index_rows):
                 + f'<article class="essay">{html_body}</article>'
                 + f'<div class="actions"><a class="btn" href="{edit_link("../../", type="essay", target=m["id"])}">修改这篇解读</a></div>'
                 + "<h2>编辑历史</h2>" + history_html([f"Essays/{m['_stem']}.md", f"Essays/{m['_stem']}.json"]))
-        (e / "index.html").write_text(page(m["title"], [("解读", "../index.html"), (m["title"], None)], body, 2), encoding="utf-8")
+        (e / "index.html").write_text(page(m["title"], [("解读", "../index.html"), (m["title"], None)], body, 2,
+                                           desc=short(m["_body"], 140)), encoding="utf-8")
 
 STATEMENT_CONJ = {}   # 表述编号 -> 猜想 slug
 
@@ -732,6 +755,162 @@ def write_redirects(conj, ids):
             (d / sid).mkdir(exist_ok=True)
             (d / sid / "index.html").write_text(redirect_page(f"../../{conj['slug']}/{sid}/index.html", f"#{sid} · {cname}"), encoding="utf-8")
 
+# ---------- 引用、数据接口、最近更新、站点地图、404 ----------
+def statement_url(slug, sid): return f"{SITE_URL}/{slug}/{sid}/index.html"
+
+def bib_escape(t): return re.sub(r"([#_&%$])", r"\\\1", t)
+
+def citation(conj, meta, tc, deps):
+    """一条表述的引用格式：纯文本和 BibTeX。用英文名，方便放进论文。"""
+    sid, decl = meta["id"], meta["declaration"]
+    rev = next((r for n, r, _ in deps if n == "mathlib"), "?")[:12]
+    lean = tc.split(":")[-1]
+    url = statement_url(conj["slug"], sid)
+    name = conj["name"]
+    text = f"Formalia statement #{sid} ({name}). Lean declaration {decl}; Lean {lean}, Mathlib {rev}. {url}"
+    bib = ("@misc{formalia-" + sid + ",\n"
+           f"  title        = {{Formalia statement \\#{sid}: {bib_escape(name)}}},\n"
+           f"  howpublished = {{\\url{{{url}}}}},\n"
+           f"  note         = {{Lean declaration \\texttt{{{bib_escape(decl)}}}; Lean {lean}, Mathlib {rev}}},\n"
+           f"  year         = {{{(meta.get('submitted_at') or '')[:4]}}}\n}}")
+    return {"text": text, "bibtex": bib}
+
+API_ROWS = []   # (conj, meta, lean_src, decl)，main() 里收集
+
+def write_api(tc, deps):
+    """给程序用的数据：statements.json 是全部表述的索引，statements/<编号>.json 是单条的完整信息。"""
+    d = OUT / "statements"; d.mkdir(exist_ok=True)
+    rev = next((r for n, r, _ in deps if n == "mathlib"), "?")
+    commit = git("rev-parse", "HEAD")
+    index = []
+    for conj, meta, lean_src, decl in sorted(API_ROWS, key=lambda r: r[1]["id"]):
+        sid = meta["id"]; cps = meta.get("claimed_proofs") or []
+        base = "Archive" if meta.get("archived") else "Conjectures"
+        rec = {
+            "schema": "formalia.statement/1",
+            "id": sid, "url": statement_url(conj["slug"], sid), "json_url": f"{SITE_URL}/statements/{sid}.json",
+            "conjecture": {"slug": conj["slug"], "name": conj["name"], "name_zh": conj.get("name_zh") or "",
+                           "url": f"{SITE_URL}/{conj['slug']}/index.html"},
+            "declaration": meta["declaration"], "negation": "¬ " + meta["declaration"], "module": meta["module"],
+            "lean": lean_src, "lean_path": f"{base}/{conj['_dir']}/{meta['_stem']}.lean",
+            "toolchain": tc, "dependencies": [{"name": n, "rev": r, "input_rev": i} for n, r, i in deps],
+            "check": None if decl is None else {k: decl.get(k) for k in
+                     ("ok", "is_prop", "axioms", "uses_sorry", "uses_native_decide", "non_standard_axioms", "registry_dependencies")},
+            "submitted_by": meta.get("submitted_by"), "submitted_at": meta.get("submitted_at"),
+            "source": meta.get("source"), "license": licenses.of(meta),
+            "informal_restatement": meta.get("informal_restatement"),
+            "claims": cps, "external_links": meta.get("external_links") or [],
+            "archived": meta.get("archived"),
+            "citation": citation(conj, meta, tc, deps),
+        }
+        (d / f"{sid}.json").write_text(json.dumps(rec, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        index.append({"id": sid, "conjecture": conj["slug"], "declaration": meta["declaration"],
+                      "url": rec["url"], "json_url": rec["json_url"], "archived": bool(meta.get("archived")),
+                      "check_ok": None if decl is None else bool(decl.get("ok")),
+                      "claims": {"prove": sum(1 for c in cps if (c.get("direction") or "prove") == "prove"),
+                                 "disprove": sum(1 for c in cps if c.get("direction") == "disprove")}})
+    out = {"schema": "formalia.index/1", "site": SITE_URL, "commit": commit, "toolchain": tc, "mathlib": rev,
+           "count": len(index), "statements": index}
+    (OUT / "statements.json").write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (OUT / "about").mkdir(exist_ok=True)
+    (OUT / "about" / "api.html").write_text(page("数据接口", [("数据接口", None)],
+        "<h1>数据接口</h1>" + md_to_html((SITE_SRC / "api.md").read_text(encoding="utf-8").replace("{{SITE}}", SITE_URL)), 1,
+        desc="Formalia 的机器可读数据：全部表述的 JSON 索引、单条表述的完整信息和引用格式。"), encoding="utf-8")
+
+def events(index_rows, essays):
+    """最近更新：新表述、证明或证否声明、新解读、归档。按时间倒序。"""
+    ev = []
+    for conj, meta, _, _ in API_ROWS:
+        sid = meta["id"]; cname = conj.get("name_zh") or conj["name"]; link = f"{conj['slug']}/{sid}/index.html"
+        if meta.get("submitted_at"):
+            ev.append({"t": meta["submitted_at"], "kind": "表述", "key": f"statement/{sid}", "link": link,
+                       "title": f"新表述 #{sid} · {cname}", "summary": short((meta.get("informal_restatement") or {}).get("text"), 200)})
+        for c in meta.get("claimed_proofs") or []:
+            when = c.get("registered_at") or c.get("date") or ""
+            if not when: continue
+            what = "证否" if c.get("direction") == "disprove" else "证明"
+            ev.append({"t": when, "kind": what, "key": f"claim/{c.get('id') or sid + when}", "link": link + "#" + (c.get("id") or ""),
+                       "title": f"{what}声明 {c.get('id') or ''} · #{sid} · {cname}",
+                       "summary": f"声称方（自称）：{c.get('claimant', '')}。" + short(c.get("note"), 150)})
+        a = meta.get("archived")
+        if a and a.get("at"):
+            ev.append({"t": a["at"], "kind": "归档", "key": f"archive/{sid}", "link": link,
+                       "title": f"归档 #{sid} · {cname}", "summary": short(a.get("reason"), 200)})
+    for m in essays:
+        if m.get("submitted_at"):
+            ev.append({"t": m["submitted_at"], "kind": "解读", "key": f"essay/{m['id']}", "link": f"essays/{m['id']}/index.html",
+                       "title": f"新解读：{m['title']}", "summary": short(m.get("_body"), 200)})
+    return sorted(ev, key=lambda e: (e["t"], e["key"]), reverse=True)
+
+def write_recent_and_feed(index_rows, essays):
+    ev = events(index_rows, essays)
+    body = ('<h1>最近更新</h1><p class="muted" style="font-family:var(--sans);font-size:14px">新登记的表述、证明与证否声明、解读和归档，按时间倒序。'
+            '也可以用阅读器订阅 <a href="../feed.xml">feed.xml</a>（Atom 格式）。</p>')
+    day = None
+    for e in ev[:200]:
+        d = e["t"][:10]
+        if d != day:
+            body += ("</ul>" if day else "") + f"<h2>{esc(d)}</h2><ul class='plain'>"; day = d
+        body += (f'<li><span class="muted">[{esc(e["kind"])}]</span> <a href="../{esc(e["link"])}">{esc(e["title"])}</a>'
+                 + (f'<br><span class="muted" style="font-size:13px">{esc(e["summary"])}</span>' if e["summary"] else "") + "</li>")
+    body += "</ul>" if day else '<p class="muted">还没有记录。</p>'
+    (OUT / "recent").mkdir(exist_ok=True)
+    (OUT / "recent" / "index.html").write_text(page("最近更新", [("最近更新", None)], body, 1,
+        desc="Formalia 最近登记的表述、证明与证否声明、解读和归档。"), encoding="utf-8")
+    # Atom 订阅源
+    from xml.sax.saxutils import escape as xesc
+    host = urllib.parse.urlparse(SITE_URL).netloc
+    def stamp(t): return t if "T" in t else f"{t}T00:00:00Z"
+    updated = stamp(ev[0]["t"]) if ev else datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    items = "".join(
+        f'<entry><id>tag:{host},2026:{xesc(e["key"])}</id><title>{xesc(e["title"])}</title>'
+        f'<link href="{xesc(SITE_URL + "/" + e["link"])}"/><updated>{xesc(stamp(e["t"]))}</updated>'
+        f'<summary>{xesc(e["summary"] or e["title"])}</summary></entry>\n' for e in ev[:50])
+    feed = ('<?xml version="1.0" encoding="utf-8"?>\n<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh-CN">\n'
+            f'<id>{xesc(SITE_URL)}/</id><title>Formalia 最近更新</title><subtitle>{xesc(SITE_DESC)}</subtitle>\n'
+            f'<link href="{xesc(SITE_URL)}/feed.xml" rel="self"/><link href="{xesc(SITE_URL)}/recent/index.html"/>\n'
+            f'<updated>{xesc(updated)}</updated><author><name>Formalia</name></author>\n{items}</feed>\n')
+    (OUT / "feed.xml").write_text(feed, encoding="utf-8")
+
+def write_404():
+    """GitHub Pages 对不存在的地址返回 404.html。地址可能在任意深度，所以用 base 让相对链接都从网站根目录算起。"""
+    root = urllib.parse.urlparse(SITE_URL).path.rstrip("/") + "/"
+    body = (f'<h1>找不到这个页面</h1><p>地址可能打错了，或者页面已经搬走。可以搜索猜想名、表述编号或关键词：</p>'
+            f'<form class="search" action="search/index.html" method="get" role="search">{SEARCH_ICON}'
+            '<input type="search" name="q" id="nf-q" placeholder="搜索猜想、编号或关键词" aria-label="搜索"><button>搜索</button></form>'
+            '<p id="nf-id" class="note" hidden></p>'
+            '<div class="actions"><a class="btn" href="index.html">回到首页</a><a class="btn" href="index.html#conjectures">浏览全部猜想</a>'
+            '<a class="btn" href="recent/index.html">最近更新</a></div>'
+            # 地址里带着表述编号时，直接给出按编号搜索的链接
+            "<script>(function(){var m=location.pathname.match(/(\\d{8})[-_](\\d{2})/);if(!m)return;var id=m[1]+'-'+m[2];"
+            "var p=document.getElementById('nf-id');p.hidden=false;var a=document.createElement('a');"
+            "a.href='search/index.html?q='+id;a.textContent='按编号 #'+id+' 搜索';p.append('地址里有表述编号。',a);"
+            "document.getElementById('nf-q').value=id;})();</script>")
+    (OUT / "404.html").write_text(page("找不到页面", [("找不到页面", None)], body, 0,
+        head=f'<base href="{esc(root)}"><meta name="robots" content="noindex">'), encoding="utf-8")
+
+SITEMAP_SKIP = ("edit/", "chat/", "404.html")
+
+def finalize(out=None):
+    """最后一遍：给每个正式页面补上规范网址，生成站点地图和 robots.txt。"""
+    out = out or OUT
+    urls = []
+    for f in sorted(out.rglob("*.html")):
+        rel = f.relative_to(out).as_posix()
+        text = f.read_text(encoding="utf-8")
+        if CANONICAL_MARK not in text: continue          # 旧网址的跳转页等
+        if rel == "404.html":
+            f.write_text(text.replace(CANONICAL_MARK, ""), encoding="utf-8"); continue
+        url = f"{SITE_URL}/{rel}"
+        f.write_text(text.replace(CANONICAL_MARK, f'<link rel="canonical" href="{esc(url)}"><meta property="og:url" content="{esc(url)}">'),
+                     encoding="utf-8")
+        if not rel.startswith(SITEMAP_SKIP): urls.append(url)
+    from xml.sax.saxutils import escape as xesc
+    (out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + "".join(f"<url><loc>{xesc(u)}</loc></url>\n" for u in urls) + "</urlset>\n", encoding="utf-8")
+    (out / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n", encoding="utf-8")
+    return urls
+
 def main():
     tc, deps = pinned_versions()
     OUT.mkdir(exist_ok=True)
@@ -762,6 +941,7 @@ def main():
             d = OUT / conj["slug"] / meta["id"]; d.mkdir(parents=True, exist_ok=True)
             (d / "index.html").write_text(render_statement(conj, meta, lean_src, check, tc, deps), encoding="utf-8")
             write_ask_context(conj, meta, lean_src, decl, tc, deps)
+            API_ROWS.append((conj, meta, lean_src, decl))
             entries.append((meta, decl))
         archived = []
         adir = ARCH / cdir.name
@@ -771,6 +951,7 @@ def main():
                 lean_src = (adir / (mj.stem + ".lean")).read_text(encoding="utf-8")
                 d = OUT / conj["slug"] / meta["id"]; d.mkdir(parents=True, exist_ok=True)
                 (d / "index.html").write_text(render_statement(conj, meta, lean_src, None, tc, deps), encoding="utf-8")
+                API_ROWS.append((conj, meta, lean_src, None))
                 archived.append(meta)
         (OUT / conj["slug"]).mkdir(parents=True, exist_ok=True)
         (OUT / conj["slug"] / "index.html").write_text(render_conjecture(conj, entries, archived), encoding="utf-8")
@@ -786,6 +967,10 @@ def main():
         for f in (ROOT / "Proofs").glob("*.lean"):
             (OUT / "proofs" / (f.stem + ".txt")).write_text(f.read_text(encoding="utf-8"), encoding="utf-8")
     (OUT / "ask.js").write_text((SITE_SRC / "ask.js").read_text(encoding="utf-8"), encoding="utf-8")
+    write_api(tc, deps)
+    write_recent_and_feed(index_rows, essays)
+    write_404()
+    finalize()
     (OUT / ".nojekyll").write_text("")
     print(f"wrote {OUT} ({sum(n for _,n in index_rows)} statements, {len(index_rows)} conjectures)")
 

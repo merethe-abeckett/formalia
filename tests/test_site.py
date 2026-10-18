@@ -96,6 +96,55 @@ with tempfile.TemporaryDirectory() as t:
     css = (site / "style.css").read_text(encoding="utf-8")
     check("overflow-wrap:anywhere" in css, "phone CSS lets long strings wrap")
 
+    # ---------- 站点地图、规范网址、描述、数据接口、订阅源、404 ----------
+    import xml.etree.ElementTree as ET
+    SITE = "https://formalnaturalist.co.nz"
+    stmts = [json.loads(p.read_text(encoding="utf-8")) for p in (r / "Conjectures").glob("*/S*.json")]
+    slugs = {c["slug"] for c in conjs}
+    sm = ET.parse(site / "sitemap.xml").getroot()
+    locs = {e.text for e in sm.iter("{http://www.sitemaps.org/schemas/sitemap/0.9}loc")}
+    for m in stmts:
+        check(f"{SITE}/{m['conjecture']}/{m['id']}/index.html" in locs, f"sitemap lists statement {m['id']}")
+    for sl in slugs:
+        check(f"{SITE}/{sl}/index.html" in locs, f"sitemap lists conjecture {sl}")
+    former = {f for c in conjs for f in c.get("former_slugs") or []}
+    check(not any(u.split("/")[3] in former for u in locs), "sitemap skips redirect pages under former slugs")
+    check(not any("/edit/" in u or "/chat/" in u or u.endswith("404.html") for u in locs), "sitemap skips edit, chat and 404")
+    robots = (site / "robots.txt").read_text(encoding="utf-8")
+    check(f"Sitemap: {SITE}/sitemap.xml" in robots, "robots.txt points to the sitemap")
+    descs = {}
+    for m in stmts:
+        h = (site / m["conjecture"] / m["id"] / "index.html").read_text(encoding="utf-8")
+        url = f"{SITE}/{m['conjecture']}/{m['id']}/index.html"
+        check(f'<link rel="canonical" href="{url}">' in h, f"canonical url on {m['id']}")
+        check('property="og:title"' in h and 'property="og:description"' in h, f"share tags on {m['id']}")
+        d = re.search(r'<meta name="description" content="([^"]*)"', h).group(1)
+        check(f"#{m['id']}" in d, f"description of {m['id']} names the statement")
+        descs[d] = m["id"]
+        check("<!--canonical-->" not in h, f"no leftover canonical marker on {m['id']}")
+        check(f"Formalia statement #{m['id']}" in h and "@misc{formalia-" in h, f"citation block on {m['id']}")
+    check(len(descs) == len(stmts), "every statement page has its own description")
+    idx = json.loads((site / "statements.json").read_text(encoding="utf-8"))
+    eq(idx["schema"], "formalia.index/1", "index schema")
+    eq(idx["count"], len(stmts), "index lists every statement")
+    for m in stmts[:5]:
+        one = json.loads((site / "statements" / f"{m['id']}.json").read_text(encoding="utf-8"))
+        lean = next((r / "Conjectures").glob(f"*/S{m['id'].replace('-', '_')}.lean")).read_text(encoding="utf-8")
+        eq(one["lean"], lean, f"JSON carries the exact Lean source of {m['id']}")
+        eq(one["negation"], "¬ " + m["declaration"], f"JSON negation of {m['id']}")
+        check(m["id"] in one["citation"]["text"] and one["citation"]["bibtex"].startswith("@misc{formalia-" + m["id"]), f"JSON citation of {m['id']}")
+    feed = ET.parse(site / "feed.xml").getroot()
+    A = "{http://www.w3.org/2005/Atom}"
+    ents = feed.findall(A + "entry")
+    check(0 < len(ents) <= 50, f"feed has entries: {len(ents)}")
+    check(all(e.find(A + "link").get("href").startswith(SITE + "/") for e in ents), "feed links are absolute")
+    check(len({e.find(A + "id").text for e in ents}) == len(ents), "feed entry ids are unique")
+    rec = (site / "recent" / "index.html").read_text(encoding="utf-8")
+    check(rec.count("<li>") >= len(stmts) + len(list((r / "Essays").glob("J*.json")) if (r / "Essays").exists() else []), "recent page lists every statement and essay")
+    nf = (site / "404.html").read_text(encoding="utf-8")
+    check('<base href="/">' in nf and 'content="noindex"' in nf and 'rel="canonical"' not in nf, "404 page uses base, noindex and no canonical")
+    check('action="search/index.html"' in nf, "404 page has a search box")
+
     # ---------- 3. 旧网址名冲突 ----------
     a, b = sorted((r / "Conjectures").glob("*/conjecture.json"))[:2]
     ca, cb = json.loads(a.read_text(encoding="utf-8")), json.loads(b.read_text(encoding="utf-8"))
