@@ -130,6 +130,17 @@ tests/                       Lean 规范、编辑应用、Worker 的测试
 
 `python3 scripts/build_site.py` 生成 `_site/`。Pages 工作流在每次推送到 `main` 时发布。需在仓库 **Settings → Pages → Source** 选择 GitHub Actions 一次。
 
+除了网页，构建还会生成这些文件：
+
+- `statements.json` 和 `statements/<编号>.json`：给程序用的数据，每条表述的 Lean 源码、版本、检查结果、声明和引用格式，说明见网站的“数据接口”页（`site/api.md`）。
+- `feed.xml`：Atom 订阅源，包含最近的表述、声明、解读和归档；网页版是“最近更新”页。
+- `s/<编号>/`：永久短链接，只认编号，跳到表述页；引用格式里用的就是它。
+- `llms.txt`：给 AI 助手的英文说明和全部猜想列表。
+- `sitemap.xml`、`robots.txt`：给搜索引擎的站点地图。
+- `404.html`：地址不存在时显示的中文页面，带搜索框。
+
+网站的正式地址默认是 `https://formalnaturalist.co.nz`，规范网址、站点地图和数据接口里的链接都以它为准；换域名时设置环境变量 `FORMALIA_SITE_URL`。
+
 ## 版本与引用
 
 工具链和依赖版本钉死在 `lean-toolchain` 和 `lake-manifest.json` 中，每个表述页面都会显示。升级版本时 CI 会重新检查全部表述，改动是历史中的普通提交。需要可引用的快照时，创建 GitHub Release 并用 Zenodo 归档，每个 Release 得到一个 DOI，见 `docs/ZENODO.md`。
