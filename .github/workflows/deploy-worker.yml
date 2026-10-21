@@ -3,7 +3,8 @@
 # 一次性准备（全部在 GitHub 仓库 Settings → Secrets and variables → Actions 里填）：
 #   Secrets：CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID、ANON_SECRET、CHAT_ADMIN_TOKEN
 #            开通网页编辑再加：EDIT_GITHUB_TOKEN；人机验证可选：TURNSTILE_SECRET
-#   Variables：可选 TURNSTILE_SITEKEY（KV 编号已写在 worker/wrangler.toml 里）
+#            “问 AI”：DEEPINFRA_API_KEY 和/或 GEMINI_API_KEY（两个都填时先用 DeepInfra）
+#   Variables：可选 TURNSTILE_SITEKEY、GEMINI_MODEL、DEEPINFRA_MODEL（KV 编号已写在 worker/wrangler.toml 里）
 # 步骤见 docs/WEB_EDIT.md。
 name: Deploy Worker
 on:
@@ -46,6 +47,7 @@ jobs:
           KV_NAMESPACE_ID: ${{ vars.KV_NAMESPACE_ID || secrets.KV_NAMESPACE_ID }}
           TURNSTILE_SITEKEY: ${{ vars.TURNSTILE_SITEKEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          DEEPINFRA_MODEL: ${{ vars.DEEPINFRA_MODEL }}
         run: |
           python3 - <<'PY'
           import os, re
@@ -56,9 +58,13 @@ jobs:
               s = re.sub(r'(?m)^id = "[^"]*"(.*)$', f'id = "{kv}"', s)
           site = os.environ.get("TURNSTILE_SITEKEY", "").strip()
           s = re.sub(r'(?m)^TURNSTILE_SITEKEY = ""(.*)$', f'TURNSTILE_SITEKEY = "{site}"', s)
-          model = os.environ.get("GEMINI_MODEL", "").strip()
-          if model and not re.fullmatch(r"[A-Za-z0-9.\-]+", model): raise SystemExit("GEMINI_MODEL 只能是模型名，例如 gemini-3.8-flash")
-          s = re.sub(r'(?m)^GEMINI_MODEL = ""(.*)$', f'GEMINI_MODEL = "{model}"', s)
+          def model_var(name, pattern, example):
+              # 变量值误写成“名字 = 值”时只取值
+              v = re.sub(rf"^{name}\s*=\s*", "", os.environ.get(name, "").strip()).strip().strip('"')
+              if v and not re.fullmatch(pattern, v): raise SystemExit(f"{name} 只能是模型名，例如 {example}")
+              return re.sub(rf'(?m)^{name} = ""(.*)$', f'{name} = "{v}"', s)
+          s = model_var("GEMINI_MODEL", r"[A-Za-z0-9.\-]+", "gemini-3.8-flash")
+          s = model_var("DEEPINFRA_MODEL", r"[A-Za-z0-9._\-]+/[A-Za-z0-9._\-]+", "Qwen/Qwen3.8-Flash")
           open(p, "w", encoding="utf-8").write(s)
           PY
       - name: 安装 wrangler
@@ -80,8 +86,9 @@ jobs:
           S_GITHUB_TOKEN: ${{ secrets.EDIT_GITHUB_TOKEN }}
           S_TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
           S_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          S_DEEPINFRA_API_KEY: ${{ secrets.DEEPINFRA_API_KEY }}
         run: |
-          for name in ANON_SECRET CHAT_ADMIN_TOKEN GITHUB_TOKEN TURNSTILE_SECRET GEMINI_API_KEY; do
+          for name in ANON_SECRET CHAT_ADMIN_TOKEN GITHUB_TOKEN TURNSTILE_SECRET GEMINI_API_KEY DEEPINFRA_API_KEY; do
             var="S_$name"; val="${!var}"
             if [ -n "$val" ]; then printf '%s' "$val" | npx wrangler secret put "$name" > /dev/null && echo "已上传 $name"; else echo "跳过 $name（未填）"; fi
           done

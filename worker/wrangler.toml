@@ -16,6 +16,7 @@ RATE_LIMIT_PER_HOUR = "6"
 SUBMIT_PER_DAY = "200"   # 全站每天网页编辑次数上限（没有人机验证时防刷）
 TURNSTILE_SITEKEY = ""   # 在后台填写
 GEMINI_MODEL = ""        # 部署时从仓库变量 GEMINI_MODEL 填入；留空则用 gemini-3.8-flash
+DEEPINFRA_MODEL = ""     # 部署时从仓库变量 DEEPINFRA_MODEL 填入；留空则用 Qwen/Qwen3.8-Flash
 ASK_PER_HOUR = "20"      # 交互式导读：每个匿名编号每小时提问次数
 ASK_PER_DAY = "300"      # 交互式导读：全站每天提问次数
 
@@ -40,7 +41,7 @@ tag = "v2"
 new_sqlite_classes = ["AskGate"]
 
 [placement]
-mode = "smart"   # 让 Worker 跑在离 Gemini 等后端近的机房，避开不受支持的地区
+mode = "smart"   # 让 Worker 跑在离 Gemini、DeepInfra 等后端近的机房，避开不受支持的地区
 
 # 密钥在 Cloudflare 后台设置一次即可，重新部署不会丢：
-# GITHUB_TOKEN、TURNSTILE_SECRET、ANON_SECRET、CHAT_ADMIN_TOKEN、GEMINI_API_KEY
+# GITHUB_TOKEN、TURNSTILE_SECRET、ANON_SECRET、CHAT_ADMIN_TOKEN、GEMINI_API_KEY、DEEPINFRA_API_KEY

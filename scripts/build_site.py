@@ -455,10 +455,10 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     else:
         body += '<p class="muted">尚未生成</p>'
     if not meta.get("archived"):
-        body += (f'<h3>问 Gemini</h3><div class="ask" id="ask" data-id="{esc(sid)}"><div class="log" aria-live="polite"></div>'
+        body += (f'<h3>问 AI</h3><div class="ask" id="ask" data-id="{esc(sid)}"><div class="log" aria-live="polite"></div>'
                  '<textarea rows="2" maxlength="500" placeholder="针对这条表述随便问，例如：Nat.Prime 是什么意思？n 从几开始？"></textarea>'
                  '<div class="row"><button type="button">提问</button><span class="muted st"></span></div>'
-                 '<p class="muted" style="font-size:13px;margin:8px 0 0">回答由 Gemini 现场生成，可能出错，不代表登记库的判断。'
+                 '<p class="muted" style="font-size:13px;margin:8px 0 0">回答由 AI 模型现场生成（下方会注明是哪个模型），可能出错，不代表登记库的判断。'
                  '它只解释这段 Lean 代码，不回答“是否等价于原猜想”。</p></div>' + script("ask.js", "../../"))
 
     ir = meta.get("informal_restatement") or {}
