@@ -103,6 +103,8 @@ Cloudflare 左侧菜单点 **Workers & Pages**，页面右侧有 **Account ID**�
 
 **3. 运行一次 Deploy Worker**（Actions → Deploy Worker → Run workflow）。打开 https://formalnaturalist.co.nz/api/config ，看到 `"edit":true` 就开通了。
 
+**表述页的“问 AI”**：在 DeepInfra 后台 API Keys 页面新建一个密钥，填为 Secret `DEEPINFRA_API_KEY`；想用 Gemini 兜底，再把 Gemini 密钥填为 Secret `GEMINI_API_KEY`。两个都填时先问 DeepInfra，出错再问 Gemini；只填一个就只用那一个。换模型时填 Variable `DEEPINFRA_MODEL`（默认 `Qwen/Qwen3.8-Flash`）或 `GEMINI_MODEL`（默认 `gemini-3.8-flash`），值只写模型名本身。填好后运行一次 Deploy Worker。
+
 **以后想加人机验证**：Cloudflare 左侧 **Turnstile** → **Add widget**，Hostname 加 `formalnaturalist.co.nz` 和 `www.formalnaturalist.co.nz`，模式选 **Managed**。把 Secret Key 填为 Secret `TURNSTILE_SECRET`，Site Key 填为 Variable `TURNSTILE_SITEKEY`，再运行一次 Deploy Worker。
 
 ### 以后

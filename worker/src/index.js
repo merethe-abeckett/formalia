@@ -10,7 +10,7 @@
  *   POST /api/submit            提交一条编辑
  *   GET  /api/status?issue=N    查询某条编辑的处理结果（不必打开 GitHub）
  *   GET  /api/chat              灌水区聊天室（WebSocket，由 Durable Object ChatRoom 承载）
- *   POST /api/ask               交互式导读：就某条表述向 Gemini 提问（由 Durable Object AskGate 转发）
+ *   POST /api/ask               交互式导读：就某条表述向 AI 提问（由 Durable Object AskGate 转发）
  *
  * 绑定（在 Cloudflare 后台配置，见 docs/WEB_EDIT.md）：
  *   KV        FORMALIA_KV        限流计数、封禁名单、私有编辑日志
@@ -24,8 +24,10 @@
  *   Variable  SUBMIT_PER_DAY     全站每天可提交次数，默认 200
  *   Durable Object  CHAT         ChatRoom 类（灌水区）
  *   Secret    CHAT_ADMIN_TOKEN   聊天室管理员口令（删消息、封禁）
- *   Durable Object  ASK          AskGate 类（交互式导读：限流 + 调用 Gemini）
- *   Secret    GEMINI_API_KEY     Gemini 密钥
+ *   Durable Object  ASK          AskGate 类（交互式导读：限流 + 调用模型）
+ *   Secret    DEEPINFRA_API_KEY  DeepInfra 密钥（可选：设了就先问 DeepInfra，出错再问 Gemini）
+ *   Variable  DEEPINFRA_MODEL    DeepInfra 上的模型名，默认 Qwen/Qwen3.8-Flash
+ *   Secret    GEMINI_API_KEY     Gemini 密钥（两个密钥至少设一个）
  *   Variable  GEMINI_MODEL       模型名，默认 gemini-3.8-flash
  *   Variable  ASK_PER_HOUR / ASK_PER_DAY  每个匿名编号每小时、全站每天的提问上限，默认 20 / 300
  *
@@ -351,13 +353,16 @@ export class ChatRoom {
 const ASK_MAX_Q = 500;
 const ASK_MAX_A = 4000;
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
+const DEEPINFRA_BASE = "https://api.deepinfra.com/v1/openai";
+const DEEPINFRA_MODEL = "Qwen/Qwen3.8-Flash";
+const RETRY = [429, 500, 502, 503, 504];
 
 export function cleanAsk(s, max) {
   return String(s ?? "").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").trim().slice(0, max);
 }
 
 async function ask(request, env, reply, url) {
-  if (!env.GEMINI_API_KEY || !env.ASK) return reply(503, { ok: false, error: "问答功能暂未开通" });
+  if (!(env.DEEPINFRA_API_KEY || env.GEMINI_API_KEY) || !env.ASK) return reply(503, { ok: false, error: "问答功能暂未开通" });
   const raw = await request.text();
   if (raw.length > 16 * 1024) return reply(413, { ok: false, error: "问题太长了" });
   let req; try { req = JSON.parse(raw); } catch { return reply(400, { ok: false, error: "提交格式不对" }); }
@@ -378,7 +383,7 @@ async function ask(request, env, reply, url) {
   const ctx = await r.json().catch(() => null);
   if (!ctx || ctx.id !== id) return reply(404, { ok: false, error: "没有这条表述" });
 
-  // 放在美国机房的 Durable Object 里调用 Gemini：避开 Gemini 不支持的地区，也让全站计数只有一份
+  // 放在美国机房的 Durable Object 里调用模型：避开 Gemini 不支持的地区，也让全站计数只有一份
   const stub = env.ASK.get(env.ASK.idFromName("gemini"), { locationHint: "wnam" });
   const res = await stub.fetch(new Request("https://ask/q", { method: "POST", body: JSON.stringify({ anon, ctx, question, history }) }));
   return reply(res.status, await res.json());
@@ -444,7 +449,7 @@ export class AskGate {
         body: JSON.stringify(body), signal: AbortSignal.timeout(45000) });
       if (r.ok) return { ok: true, data: await r.json() };
       last = { ok: false, status: r.status, text: (await r.text()).slice(0, 300) };
-      if (![429, 500, 502, 503, 504].includes(r.status)) break;
+      if (!RETRY.includes(r.status)) break;
       await new Promise(res => setTimeout(res, 1500 * (attempt + 1)));
     }
     return last;
@@ -459,16 +464,40 @@ export class AskGate {
     return names[0] || null;
   }
 
-  async fetch(request) {
-    const { anon, ctx, question, history } = await request.json();
-    const json = (status, obj) => new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
-    const why = await this.take(anon);
-    if (why) return json(429, { ok: false, error: why });
+  /** DeepInfra 的 OpenAI 兼容接口。失败时只重试一次，然后交给 Gemini。 */
+  async deepinfra(model, messages) {
+    let last;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const r = await fetch(`${DEEPINFRA_BASE}/chat/completions`, {
+        method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${this.env.DEEPINFRA_API_KEY}` },
+        body: JSON.stringify({ model, messages, temperature: 0.2, max_tokens: 2048 }), signal: AbortSignal.timeout(30000) });
+      if (r.ok) return { ok: true, data: await r.json() };
+      last = { ok: false, status: r.status };
+      if (!RETRY.includes(r.status)) break;
+      await new Promise(res => setTimeout(res, 1500));
+    }
+    return last;
+  }
 
+  async askDeepInfra(system, question, history) {
+    const model = this.env.DEEPINFRA_MODEL || DEEPINFRA_MODEL;
+    const messages = [{ role: "system", content: system }];
+    for (const h of history || []) messages.push({ role: "user", content: h.q }, { role: "assistant", content: h.a });
+    messages.push({ role: "user", content: question });
+    let r;
+    try { r = await this.deepinfra(model, messages); } catch { return { status: 504 }; }
+    if (!r.ok) return { status: r.status };
+    const msg = ((r.data.choices || [])[0] || {}).message || {};
+    // 思考模型可能把推理过程放在 <think> 里，只留最终回答
+    const answer = String(msg.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim().slice(0, ASK_MAX_A);
+    return answer ? { answer, model } : { status: 502 };
+  }
+
+  async askGemini(system, question, history) {
     const contents = [];
     for (const h of history || []) contents.push({ role: "user", parts: [{ text: h.q }] }, { role: "model", parts: [{ text: h.a }] });
     contents.push({ role: "user", parts: [{ text: question }] });
-    const body = { systemInstruction: { parts: [{ text: askSystemPrompt(ctx) }] }, contents,
+    const body = { systemInstruction: { parts: [{ text: system }] }, contents,
                    generationConfig: { temperature: 0.2, maxOutputTokens: 2048 } };
 
     let model = this.model || this.env.GEMINI_MODEL || "gemini-3.8-flash";
@@ -479,12 +508,28 @@ export class AskGate {
         const alt = await this.fallbackModel();
         if (alt && alt !== model) { model = alt; r = await this.gemini(model, body); }
       }
-    } catch { return json(504, { ok: false, error: "Gemini 没有及时回应，请稍后再试" }); }
-    if (!r.ok) return json(502, { ok: false, error: r.status === 429 ? "Gemini 现在太忙，请稍后再试" : "Gemini 暂时无法回答，请稍后再试" });
+    } catch { return { status: 504 }; }
+    if (!r.ok) return { status: r.status };
     this.model = model;
     const cand = (r.data.candidates || [])[0] || {};
     const answer = ((cand.content || {}).parts || []).filter(p => p.text && !p.thought).map(p => p.text).join("").trim().slice(0, ASK_MAX_A);
-    if (!answer) return json(502, { ok: false, error: cand.finishReason === "SAFETY" ? "这个问题 Gemini 不愿回答，换个问法试试" : "Gemini 没有给出回答，请换个问法再试" });
-    return json(200, { ok: true, answer, model });
+    return answer ? { answer, model } : { status: 502, safety: cand.finishReason === "SAFETY" };
+  }
+
+  async fetch(request) {
+    const { anon, ctx, question, history } = await request.json();
+    const json = (status, obj) => new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
+    const why = await this.take(anon);
+    if (why) return json(429, { ok: false, error: why });
+
+    // 先问 DeepInfra（设了密钥时），出错或没有回答再问 Gemini
+    const system = askSystemPrompt(ctx);
+    let r = { status: 503 };
+    if (this.env.DEEPINFRA_API_KEY) r = await this.askDeepInfra(system, question, history);
+    if (!r.answer && this.env.GEMINI_API_KEY) r = await this.askGemini(system, question, history);
+    if (r.answer) return json(200, { ok: true, answer: r.answer, model: r.model });
+    if (r.status === 504) return json(504, { ok: false, error: "模型没有及时回应，请稍后再试" });
+    if (r.safety) return json(502, { ok: false, error: "这个问题模型不愿回答，换个问法试试" });
+    return json(502, { ok: false, error: r.status === 429 ? "模型现在太忙，请稍后再试" : "模型暂时无法回答，请稍后再试" });
   }
 }

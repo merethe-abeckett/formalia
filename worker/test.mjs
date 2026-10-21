@@ -114,6 +114,7 @@ const CTX = { id: "20261014-01", declaration: "Registry.Goldbach.S20261014_01", 
   lean: "def S20261014_01 : Prop := ∀ n : ℕ, 2 < n → Even n → ∃ p q, Nat.Prime p ∧ Nat.Prime q ∧ n = p + q",
   dependencies: [{ name: "Nat.Prime", module: "Mathlib.Data.Nat.Prime.Defs" }], guide: "导读", restatement: { text: "复述" } };
 const gemCalls = []; let gemStatus = [200]; let gemModels = [];
+const diCalls = []; let diStatus = [200];
 const baseFetch = globalThis.fetch;
 globalThis.fetch = async (url, init = {}) => {
   url = String(url);
@@ -127,6 +128,13 @@ globalThis.fetch = async (url, init = {}) => {
     return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: "思考", thought: true }, { text: "`Nat.Prime p` 表示 p 是素数。" }] } }] }));
   }
   if (url.includes("generativelanguage.googleapis.com/v1beta/models?")) return new Response(JSON.stringify({ models: gemModels }));
+  if (url === "https://api.deepinfra.com/v1/openai/chat/completions") {
+    assert.equal(init.headers.Authorization, "Bearer dikey");
+    const body = JSON.parse(init.body); diCalls.push(body);
+    const st = diStatus.length > 1 ? diStatus.shift() : diStatus[0];
+    if (st !== 200) return new Response("err", { status: st });
+    return new Response(JSON.stringify({ choices: [{ message: { role: "assistant", content: "<think>推理</think>\n`p` 是素数。" } }] }));
+  }
   return baseFetch(url, init);
 };
 class Storage { constructor() { this.m = new Map(); } async get(k) { return structuredClone(this.m.get(k)); } async put(k, v) { this.m.set(k, structuredClone(v)); } }
@@ -165,5 +173,25 @@ gemStatus = [404, 200]; gemModels = [{ name: "models/gemini-9-flash", supportedG
 r = await askPost({ id: "20261014-01", question: "换模型" }); j = await r.json(); assert.equal(r.status, 200); assert.equal(j.model, "gemini-9-flash");
 ok("ask: falls back to newest flash model on 404");
 gemStatus = [400]; r = await askPost({ id: "20261014-01", question: "坏请求" }); assert.equal(r.status, 502); gemStatus = [200]; ok("ask: Gemini error → 502");
+// DeepInfra 在前，Gemini 兜底
+const diEnv = { ...askEnv, DEEPINFRA_API_KEY: "dikey", DEEPINFRA_MODEL: "org/model-x" };
+gate = new AskGate({ storage: new Storage() }, diEnv);
+diEnv.ASK = { idFromName: (n) => n, get: () => ({ fetch: (req) => gate.fetch(req) }) };
+let before = gemCalls.length;
+r = await askPost({ id: "20261014-01", question: "p 是什么？", history: [{ q: "上一问", a: "上一答" }] }, "203.0.113.30", diEnv);
+j = await r.json(); assert.equal(r.status, 200, JSON.stringify(j));
+assert.equal(j.answer, "`p` 是素数。"); assert.equal(j.model, "org/model-x"); assert.equal(gemCalls.length, before);
+const di = diCalls.at(-1);
+assert.equal(di.model, "org/model-x");
+assert.deepEqual(di.messages.map(m => m.role), ["system", "user", "assistant", "user"]);
+assert.ok(di.messages[0].content.includes(CTX.lean)); assert.equal(di.messages[3].content, "p 是什么？");
+ok("ask: DeepInfra first, <think> dropped, Gemini not called");
+diStatus = [500]; r = await askPost({ id: "20261014-01", question: "兜底" }, "203.0.113.31", diEnv); j = await r.json();
+assert.equal(r.status, 200); assert.equal(j.model, "gemini-x-flash"); assert.equal(gemCalls.length, before + 1); diStatus = [200];
+ok("ask: DeepInfra down → Gemini answers");
+const diOnly = { ...diEnv, GEMINI_API_KEY: "" }; gate = new AskGate({ storage: new Storage() }, diOnly); diOnly.ASK = { idFromName: (n) => n, get: () => ({ fetch: (req) => gate.fetch(req) }) };
+r = await askPost({ id: "20261014-01", question: "只有 DeepInfra" }, "203.0.113.32", diOnly); assert.equal(r.status, 200);
+diStatus = [400]; r = await askPost({ id: "20261014-01", question: "坏" }, "203.0.113.32", diOnly); assert.equal(r.status, 502); diStatus = [200];
+ok("ask: DeepInfra alone works; its error → 502");
 assert.ok(askSystemPrompt(CTX).includes("不可以")); 
 console.log(`worker tests: ${n} passed`);

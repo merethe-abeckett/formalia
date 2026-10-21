@@ -1,4 +1,4 @@
-// 交互式导读：在表述页面上向 Gemini 提问。代码许可：Apache-2.0。
+// 交互式导读：在表述页面上向 AI 提问（Worker 决定用哪个模型）。代码许可：Apache-2.0。
 // 浏览器只发送编号和问题；表述代码由 Worker 从本站 /ask/<编号>.json 读取。
 (function () {
   const box = document.getElementById("ask");
@@ -17,7 +17,7 @@
     const q = input.value.trim();
     if (!q || btn.disabled) return;
     add("q", esc(q));
-    input.value = ""; btn.disabled = true; st.textContent = "Gemini 正在回答……";
+    input.value = ""; btn.disabled = true; st.textContent = "正在回答……";
     try {
       const r = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, question: q, history: history.slice(-3) }) });
