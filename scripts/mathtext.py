@@ -81,7 +81,7 @@ def ascii_words(s):
     return re.findall(r"[A-Za-z0-9]+", s)
 
 # 网站顶层已有的目录和文件；猜想的网址名（现用或旧的）不能和它们重名，否则会覆盖这些页面
-RESERVED_SLUGS = {"about", "ask", "chat", "edit", "essays", "proofs", "search", "api", "cdn-cgi", "index", "statements", "recent"}
+RESERVED_SLUGS = {"about", "ask", "chat", "edit", "essays", "proofs", "search", "api", "cdn-cgi", "index", "statements", "recent", "s"}
 
 def slugify(name, limit=80):
     """名称 → 网址名：小写、连字符分隔，超长时在单词边界截断。"""

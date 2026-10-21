@@ -501,7 +501,8 @@ def render_statement(conj, meta, lean_src, check, tc, deps):
     if not meta.get("archived"):
         body += "<h2>自己验证</h2><p>不想相信本站的检查结果？在自己电脑上用同样的版本重跑一遍：</p>" + verify_html(meta, tc)
     cite = citation(conj, meta, tc, deps)
-    body += ("<h2>引用</h2><p>在论文、公告或证明说明里提到这条表述时，请引用编号。纯文本：</p>"
+    body += ("<h2>引用</h2><p>在论文、公告或证明说明里提到这条表述时，请引用编号。永久短链接："
+             f'<a href="../../s/{esc(sid)}/index.html"><code>{esc(short_url(sid))}</code></a>。纯文本：</p>'
              f"<pre class=\"wrap\"><code>{esc(cite['text'])}</code></pre><p>BibTeX：</p><pre><code>{esc(cite['bibtex'])}</code></pre>"
              f'<p class="note">机器可读的完整数据：<a href="../../statements/{esc(sid)}.json">statements/{esc(sid)}.json</a>，格式见<a href="../../about/api.html">数据接口</a>。</p>')
     base = "Archive" if meta.get("archived") else "Conjectures"
@@ -737,13 +738,20 @@ def founder_quote():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     return next((l for l in text.splitlines() if l.startswith(">") and "我觉得中国" in l), "")
 
-def redirect_page(target, title):
+def redirect_page(target, title, lead="这个页面已经搬到"):
     """旧网址的跳转页：立即跳到新地址，保留 ?查询 和 #锚点；不支持脚本时靠 meta refresh 和链接。"""
     t = esc(target)
     return (f'<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>{esc(title)} · {SITE_NAME}</title>'
             f'<meta name="robots" content="noindex"><link rel="canonical" href="{t}"><meta http-equiv="refresh" content="0; url={t}">'
             f'<script>location.replace({json.dumps(target)} + location.search + location.hash)</script></head>'
-            f'<body><p>这个页面已经搬到 <a href="{t}">{esc(title)}</a>。</p></body></html>')
+            f'<body><p>{esc(lead)} <a href="{t}">{esc(title)}</a>。</p></body></html>')
+
+def write_short_links(conj, ids):
+    """短链接 /s/<编号>/：只认编号，猜想改名、换网址名都不受影响，适合印在论文和徽章里。"""
+    cname = conj.get("name_zh") or conj["name"]
+    for sid in ids:
+        d = OUT / "s" / sid; d.mkdir(parents=True, exist_ok=True)
+        (d / "index.html").write_text(redirect_page(f"../../{conj['slug']}/{sid}/index.html", f"#{sid} · {cname}", "前往"), encoding="utf-8")
 
 def write_redirects(conj, ids):
     """猜想改过网址名时，在每个旧网址名下给猜想页和各条表述页写跳转页。"""
@@ -757,6 +765,7 @@ def write_redirects(conj, ids):
 
 # ---------- 引用、数据接口、最近更新、站点地图、404 ----------
 def statement_url(slug, sid): return f"{SITE_URL}/{slug}/{sid}/index.html"
+def short_url(sid): return f"{SITE_URL}/s/{sid}/"
 
 def bib_escape(t): return re.sub(r"([#_&%$])", r"\\\1", t)
 
@@ -765,7 +774,7 @@ def citation(conj, meta, tc, deps):
     sid, decl = meta["id"], meta["declaration"]
     rev = next((r for n, r, _ in deps if n == "mathlib"), "?")[:12]
     lean = tc.split(":")[-1]
-    url = statement_url(conj["slug"], sid)
+    url = short_url(sid)          # 短链接只认编号，猜想改名也不会失效
     name = conj["name"]
     text = f"Formalia statement #{sid} ({name}). Lean declaration {decl}; Lean {lean}, Mathlib {rev}. {url}"
     bib = ("@misc{formalia-" + sid + ",\n"
@@ -788,7 +797,7 @@ def write_api(tc, deps):
         base = "Archive" if meta.get("archived") else "Conjectures"
         rec = {
             "schema": "formalia.statement/1",
-            "id": sid, "url": statement_url(conj["slug"], sid), "json_url": f"{SITE_URL}/statements/{sid}.json",
+            "id": sid, "url": statement_url(conj["slug"], sid), "short_url": short_url(sid), "json_url": f"{SITE_URL}/statements/{sid}.json",
             "conjecture": {"slug": conj["slug"], "name": conj["name"], "name_zh": conj.get("name_zh") or "",
                            "url": f"{SITE_URL}/{conj['slug']}/index.html"},
             "declaration": meta["declaration"], "negation": "¬ " + meta["declaration"], "module": meta["module"],
@@ -816,6 +825,37 @@ def write_api(tc, deps):
     (OUT / "about" / "api.html").write_text(page("数据接口", [("数据接口", None)],
         "<h1>数据接口</h1>" + md_to_html((SITE_SRC / "api.md").read_text(encoding="utf-8").replace("{{SITE}}", SITE_URL)), 1,
         desc="Formalia 的机器可读数据：全部表述的 JSON 索引、单条表述的完整信息和引用格式。"), encoding="utf-8")
+
+def write_llms_txt(index_rows):
+    """llms.txt（llmstxt.org 的约定）：给 AI 助手和检索工具的一页说明，指向机器可读的数据。"""
+    n = sum(k for _, k in index_rows)
+    lines = [
+        "# Formalia", "",
+        "> A neutral registry of Lean 4 statements of mathematical conjectures. Formalia lists, it does not judge: "
+        "each statement has a permanent ID (YYYYMMDD-NN) and fixed Lean code, and proof or disproof claims are "
+        "registered only after they compile against the pinned Lean and Mathlib versions.", "",
+        f"The site is written in Chinese; the data below is language-neutral. It currently lists {n} statements "
+        f"for {len(index_rows)} conjectures. Cite a statement by its ID, e.g. \"Formalia statement #20261014-01\", "
+        f"or link to {SITE_URL}/s/<ID>/.", "",
+        "Important: a registered statement is one person's formalization. It may differ from the conjecture as "
+        "mathematicians state it. Formalia does not certify that a statement is a faithful translation, and a "
+        "registered claim means only that the submitted proof compiles against that exact Lean statement.", "",
+        "## Data",
+        f"- [All statements (JSON index)]({SITE_URL}/statements.json): ID, conjecture, Lean declaration, check status, claim counts",
+        f"- [One statement (JSON)]({SITE_URL}/statements/20261014-01.json): full Lean source, pinned versions, checker report, claims, citation; replace the ID",
+        f"- [Data documentation]({SITE_URL}/about/api.html)",
+        f"- [Recent changes (Atom feed)]({SITE_URL}/feed.xml)", "",
+        "## Pages",
+        f"- [Home]({SITE_URL}/index.html): all conjectures",
+        f"- [Guide]({SITE_URL}/about/guide.html): how statements and claims are registered and checked",
+        f"- [What is Lean]({SITE_URL}/about/lean.html): an introduction for non-specialists",
+        f"- [Search]({SITE_URL}/search/index.html)", "",
+        "## Conjectures",
+    ]
+    for conj, k in sorted(index_rows, key=lambda r: r[0]["name"].lower()):
+        zh = f" ({conj['name_zh']})" if conj.get("name_zh") and conj["name_zh"] != conj["name"] else ""
+        lines.append(f"- [{conj['name']}{zh}]({SITE_URL}/{conj['slug']}/index.html): {k} statement{'s' if k != 1 else ''}")
+    (OUT / "llms.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 def events(index_rows, essays):
     """最近更新：新表述、证明或证否声明、新解读、归档。按时间倒序。"""
@@ -955,7 +995,9 @@ def main():
                 archived.append(meta)
         (OUT / conj["slug"]).mkdir(parents=True, exist_ok=True)
         (OUT / conj["slug"] / "index.html").write_text(render_conjecture(conj, entries, archived), encoding="utf-8")
-        write_redirects(conj, [m["id"] for m, _ in entries] + [m["id"] for m in archived])
+        ids = [m["id"] for m, _ in entries] + [m["id"] for m in archived]
+        write_redirects(conj, ids)
+        write_short_links(conj, ids)
         index_rows.append((conj, len(entries)))
     (OUT / "index.html").write_text(render_index(index_rows, tc, deps, all_ok), encoding="utf-8")
     write_edit_pages(index_rows)
@@ -969,6 +1011,7 @@ def main():
     (OUT / "ask.js").write_text((SITE_SRC / "ask.js").read_text(encoding="utf-8"), encoding="utf-8")
     write_api(tc, deps)
     write_recent_and_feed(index_rows, essays)
+    write_llms_txt(index_rows)
     write_404()
     finalize()
     (OUT / ".nojekyll").write_text("")

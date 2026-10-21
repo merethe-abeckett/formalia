@@ -141,6 +141,16 @@ with tempfile.TemporaryDirectory() as t:
     check(len({e.find(A + "id").text for e in ents}) == len(ents), "feed entry ids are unique")
     rec = (site / "recent" / "index.html").read_text(encoding="utf-8")
     check(rec.count("<li>") >= len(stmts) + len(list((r / "Essays").glob("J*.json")) if (r / "Essays").exists() else []), "recent page lists every statement and essay")
+    for m in stmts:
+        sp = site / "s" / m["id"] / "index.html"
+        check(sp.exists() and f'../../{m["conjecture"]}/{m["id"]}/index.html' in sp.read_text(encoding="utf-8"), f"short link /s/{m['id']}/")
+    check(not any("/s/" in u for u in locs), "sitemap skips short-link redirects")
+    one = json.loads((site / "statements" / f"{stmts[0]['id']}.json").read_text(encoding="utf-8"))
+    eq(one["short_url"], f"{SITE}/s/{stmts[0]['id']}/", "JSON short_url")
+    check(one["short_url"] in one["citation"]["text"], "citation uses the short link")
+    llms = (site / "llms.txt").read_text(encoding="utf-8")
+    check(llms.startswith("# Formalia\n") and f"{SITE}/statements.json" in llms, "llms.txt title and data link")
+    check(all(f"{SITE}/{sl}/index.html" in llms for sl in slugs), "llms.txt lists every conjecture")
     nf = (site / "404.html").read_text(encoding="utf-8")
     check('<base href="/">' in nf and 'content="noindex"' in nf and 'rel="canonical"' not in nf, "404 page uses base, noindex and no canonical")
     check('action="search/index.html"' in nf, "404 page has a search box")

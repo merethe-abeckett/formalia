@@ -16,7 +16,7 @@ Formalia 的全部内容都有机器可读的版本，不需要注册，也没�
 
 例如 `{{SITE}}/statements/20261014-01.json`。字段：
 
-- `id`、`url`、`json_url`：编号、网页地址、本文件地址。
+- `id`、`url`、`short_url`、`json_url`：编号、网页地址、永久短链接、本文件地址。
 - `conjecture`：所属猜想的网址名、英文名、中文名和页面地址。
 - `declaration`、`negation`、`module`：Lean 声明的完整名称、它的否命题、所在模块。证明声明要证明的就是 `declaration` 本身，证否声明要证明的是 `negation`。
 - `lean`、`lean_path`：表述文件的完整源码，以及它在仓库里的路径。
@@ -29,6 +29,22 @@ Formalia 的全部内容都有机器可读的版本，不需要注册，也没�
 - `citation`：纯文本和 BibTeX 两种引用格式。
 
 字段只会增加，不会改名或删除。如果将来需要不兼容的改动，会换一个新的 `schema` 值，例如 `formalia.statement/2`。
+
+## 短链接
+
+```
+{{SITE}}/s/<编号>/
+```
+
+只认编号，跳到这条表述的页面。猜想改名、换网址名都不会失效，适合印在论文、幻灯片和徽章里。
+
+## 给 AI 助手
+
+```
+{{SITE}}/llms.txt
+```
+
+按 [llms.txt](https://llmstxt.org/) 约定写的一页英文说明：登记库是什么、不是什么，数据在哪里，以及全部猜想的列表。
 
 ## 引用
 
